@@ -1,4 +1,4 @@
-namespace Contracts.Employee;
+namespace Contracts.EmployeeEntities;
 
 /// <summary>
 /// Смена на человека

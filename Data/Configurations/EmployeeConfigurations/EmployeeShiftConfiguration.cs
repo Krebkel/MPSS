@@ -1,8 +1,8 @@
-using Contracts.Employee;
+using Contracts.EmployeeEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Data.Configurations.Employee;
+namespace Data.Configurations.EmployeeConfigurations;
 
 internal class EmployeeShiftConfiguration : IEntityTypeConfiguration<EmployeeShift>
 {

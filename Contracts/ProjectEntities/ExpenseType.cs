@@ -1,4 +1,4 @@
-namespace Contracts.Project;
+namespace Contracts.ProjectEntities;
 
 /// <summary>
 /// Тип расхода

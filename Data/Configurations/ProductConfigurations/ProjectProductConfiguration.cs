@@ -1,9 +1,8 @@
-using Contracts;
-using Contracts.Product;
+using Contracts.ProductEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Data.Configurations.Product;
+namespace Data.Configurations.ProductConfigurations;
 
 internal class ProjectProductConfiguration : IEntityTypeConfiguration<ProjectProduct>
 {

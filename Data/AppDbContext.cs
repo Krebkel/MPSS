@@ -1,10 +1,10 @@
-using Contracts.Employee;
-using Contracts.Product;
-using Contracts.Project;
 using System.Reflection;
+using Contracts.EmployeeEntities;
+using Contracts.ProductEntities;
+using Contracts.ProjectEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using ProjectProduct = Contracts.Product.ProjectProduct;
+using ProjectProduct = Contracts.ProductEntities.ProjectProduct;
 
 namespace Data;
 

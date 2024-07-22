@@ -1,8 +1,8 @@
-using Contracts.Project;
+using Contracts.ProjectEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Data.Configurations.Project;
+namespace Data.Configurations.ProjectConfigurations;
 
 internal class CounteragentConfiguration : IEntityTypeConfiguration<Counteragent>
 {

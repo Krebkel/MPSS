@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Data.Configurations.Product;
+namespace Data.Configurations.ProductConfigurations;
 
-internal class ProductConfiguration : IEntityTypeConfiguration<Contracts.Product.Product>
+internal class ProductConfiguration : IEntityTypeConfiguration<Contracts.ProductEntities.Product>
 {
-    public void Configure(EntityTypeBuilder<Contracts.Product.Product> builder)
+    public void Configure(EntityTypeBuilder<Contracts.ProductEntities.Product> builder)
     {
         builder.HasKey(m => m.Id);
         builder.Property(es => es.Name).IsRequired().HasMaxLength(100);
