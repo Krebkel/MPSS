@@ -22,11 +22,17 @@ public class EmployeeShiftService : IEmployeeShiftService
         _context.SaveChanges();
         return employeeShift.Id;
     }
+    
+    /// <inheritdoc />
+    public EmployeeShift GetEmployeeShift(int employeeShiftId)
+    {
+        return _context.EmployeeShifts.Find(employeeShiftId);
+    }
 
     /// <inheritdoc />
-    public void UpdateEmployeeShift(EmployeeShift employeeShift)
+    public void UpdateEmployeeShift(EmployeeShift employeeShiftId)
     {
-        _context.EmployeeShifts.Update(employeeShift);
+        _context.EmployeeShifts.Update(employeeShiftId);
         _context.SaveChanges();
     }
 

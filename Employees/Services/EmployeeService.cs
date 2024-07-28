@@ -24,10 +24,27 @@ public class EmployeeService : IEmployeeService
     }
 
     /// <inheritdoc />
+    public Employee GetEmployee(int employeeId)
+    {
+        return _context.Employees.Find(employeeId);
+    }
+    
+    /// <inheritdoc />
     public void UpdateEmployee(Employee employee)
     {
         _context.Employees.Update(employee);
         _context.SaveChanges();
+    }
+
+    /// <inheritdoc />
+    public void DeleteEmployee(int employeeId)
+    {
+        var employee = _context.Employees.Find(employeeId);
+        if (employee != null)
+        {
+            _context.Employees.Remove(employee);
+            _context.SaveChanges();
+        }
     }
 
     /// <inheritdoc />

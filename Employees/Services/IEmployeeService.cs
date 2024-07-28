@@ -8,7 +8,7 @@ namespace Employees.Services;
 public interface IEmployeeService
 {
     /// <summary>
-    /// Добавление сотрудника в базу данных
+    /// Создание нового сотрудника в базе данных
     /// </summary>
     /// <param name="employee">Сотрудник</param>
     /// <returns>ID созданного сотрудника</returns>
@@ -19,6 +19,19 @@ public interface IEmployeeService
     /// </summary>
     /// <param name="employee">Сотрудник</param>
     void UpdateEmployee(Employee employee);
+    
+    /// <summary>
+    /// Получение данных сотрудника из базы данных
+    /// </summary>
+    /// <param name="employeeId">ID сотрудника</param>
+    /// <returns>Сотрудник</returns>
+    Employee GetEmployee(int employeeId);
+
+    /// <summary>
+    /// Удаление данных сотрудника из базы данных
+    /// </summary>
+    /// <param name="employeeId">ID сотрудника</param>
+    void DeleteEmployee(int employeeId);
 
     /// <summary>
     /// Назначение смены сотруднику

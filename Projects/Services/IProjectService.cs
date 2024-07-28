@@ -15,6 +15,13 @@ public interface IProjectService
     int CreateProject(Project project);
 
     /// <summary>
+    /// Получение данных проекта из базы данных
+    /// </summary>
+    /// <param name="projectId">ID проекта</param>
+    /// <returns>Проект</returns>
+    Project GetProject(int projectId);
+
+    /// <summary>
     /// Обновление данных проекта в базе данных
     /// </summary>
     /// <param name="project">Проект</param>

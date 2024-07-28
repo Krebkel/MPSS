@@ -15,6 +15,13 @@ public interface IEmployeeShiftService
     int CreateEmployeeShift(EmployeeShift employeeShift);
 
     /// <summary>
+    /// Получение данных смены сотрудника из базы данных
+    /// </summary>
+    /// <param name="employeeShiftId">ID смены сотрудника</param>
+    /// <returns>Смена</returns>
+    EmployeeShift GetEmployeeShift(int employeeShiftId);
+    
+    /// <summary>
     /// Обновление данных смены сотрудника в базе данных
     /// </summary>
     /// <param name="employeeShift">Смена сотрудника</param>

@@ -10,9 +10,13 @@
     <ItemGroup>
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\Data\Data.csproj" />
+      <ProjectReference Include="..\Employees\Employees.csproj" />
+      <ProjectReference Include="..\Products\Products.csproj" />
+      <ProjectReference Include="..\Projects\Projects.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
     </ItemGroup>
 

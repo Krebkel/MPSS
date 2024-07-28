@@ -22,6 +22,12 @@ public class ProjectService : IProjectService
         _context.SaveChanges();
         return project.Id;
     }
+    
+    /// <inheritdoc />
+    public Project GetProject(int projectId)
+    {
+        return _context.Projects.Find(projectId);
+    }
 
     /// <inheritdoc />
     public void UpdateProject(Project project)
