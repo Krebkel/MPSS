@@ -5,7 +5,7 @@ namespace Products;
 
 public static class DependencyRegistrations
 {
-    public static IServiceCollection AddPostgresInvoices(this IServiceCollection services)
+    public static IServiceCollection AddPostgresProducts(this IServiceCollection services)
     {
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IProductComponentService, ProductComponentService>();
