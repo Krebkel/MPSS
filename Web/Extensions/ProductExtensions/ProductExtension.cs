@@ -1,7 +1,5 @@
 using Contracts.ProductEntities;
-using Web.Requests;
 using Web.Requests.ProductRequests;
-using Web.Responses;
 using Web.Responses.ProductResponses;
 
 namespace Web.Extensions.ProductExtensions;

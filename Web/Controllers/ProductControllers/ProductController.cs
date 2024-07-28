@@ -2,9 +2,7 @@ using Products.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Web.Extensions.ProductExtensions;
-using Web.Requests;
 using Web.Requests.ProductRequests;
-using Web.Responses;
 using Web.Responses.ProductResponses;
 
 namespace Web.Controllers.ProductControllers;

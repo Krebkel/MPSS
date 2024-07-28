@@ -2,9 +2,7 @@ using Employees.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Web.Extensions.EmployeeExtensions;
-using Web.Requests;
 using Web.Requests.EmployeeRequests;
-using Web.Responses;
 using Web.Responses.EmployeeResponses;
 
 namespace Web.Controllers.EmployeeControllers;

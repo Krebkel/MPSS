@@ -1,7 +1,5 @@
 using Contracts.EmployeeEntities;
-using Web.Requests;
 using Web.Requests.EmployeeRequests;
-using Web.Responses;
 using Web.Responses.EmployeeResponses;
 
 namespace Web.Extensions.EmployeeExtensions;
