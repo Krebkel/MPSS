@@ -1,6 +1,6 @@
 using Contracts.ProjectEntities;
 
-namespace Web.Services.ProjectServices;
+namespace Projects.Services;
 
 /// <summary>
 /// Интерфейс сервиса для работы с контрагентами.

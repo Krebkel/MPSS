@@ -1,6 +1,6 @@
 using Contracts.EmployeeEntities;
 
-namespace Web.Services.EmployeeServices;
+namespace Employees.Services;
 
 /// <summary>
 /// Сервис для управления сменами сотрудников

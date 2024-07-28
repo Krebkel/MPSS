@@ -1,7 +1,7 @@
 using Contracts.ProjectEntities;
 using Data;
 
-namespace Web.Services.ProjectServices;
+namespace Projects.Services;
 
 /// <summary>
 /// Сервис для управления проектами
@@ -44,16 +44,22 @@ public class ProjectService : IProjectService
     /// <inheritdoc />
     public double CalculateTotalCost(int projectId)
     {
-        var project = _context.Projects.Find(projectId);
+        var projectProducts = _context.ProjectProducts
+            .Where(pp => pp.ProjectId == projectId)
+            .ToList();
 
-        if (project == null)
+        double totalCost = 0;
+
+        foreach (var projectProduct in projectProducts)
         {
-            throw new ArgumentException("Проект не найден.");
-        }
+            var product = _context.Products
+                .FirstOrDefault(p => p.Id == projectProduct.ProductId);
 
-        var totalCost = _context.EmployeeShifts
-            .Where(es => es.ProjectId == projectId)
-            .Sum(es => es.Wage ?? 0);
+            if (product != null)
+            {
+                totalCost += projectProduct.Quantity * (product.Cost + projectProduct.Markup);
+            }
+        }
 
         return totalCost;
     }

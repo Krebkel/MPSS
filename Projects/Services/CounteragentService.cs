@@ -1,7 +1,7 @@
 using Contracts.ProjectEntities;
 using Data;
 
-namespace Web.Services.ProjectServices;
+namespace Projects.Services;
 
 /// <summary>
 /// Сервис для работы с контрагентами

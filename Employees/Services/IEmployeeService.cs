@@ -1,6 +1,6 @@
 using Contracts.EmployeeEntities;
 
-namespace Web.Services.EmployeeServices;
+namespace Employees.Services;
 
 /// <summary>
 /// Интерфейс сервиса для работы с сотрудниками.
