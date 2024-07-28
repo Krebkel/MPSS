@@ -24,12 +24,11 @@ public interface IProductService
     /// Обновление данных изделия в базе данных
     /// </summary>
     /// <param name="productId">ID изделия</param>
-    public void DeleteProduct(int productId);
+    void DeleteProduct(int productId);
 
     /// <summary>
     /// Получение данных изделия из базы данных
     /// </summary>
     /// <param name="productId">ID изделия</param>
-    public Product GetProduct(int productId);
-
+    Product GetProduct(int productId);
 }

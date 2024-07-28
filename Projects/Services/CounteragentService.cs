@@ -24,6 +24,12 @@ public class CounteragentService : ICounteragentService
     }
 
     /// <inheritdoc />
+    public Counteragent GetCounteragent(int counteragentId)
+    {
+        return _context.Counteragents.Find(counteragentId);
+    }
+    
+    /// <inheritdoc />
     public void UpdateCounteragent(Counteragent counteragent)
     {
         _context.Counteragents.Update(counteragent);

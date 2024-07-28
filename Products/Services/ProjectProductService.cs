@@ -21,6 +21,12 @@ public class ProjectProductService : IProjectProductService
     }
 
     /// <inheritdoc />
+    public ProjectProduct GetProjectProduct(int projectProductId)
+    {
+        return _context.ProjectProducts.Find(projectProductId);
+    }
+    
+    /// <inheritdoc />
     public void UpdateProjectProduct(ProjectProduct projectProduct)
     {
         _context.ProjectProducts.Update(projectProduct);
@@ -36,11 +42,5 @@ public class ProjectProductService : IProjectProductService
             _context.ProjectProducts.Remove(projectProduct);
             _context.SaveChanges();
         }
-    }
-
-    /// <inheritdoc />
-    public ProjectProduct GetProjectProduct(int projectProductId)
-    {
-        return _context.ProjectProducts.Find(projectProductId);
     }
 }

@@ -19,6 +19,12 @@ public class ProductComponentService : IProductComponentService
         _context.SaveChanges();
         return productComponent.Id;
     }
+    
+    /// <inheritdoc />
+    public ProductComponent GetProductComponent(int productComponentId)
+    {
+        return _context.ProductComponents.Find(productComponentId);
+    }
 
     /// <inheritdoc />
     public void UpdateProductComponent(ProductComponent productComponent)
@@ -36,12 +42,6 @@ public class ProductComponentService : IProductComponentService
             _context.ProductComponents.Remove(productComponent);
             _context.SaveChanges();
         }
-    }
-
-    /// <inheritdoc />
-    public ProductComponent GetProductComponent(int productComponentId)
-    {
-        return _context.ProductComponents.Find(productComponentId);
     }
 
     /// <inheritdoc />
