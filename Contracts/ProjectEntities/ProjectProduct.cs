@@ -1,4 +1,4 @@
-namespace Contracts.Product;
+namespace Contracts.ProjectEntities;
 
 /// <summary>
 /// Производимая единица (Секция стеллажа, ящик, etc.) на проекте

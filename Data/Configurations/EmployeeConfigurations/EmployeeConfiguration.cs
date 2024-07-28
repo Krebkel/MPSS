@@ -1,11 +1,12 @@
+using Contracts.EmployeeEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Data.Configurations.Employee;
+namespace Data.Configurations.EmployeeConfigurations;
 
-internal class EmployeeConfiguration : IEntityTypeConfiguration<Contracts.Employee.Employee>
+internal class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 {
-    public void Configure(EntityTypeBuilder<Contracts.Employee.Employee> builder)
+    public void Configure(EntityTypeBuilder<Employee> builder)
     {
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Name).IsRequired().HasMaxLength(100);

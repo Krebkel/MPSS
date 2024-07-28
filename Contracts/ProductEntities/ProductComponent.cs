@@ -1,4 +1,4 @@
-namespace Contracts.Product;
+namespace Contracts.ProductEntities;
 
 /// <summary>
 /// Детали производимого продукта
