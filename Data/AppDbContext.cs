@@ -4,7 +4,6 @@ using Contracts.ProductEntities;
 using Contracts.ProjectEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using ProjectProduct = Contracts.ProductEntities.ProjectProduct;
 
 namespace Data;
 
