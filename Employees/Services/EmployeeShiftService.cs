@@ -28,6 +28,14 @@ public class EmployeeShiftService : IEmployeeShiftService
     {
         return _context.EmployeeShifts.Find(employeeShiftId);
     }
+    
+    /// <inheritdoc />
+    public List<EmployeeShift> GetAllEmployeeShifts(int employeeId)
+    {
+        return _context.EmployeeShifts
+            .Where(es => es.EmployeeId == employeeId)
+            .ToList();
+    }
 
     /// <inheritdoc />
     public void UpdateEmployeeShift(EmployeeShift employeeShiftId)

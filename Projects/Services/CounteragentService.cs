@@ -30,6 +30,12 @@ public class CounteragentService : ICounteragentService
     }
     
     /// <inheritdoc />
+    public List<Counteragent> GetAllCounteragents()
+    {
+        return _context.Counteragents.ToList();
+    }
+    
+    /// <inheritdoc />
     public void UpdateCounteragent(Counteragent counteragent)
     {
         _context.Counteragents.Update(counteragent);

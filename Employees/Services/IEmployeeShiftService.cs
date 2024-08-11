@@ -20,7 +20,14 @@ public interface IEmployeeShiftService
     /// <param name="employeeShiftId">ID смены сотрудника</param>
     /// <returns>Смена</returns>
     EmployeeShift GetEmployeeShift(int employeeShiftId);
-    
+
+    /// <summary>
+    /// Получение данных всех смен сотрудника из базы данных
+    /// </summary>
+    /// <param name="employeeId">ID сотрудника</param>
+    /// <returns>Список смен</returns>
+    List<EmployeeShift> GetAllEmployeeShifts(int employeeId);
+
     /// <summary>
     /// Обновление данных смены сотрудника в базе данных
     /// </summary>

@@ -27,6 +27,14 @@ public class ProjectProductService : IProjectProductService
     }
     
     /// <inheritdoc />
+    public List<ProjectProduct> GetAllProjectProducts(int projectId)
+    {
+        return _context.ProjectProducts
+            .Where(es => es.ProjectId == projectId)
+            .ToList();
+    }
+    
+    /// <inheritdoc />
     public void UpdateProjectProduct(ProjectProduct projectProduct)
     {
         _context.ProjectProducts.Update(projectProduct);

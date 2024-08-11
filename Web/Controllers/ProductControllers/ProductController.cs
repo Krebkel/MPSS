@@ -36,6 +36,22 @@ public class ProductController : ControllerBase
         return Ok(product.ToApiProduct());
     }
 
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApiProduct>))]
+    public IActionResult GetAllProducts()
+    {
+        var products = _productService.GetAllProducts();
+        
+        var apiProducts = products.Select(p => new ApiProduct()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Cost = p.Cost
+        }).ToList();        
+        
+        return Ok(apiProducts);
+    }
+
     [HttpPut("{id}")]
     public IActionResult UpdateProduct(int id, [FromBody] UpdateProductApiRequest apiRequest)
     {

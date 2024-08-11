@@ -25,6 +25,12 @@ public class ProductService : IProductService
     {
         return _context.Products.Find(productId);
     }
+    
+    /// <inheritdoc />
+    public List<Product> GetAllProducts()
+    {
+        return _context.Products.ToList();
+    }
 
     /// <inheritdoc />
     public void UpdateProduct(Product product)

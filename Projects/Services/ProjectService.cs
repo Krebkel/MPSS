@@ -28,6 +28,12 @@ public class ProjectService : IProjectService
     {
         return _context.Projects.Find(projectId);
     }
+    
+    /// <inheritdoc />
+    public List<Project> GetAllProjects()
+    {
+        return _context.Projects.ToList();
+    }
 
     /// <inheritdoc />
     public void UpdateProject(Project project)

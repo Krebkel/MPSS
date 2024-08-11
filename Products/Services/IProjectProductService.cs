@@ -12,6 +12,18 @@ public interface IProjectProductService
     int CreateProjectProduct(ProjectProduct projectProduct);
 
     /// <summary>
+    /// Получение изделия в проекте из базы данных
+    /// </summary>
+    /// <param name="projectProductId">ID изделия в проекте</param>
+    ProjectProduct GetProjectProduct(int projectProductId);
+
+    /// <summary>
+    /// Получение данных всех изделий в проекте
+    /// </summary>
+    /// <param name="projectId">ID проекта</param>
+    List<ProjectProduct> GetAllProjectProducts(int projectId);
+    
+    /// <summary>
     /// Обновление изделия в проекте в базе данных
     /// </summary>
     /// <param name="projectProduct">Изделие в проекте</param>
@@ -22,10 +34,4 @@ public interface IProjectProductService
     /// </summary>
     /// <param name="projectProductId">ID изделия в проекте</param>
     void DeleteProjectProduct(int projectProductId);
-
-    /// <summary>
-    /// Получение изделия в проекте из базы данных
-    /// </summary>
-    /// <param name="projectProductId">ID изделия в проекте</param>
-    ProjectProduct GetProjectProduct(int projectProductId);
 }

@@ -35,6 +35,24 @@ public class ProjectProductController : ControllerBase
         var projectProduct = _projectProductService.GetProjectProduct(id);
         return Ok(projectProduct.ToApiProjectProduct());
     }
+    
+    [HttpGet("project/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApiProjectProduct>))]
+    public IActionResult GetAllProjectProducts(int projectId)
+    {
+        var projectProducts = _projectProductService.GetAllProjectProducts(projectId);
+        
+        var apiProjectProducts = projectProducts.Select(pp => new ApiProjectProduct()
+        {
+            Id = pp.Id,
+            Markup = pp.Markup,
+            ProductId = pp.ProductId,
+            ProjectId = pp.ProjectId,
+            Quantity = pp.Quantity
+        }).ToList();        
+        
+        return Ok(apiProjectProducts);
+    }
 
     [HttpPut("{id}")]
     public IActionResult UpdateProjectProduct(int id, [FromBody] UpdateProjectProductApiRequest apiRequest)
