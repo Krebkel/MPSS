@@ -35,6 +35,24 @@ public class ProductComponentController : ControllerBase
         var productComponent = _productComponentService.GetProductComponent(id);
         return Ok(productComponent.ToApiProductComponent());
     }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApiProductComponent>))]
+    public IActionResult GetAllProductComponents()
+    {
+        var productComponents = _productComponentService.GetAllProductComponents();
+        
+        var response = productComponents.Select(es => new ApiProductComponent()
+        {
+            Id = es.Id,
+            Name = es.Name,
+            ProductId = es.ProductId,
+            Quantity = es.Quantity,
+            Weight = es.Weight
+        }).ToList();        
+        
+        return Ok(response);
+    }
 
     [HttpPut("{id}")]
     public IActionResult UpdateProductComponent(int id, [FromBody] UpdateProductComponentApiRequest apiRequest)

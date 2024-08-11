@@ -35,6 +35,27 @@ public class CounteragentController : ControllerBase
         var counteragent = _counteragentService.GetCounteragent(id);
         return Ok(counteragent.ToApiCounteragent());
     }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApiCounteragent>))]
+    public IActionResult GetAllCounteragents()
+    {
+        var counteragents = _counteragentService.GetAllCounteragents();
+        
+        var apiCounteragents = counteragents.Select(c => new ApiCounteragent()
+        {
+            Id = c.Id,
+            Name = c.Name,
+            AccountNumber = c.AccountNumber,
+            BIK = c.BIK,
+            Contact = c.Contact,
+            Phone = c.Phone,
+            INN = c.INN,
+            OGRN = c.OGRN
+        }).ToList();        
+        
+        return Ok(apiCounteragents);
+    }
 
     [HttpPut("{id}")]
     public IActionResult UpdateCounteragent(int id, [FromBody] UpdateCounteragentApiRequest apiRequest)

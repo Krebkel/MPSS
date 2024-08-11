@@ -13,6 +13,17 @@ public interface IProductService
     /// <param name="product">Изделие</param>
     /// <returns>ID созданного изделия</returns>
     int CreateProduct(Product product);
+    
+    /// <summary>
+    /// Получение данных изделия из базы данных
+    /// </summary>
+    /// <param name="productId">ID изделия</param>
+    Product GetProduct(int productId);
+
+    /// <summary>
+    /// Получение данных о всех изделиях из базы данных
+    /// </summary>
+    List<Product> GetAllProducts();
 
     /// <summary>
     /// Обновление данных изделия в базе данных
@@ -25,10 +36,4 @@ public interface IProductService
     /// </summary>
     /// <param name="productId">ID изделия</param>
     void DeleteProduct(int productId);
-
-    /// <summary>
-    /// Получение данных изделия из базы данных
-    /// </summary>
-    /// <param name="productId">ID изделия</param>
-    Product GetProduct(int productId);
 }

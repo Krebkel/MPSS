@@ -35,6 +35,28 @@ public class EmployeeController : ControllerBase
         var employee = _employeeService.GetEmployee(id);
         return Ok(employee.ToApiEmployee());
     }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApiEmployee>))]
+    public IActionResult GetAllEmployees()
+    {
+        var employees = _employeeService.GetAllEmployees();
+        
+        var apiEmployees = employees.Select(e => new ApiEmployee
+        {
+            Id = e.Id,
+            Name = e.Name,
+            AccountNumber = e.AccountNumber,
+            BIK = e.BIK,
+            DateOfBirth = e.DateOfBirth,
+            INN = e.INN,
+            IsDriver = e.IsDriver,
+            Passport = e.Passport,
+            Phone = e.Phone
+        }).ToList();        
+        
+        return Ok(apiEmployees);
+    }
 
     [HttpPut("{id}")]
     public IActionResult UpdateEmployee(int id, [FromBody] UpdateEmployeeApiRequest apiRequest)

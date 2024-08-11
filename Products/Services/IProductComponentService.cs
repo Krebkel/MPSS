@@ -11,6 +11,18 @@ public interface IProductComponentService
     /// <returns>ID созданного компонента изделия</returns>
     int CreateProductComponent(ProductComponent productComponent);
     
+    
+    /// <summary>
+    /// Получение компонента изделия из базы данных
+    /// </summary>
+    /// <param name="productComponentId">ID компонента изделия</param>
+    ProductComponent GetProductComponent(int productComponentId);
+
+    /// <summary>
+    /// Получение всех компонентов изделий из базы данных
+    /// </summary>
+    public List<ProductComponent> GetAllProductComponents();
+    
     /// <summary>
     /// Обновление компонента изделия в базе данных
     /// </summary>
@@ -22,12 +34,6 @@ public interface IProductComponentService
     /// </summary>
     /// <param name="productComponentId">ID компонента изделия</param>
     void DeleteProductComponent(int productComponentId);
-
-    /// <summary>
-    /// Получение компонента изделия из базы данных
-    /// </summary>
-    /// <param name="productComponentId">ID компонента изделия</param>
-    ProductComponent GetProductComponent(int productComponentId);
 
     /// <summary>
     /// Расчет веса компонентов изделия по количеству

@@ -43,6 +43,29 @@ public class EmployeeShiftController : ControllerBase
         var employeeShift = _employeeShiftService.GetEmployeeShift(id);
         return Ok(employeeShift.ToApiEmployeeShift());
     }
+    
+    [HttpGet("employee/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApiEmployeeShift>))]
+    public IActionResult GetAllEmployeeShifts(int employeeId)
+    {
+        var employeeShifts = _employeeShiftService.GetAllEmployeeShifts(employeeId);
+        
+        var response = employeeShifts.Select(es => new ApiEmployeeShift
+        {
+            Id = es.Id,
+            ProjectId = es.ProjectId,
+            EmployeeId = es.EmployeeId,
+            Date = es.Date,
+            Arrival = es.Arrival,
+            Departure = es.Departure,
+            HoursWorked = es.HoursWorked,
+            TravelTime = es.TravelTime,
+            ConsiderTravel = es.ConsiderTravel,
+            Wage = es.Wage
+        }).ToList();        
+        
+        return Ok(response);
+    }
 
     [HttpDelete("{id}")]
     public IActionResult DeleteEmployeeShift(int id)

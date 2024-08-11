@@ -35,6 +35,29 @@ public class ProjectController : ControllerBase
         var project = _projectService.GetProject(id);
         return Ok(project.ToApiProject());
     }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApiProject>))]
+    public IActionResult GetAllProjects()
+    {
+        var projects = _projectService.GetAllProjects();
+        
+        var apiProjects = projects.Select(p => new ApiProject()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Address = p.Address,
+            CounteragentId = p.CounteragentId,
+            DeadlineDate = p.DeadlineDate,
+            IsActive = p.IsActive,
+            DateSuspended = p.DateSuspended,
+            StartDate = p.StartDate,
+            ResponsibleEmployeeId = p.ResponsibleEmployeeId,
+            TotalCost = p.TotalCost
+        }).ToList();        
+        
+        return Ok(apiProjects);
+    }
 
     [HttpPut("{id}")]
     public IActionResult UpdateProject(int id, [FromBody] UpdateProjectApiRequest apiRequest)

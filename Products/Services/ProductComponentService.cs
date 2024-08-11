@@ -27,6 +27,12 @@ public class ProductComponentService : IProductComponentService
     }
 
     /// <inheritdoc />
+    public List<ProductComponent> GetAllProductComponents()
+    {
+        return _context.ProductComponents.ToList();
+    }
+
+    /// <inheritdoc />
     public void UpdateProductComponent(ProductComponent productComponent)
     {
         _context.ProductComponents.Update(productComponent);

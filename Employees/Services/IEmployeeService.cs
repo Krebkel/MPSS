@@ -28,6 +28,12 @@ public interface IEmployeeService
     Employee GetEmployee(int employeeId);
 
     /// <summary>
+    /// Получение данных всех сотрудников из базы данных
+    /// </summary>
+    /// <returns>Сотрудники</returns>
+    List<Employee> GetAllEmployees();
+
+    /// <summary>
     /// Удаление данных сотрудника из базы данных
     /// </summary>
     /// <param name="employeeId">ID сотрудника</param>

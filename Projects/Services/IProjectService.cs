@@ -22,6 +22,13 @@ public interface IProjectService
     Project GetProject(int projectId);
 
     /// <summary>
+    /// Получение данных всех проектов из базы данных
+    /// </summary>
+    /// <returns>Список проектов</returns>
+    List<Project> GetAllProjects();
+
+    
+    /// <summary>
     /// Обновление данных проекта в базе данных
     /// </summary>
     /// <param name="project">Проект</param>

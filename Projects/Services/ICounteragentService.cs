@@ -19,8 +19,14 @@ public interface ICounteragentService
     /// </summary>
     /// <param name="counteragentId">ID контрагента</param>
     /// <returns>Контрагент</returns>
-    public Counteragent GetCounteragent(int counteragentId);
+    Counteragent GetCounteragent(int counteragentId);
 
+    /// <summary>
+    /// Получение данных всех контрагентов из базы данных
+    /// </summary>
+    /// <returns>Список контрагентов</returns>
+    List<Counteragent> GetAllCounteragents();
+    
     /// <summary>
     /// Обновление данных контрагента в базе данных
     /// </summary>

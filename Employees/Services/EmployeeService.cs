@@ -30,6 +30,12 @@ public class EmployeeService : IEmployeeService
     }
     
     /// <inheritdoc />
+    public List<Employee> GetAllEmployees()
+    {
+        return _context.Employees.ToList();
+    }
+    
+    /// <inheritdoc />
     public void UpdateEmployee(Employee employee)
     {
         _context.Employees.Update(employee);
