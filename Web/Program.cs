@@ -46,7 +46,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-    c.RoutePrefix = string.Empty; // делает Swagger UI доступным по корневому URL
+    c.RoutePrefix = "swagger"; 
 });
 
 // Настройка статических файлов
@@ -62,18 +62,6 @@ app.UseDefaultFiles()
                MaxAge = TimeSpan.FromMinutes(1)
            };
        }
-   });
-
-// Инициализация базы данных
-InitializeDatabase(app);
+   }); 
 
 app.Run();
-
-void InitializeDatabase(IApplicationBuilder application)
-{
-    using var scope = application.ApplicationServices
-                                .GetRequiredService<IServiceScopeFactory>()
-                                .CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-}

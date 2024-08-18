@@ -1,0 +1,166 @@
+body {
+    font-family: 'Rosatom', sans-serif;
+    background-color: #f4f5f7;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    padding: 4.375rem 1.25rem 1.25rem 1.25rem; /* Отступы для контента */
+    width: 100%; /* Ширина основного контента */
+    height: 100vh; /* Высота экрана */
+    position: relative; /* Для работы с абсолютным позиционированием внутренних элементов */
+}
+
+/* Стили для панели вкладок */
+.navbar {
+    background-color: #f4f5f7;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    justify-content: left;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.navbar-nav .nav-link {
+    color: #7b7271;
+    font-size: 1.125rem;
+    padding: 0.625rem 1.25rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: inline-block;
+}
+
+.navbar-nav .nav-link:last-child {
+    border-right: none;
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+    background-color: #faeedb;
+    color: #1e1e2c;
+}
+
+/* Стили для фиксированного контента */
+.content {
+    background-color: #f4f5f7;
+    border-radius: 0.3rem;
+    box-shadow: 0rem 0rem 0.9375rem rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    position: fixed;
+    top: 4.125rem;
+    left: 16rem;
+    width: calc(100% - 20rem);
+    height: calc(100vh - 4.375rem);
+    overflow: auto;
+    z-index: 900;
+}
+
+/* Стили для левого меню */
+.sidebar {
+    background-color: #f4f5f7;
+    padding: 1rem;
+    position: fixed;
+    left: 0;
+    width: 13rem;
+    margin-top: 2rem;
+    height: calc(100vh);
+    overflow-y: auto;
+    z-index: 800; /* Под content */
+    font-size: 1.125rem;
+}
+
+.sidebar .nav {
+    list-style: none; /* Убирает маркеры (точки) у пунктов списка */
+    padding-left: 0; /* Убирает отступ слева */
+}
+
+.sidebar .nav-link {
+    display: block;
+    color: #7b7271;
+    border-radius: 0.3rem;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    background-color: #f4f5f7;
+    position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-decoration: none;
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+    background-color: #faeedb; /* Фон при наведении или активации */
+    color: #1e1e2c; /* Цвет текста при наведении или активации */
+}
+
+/* Стили для таблиц */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    border: 0.01rem solid #ddd;
+    padding: 0.75rem;
+    text-align: centre;
+}
+
+th {
+    background-color: #fbfbfb;
+    font-weight: bold;
+}
+
+.shortcol {
+    width: 0.5rem;
+}
+
+.midcol {
+    width: 4rem;
+}
+
+.longcol {
+    width: 8rem;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Стили для кнопок */
+.btn {
+    background-color: #fbfbfb;
+    font-family: 'Rosatom', sans-serif;
+    border-color: #faeedb;
+    border-radius: 0.3rem;
+    border-width: 0.087rem;
+    position: fixed;
+    margin-top: -0.0875rem;
+    margin-left: 1rem;
+}
+
+.btn-primary {
+    padding: 0.5rem;
+}
+
+.btn-primary:hover {
+    background-color: #faeedb;
+}
