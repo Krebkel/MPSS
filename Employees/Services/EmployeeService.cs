@@ -38,8 +38,13 @@ public class EmployeeService : IEmployeeService
     /// <inheritdoc />
     public void UpdateEmployee(Employee employee)
     {
-        _context.Employees.Update(employee);
-        _context.SaveChanges();
+        var existingEmployee = _context.Employees.Find(employee.Id);
+        
+        if (existingEmployee != null)
+        {
+            _context.Employees.Update(employee);
+            _context.SaveChanges();
+        }
     }
 
     /// <inheritdoc />
@@ -59,38 +64,5 @@ public class EmployeeService : IEmployeeService
         _context.EmployeeShifts.Add(employeeShift);
         _context.SaveChanges();
         return employeeShift.Id;
-    }
-
-    /// <inheritdoc />
-    public double CalculateWage(int employeeId, int projectId)
-    {
-        var shifts = _context.EmployeeShifts
-            .Where(es => es.EmployeeId == employeeId && es.ProjectId == projectId)
-            .ToList();
-
-        double totalWage = 0;
-        foreach (var shift in shifts)
-        {
-            if (shift.Wage.HasValue)
-            {
-                totalWage += shift.Wage.Value;
-            }
-        }
-
-        return totalWage;
-    }
-
-    /// <inheritdoc />
-    public double CalculateShiftWage(int employeeId, int employeeShiftId)
-    {
-        var shift = _context.EmployeeShifts
-            .FirstOrDefault(es => es.EmployeeId == employeeId && es.Id == employeeShiftId);
-
-        if (shift == null)
-        {
-            throw new ArgumentException("Смена не найдена.");
-        }
-
-        return shift.Wage ?? 0;
     }
 }

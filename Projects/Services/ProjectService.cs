@@ -1,5 +1,6 @@
 using Contracts.ProjectEntities;
 using Data;
+using Employees.Services;
 
 namespace Projects.Services;
 
@@ -9,15 +10,19 @@ namespace Projects.Services;
 public class ProjectService : IProjectService
 {
     private readonly AppDbContext _context;
+    private readonly IEmployeeShiftService _employeeShiftService;
 
-    public ProjectService(AppDbContext context)
+    public ProjectService(AppDbContext context, IEmployeeShiftService employeeShiftService)
     {
         _context = context;
+        _employeeShiftService = employeeShiftService;
     }
 
     /// <inheritdoc />
     public int CreateProject(Project project)
     {
+        ValidateProject(project);
+
         _context.Projects.Add(project);
         _context.SaveChanges();
         return project.Id;
@@ -38,8 +43,14 @@ public class ProjectService : IProjectService
     /// <inheritdoc />
     public void UpdateProject(Project project)
     {
-        _context.Projects.Update(project);
-        _context.SaveChanges();
+        ValidateProject(project);
+
+        var existingProject = _context.Projects.Find(project.Id);
+        if (existingProject != null)
+        {
+            _context.Projects.Update(project);
+            _context.SaveChanges();
+        }
     }
 
     /// <inheritdoc />
@@ -102,24 +113,80 @@ public class ProjectService : IProjectService
     }
 
     /// <inheritdoc />
-    public void SuspendProject(int projectId)
+    public void ChangeProjectStatus(int projectId, ProjectStatus projectStatus)
     {
         var project = _context.Projects.Find(projectId);
         if (project != null)
         {
-            project.IsActive = false;
+            project.ProjectStatus = projectStatus;
             _context.SaveChanges();
         }
     }
-    
+
     /// <inheritdoc />
-    public void ContinueProject(int projectId)
+    public void DistributeProjectBonus(int projectId, double managerShare)
     {
         var project = _context.Projects.Find(projectId);
-        if (project != null)
+        if (project == null)
         {
-            project.IsActive = true;
-            _context.SaveChanges();
+            throw new ArgumentException("Проект не найден.");
         }
+
+        var shifts = _context.EmployeeShifts
+            .Where(es => es.ProjectId == projectId)
+            .ToList();
+
+        if (shifts.Count == 0)
+        {
+            return;
+        }
+
+        double totalMarkup = _context.ProjectProducts
+            .Where(pp => pp.ProjectId == projectId)
+            .Sum(pp => pp.Markup * pp.Quantity);
+
+        double expensesNotPaidByCompany = _context.Expenses
+            .Where(e => e.ProjectId == projectId && !e.IsPaidByCompany)
+            .Sum(e => e.Amount ?? 0);
+
+        double totalISN = shifts.Sum(es => es.ISN);
+
+        double distributableAmount = totalMarkup - managerShare - expensesNotPaidByCompany;
+
+        foreach (var shift in shifts)
+        {
+            double employeeBonus = (shift.ISN / totalISN) * distributableAmount;
+            double totalWage = _employeeShiftService.CalculateTotalWage(shift.EmployeeId, projectId) + employeeBonus;
+        }
+
+        _context.SaveChanges();
+    }
+
+    /// <inheritdoc />
+    public double CalculateTotalWageForDoneProjects(int employeeId)
+    {
+        return _employeeShiftService.CalculateTotalWageForDoneProjects(employeeId);
+    }
+
+    /// <inheritdoc />
+    private void ValidateProject(Project project)
+    {
+        if (string.IsNullOrWhiteSpace(project.Name))
+        {
+            throw new ArgumentException("Project name is required.");
+        }
+
+        if (project.CounteragentId <= 0)
+        {
+            throw new ArgumentException("Valid CounteragentId is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(project.Address))
+        {
+            throw new ArgumentException("Project address is required.");
+        }
+
+        if (project.DeadlineDate == default)
+            throw new ArgumentException("Project deadline is required.");
     }
 }

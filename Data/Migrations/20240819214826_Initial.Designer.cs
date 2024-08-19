@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240728212224_Initial")]
+    [Migration("20240819214826_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -37,14 +37,14 @@ namespace Data.Migrations
                     b.Property<decimal?>("AccountNumber")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<long?>("BIK")
-                        .HasColumnType("bigint");
+                    b.Property<decimal?>("BIK")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<DateTimeOffset>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long?>("INN")
-                        .HasColumnType("bigint");
+                    b.Property<decimal?>("INN")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<bool>("IsDriver")
                         .HasColumnType("boolean");
@@ -54,8 +54,8 @@ namespace Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<long?>("Passport")
-                        .HasColumnType("bigint");
+                    b.Property<decimal?>("Passport")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -93,14 +93,14 @@ namespace Data.Migrations
                     b.Property<float?>("HoursWorked")
                         .HasColumnType("float");
 
+                    b.Property<int>("ISN")
+                        .HasColumnType("integer");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
 
                     b.Property<float?>("TravelTime")
                         .HasColumnType("float");
-
-                    b.Property<double?>("Wage")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -235,6 +235,9 @@ namespace Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<bool>("IsPaidByCompany")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -271,10 +274,14 @@ namespace Data.Migrations
                     b.Property<DateTimeOffset>("DeadlineDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                    b.Property<float>("ManagerShare")
+                        .HasColumnType("real");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProjectStatus")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -285,11 +292,21 @@ namespace Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<double>("TotalCost")
-                        .HasColumnType("double precision");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CounteragentId");
+
                     b.ToTable("Projects", "mpss");
+                });
+
+            modelBuilder.Entity("Contracts.ProjectEntities.Project", b =>
+                {
+                    b.HasOne("Contracts.ProjectEntities.Counteragent", null)
+                        .WithMany()
+                        .HasForeignKey("CounteragentId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
         }

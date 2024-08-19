@@ -38,8 +38,13 @@ public class CounteragentService : ICounteragentService
     /// <inheritdoc />
     public void UpdateCounteragent(Counteragent counteragent)
     {
-        _context.Counteragents.Update(counteragent);
-        _context.SaveChanges();
+        var existingCounteragent = _context.Counteragents.Find(counteragent.Id);
+        
+        if (existingCounteragent != null)
+        {
+            _context.Counteragents.Update(counteragent);
+            _context.SaveChanges();
+        }
     }
 
     /// <inheritdoc />

@@ -17,8 +17,7 @@ public static class EmployeeShiftExtension
             Departure = apiRequest.Departure,
             HoursWorked = apiRequest.HoursWorked,
             TravelTime = apiRequest.TravelTime,
-            ConsiderTravel = apiRequest.ConsiderTravel,
-            Wage = apiRequest.Wage
+            ConsiderTravel = apiRequest.ConsiderTravel
         };
     }
 
@@ -34,8 +33,7 @@ public static class EmployeeShiftExtension
             Departure = apiRequest.Departure,
             HoursWorked = apiRequest.HoursWorked,
             TravelTime = apiRequest.TravelTime,
-            ConsiderTravel = apiRequest.ConsiderTravel,
-            Wage = apiRequest.Wage
+            ConsiderTravel = apiRequest.ConsiderTravel
         };
     }
 
@@ -51,8 +49,7 @@ public static class EmployeeShiftExtension
             Departure = employeeShift.Departure,
             HoursWorked = employeeShift.HoursWorked,
             TravelTime = employeeShift.TravelTime,
-            ConsiderTravel = employeeShift.ConsiderTravel,
-            Wage = employeeShift.Wage
+            ConsiderTravel = employeeShift.ConsiderTravel
         };
     }
 }

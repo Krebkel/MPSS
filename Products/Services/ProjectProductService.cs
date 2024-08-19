@@ -37,14 +37,20 @@ public class ProjectProductService : IProjectProductService
     /// <inheritdoc />
     public void UpdateProjectProduct(ProjectProduct projectProduct)
     {
-        _context.ProjectProducts.Update(projectProduct);
-        _context.SaveChanges();
+        var existingProjectProduct = _context.ProjectProducts.Find(projectProduct.Id);
+        
+        if (existingProjectProduct != null)
+        {
+            _context.ProjectProducts.Update(projectProduct);
+            _context.SaveChanges();
+        }
     }
 
     /// <inheritdoc />
     public void DeleteProjectProduct(int projectProductId)
     {
         var projectProduct = _context.ProjectProducts.Find(projectProductId);
+        
         if (projectProduct != null)
         {
             _context.ProjectProducts.Remove(projectProduct);

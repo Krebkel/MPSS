@@ -18,7 +18,8 @@ public static class ProjectExtension
             CounteragentId = apiRequest.CounteragentId,
             TotalCost = apiRequest.TotalCost,
             ResponsibleEmployeeId = apiRequest.ResponsibleEmployeeId,
-            IsActive = apiRequest.IsActive
+            ProjectStatus = apiRequest.ProjectStatus,
+            ManagerShare = apiRequest.ManagerShare
         };
     }
 
@@ -35,7 +36,8 @@ public static class ProjectExtension
             CounteragentId = apiRequest.CounteragentId,
             TotalCost = apiRequest.TotalCost,
             ResponsibleEmployeeId = apiRequest.ResponsibleEmployeeId,
-            IsActive = apiRequest.IsActive
+            ProjectStatus = apiRequest.ProjectStatus,
+            ManagerShare = apiRequest.ManagerShare
         };
     }
 
@@ -52,7 +54,8 @@ public static class ProjectExtension
             CounteragentId = project.CounteragentId,
             TotalCost = project.TotalCost,
             ResponsibleEmployeeId = project.ResponsibleEmployeeId,
-            IsActive = project.IsActive
+            ProjectStatus = project.ProjectStatus,
+            ManagerShare = project.ManagerShare
         };
     }
 }

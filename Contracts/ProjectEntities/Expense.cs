@@ -29,4 +29,9 @@ public class Expense : DatabaseEntity
     /// Тип расхода
     /// </summary>
     public ExpenseType Type { get; set; }
+    
+    /// <summary>
+    /// Оплачено ли заказчиком
+    /// </summary>
+    public bool IsPaidByCompany { get; set; }
 }

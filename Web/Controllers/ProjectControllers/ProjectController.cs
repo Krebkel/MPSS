@@ -1,3 +1,4 @@
+using Contracts.ProjectEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Projects.Services;
@@ -49,7 +50,7 @@ public class ProjectController : ControllerBase
             Address = p.Address,
             CounteragentId = p.CounteragentId,
             DeadlineDate = p.DeadlineDate,
-            IsActive = p.IsActive,
+            ProjectStatus = p.ProjectStatus,
             DateSuspended = p.DateSuspended,
             StartDate = p.StartDate,
             ResponsibleEmployeeId = p.ResponsibleEmployeeId,
@@ -90,17 +91,27 @@ public class ProjectController : ControllerBase
         return Ok(averageProductivity);
     }
 
-    [HttpPost("suspend/{projectId}")]
-    public IActionResult SuspendProject(int projectId)
+    [HttpPut("{projectId}/status")]
+    public IActionResult UpdateProjectStatus(int projectId, [FromBody] string status)
     {
-        _projectService.SuspendProject(projectId);
-        return Ok();
-    }
+        if (Enum.TryParse(typeof(ProjectStatus), status, true, out var result))
+        {
+            var projectStatus = (ProjectStatus)result;
 
-    [HttpPost("continue/{projectId}")]
-    public IActionResult ContinueProject(int projectId)
-    {
-        _projectService.ContinueProject(projectId);
-        return Ok();
+            var project = _projectService.GetProject(projectId);
+            if (project == null)
+            {
+                return NotFound("Проект не найден.");
+            }
+
+            project.ProjectStatus = projectStatus;
+            _projectService.UpdateProject(project);
+
+            return Ok("Статус проекта успешно обновлен.");
+        }
+        else
+        {
+            return BadRequest("Неверный статус проекта.");
+        }
     }
 }

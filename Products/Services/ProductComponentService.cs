@@ -35,8 +35,13 @@ public class ProductComponentService : IProductComponentService
     /// <inheritdoc />
     public void UpdateProductComponent(ProductComponent productComponent)
     {
-        _context.ProductComponents.Update(productComponent);
-        _context.SaveChanges();
+        var existingProductComponent = _context.ProductComponents.Find(productComponent.Id);
+
+        if (existingProductComponent != null)
+        {
+            _context.ProductComponents.Update(productComponent);
+            _context.SaveChanges();
+        }
     }
 
     /// <inheritdoc />

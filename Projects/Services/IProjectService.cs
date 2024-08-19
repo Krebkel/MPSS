@@ -27,7 +27,6 @@ public interface IProjectService
     /// <returns>Список проектов</returns>
     List<Project> GetAllProjects();
 
-    
     /// <summary>
     /// Обновление данных проекта в базе данных
     /// </summary>
@@ -55,14 +54,22 @@ public interface IProjectService
     double CalculateAverageProductivity(int projectId);
 
     /// <summary>
-    /// Приостановка выполнения проекта и заморозка времени до дедлайна
+    /// Изменение статуса проекта
     /// </summary>
     /// <param name="projectId">ID проекта</param>
-    void SuspendProject(int projectId);
+    void ChangeProjectStatus(int projectId, ProjectStatus projectStatus);
 
     /// <summary>
-    /// Продолжение выполнения проекта и пересчет дедлайна
+    /// Распределение зарплат по сотрудникам
     /// </summary>
-    /// <param name="projectId">ID проекта</param>
-    void ContinueProject(int projectId);
+    /// <param name="projectId"></param>
+    /// <param name="managerShare"></param>
+    void DistributeProjectBonus(int projectId, double managerShare);
+
+    /// <summary>
+    /// Расчет заработной платы сотрудников за выполненные проекты
+    /// </summary>
+    /// <param name="employeeId"></param>
+    /// <returns></returns>
+    double CalculateTotalWageForDoneProjects(int employeeId);
 }

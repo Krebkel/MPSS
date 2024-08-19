@@ -15,12 +15,6 @@ public interface IEmployeeService
     int CreateEmployee(Employee employee);
 
     /// <summary>
-    /// Обновление данных сотрудника в базе данных
-    /// </summary>
-    /// <param name="employee">Сотрудник</param>
-    void UpdateEmployee(Employee employee);
-    
-    /// <summary>
     /// Получение данных сотрудника из базы данных
     /// </summary>
     /// <param name="employeeId">ID сотрудника</param>
@@ -32,6 +26,12 @@ public interface IEmployeeService
     /// </summary>
     /// <returns>Сотрудники</returns>
     List<Employee> GetAllEmployees();
+    
+    /// <summary>
+    /// Обновление данных сотрудника в базе данных
+    /// </summary>
+    /// <param name="employee">Сотрудник</param>
+    void UpdateEmployee(Employee employee);
 
     /// <summary>
     /// Удаление данных сотрудника из базы данных
@@ -46,19 +46,4 @@ public interface IEmployeeService
     /// <returns>ID созданной смены</returns>
     int AssignShift(EmployeeShift employeeShift);
 
-    /// <summary>
-    /// Расчет зарплаты сотрудника за проект
-    /// </summary>
-    /// <param name="employeeId">ID сотрудника</param>
-    /// <param name="projectId">ID проекта</param>
-    /// <returns>Сумма заработной платы</returns>
-    double CalculateWage(int employeeId, int projectId);
-
-    /// <summary>
-    /// Расчет зарплаты за смену для сотрудника
-    /// </summary>
-    /// <param name="employeeId">ID сотрудника</param>
-    /// <param name="employeeShiftId">ID смены</param>
-    /// <returns>Сумма заработной платы за смену</returns>
-    double CalculateShiftWage(int employeeId, int employeeShiftId);
 }

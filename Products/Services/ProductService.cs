@@ -35,8 +35,13 @@ public class ProductService : IProductService
     /// <inheritdoc />
     public void UpdateProduct(Product product)
     {
-        _context.Products.Update(product);
-        _context.SaveChanges();
+        var existingProduct = _context.Products.Find(product.Id);
+        
+        if (existingProduct != null)
+        {
+            _context.Products.Update(product);
+            _context.SaveChanges();
+        }
     }
 
     /// <inheritdoc />

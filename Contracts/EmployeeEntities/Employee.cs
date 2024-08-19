@@ -23,7 +23,7 @@ public class Employee : DatabaseEntity
     /// <summary>
     /// Серия и номер паспорта сотрудника
     /// </summary>
-    public uint? Passport { get; set; }
+    public ulong? Passport { get; set; }
 
     /// <summary>
     /// Дата рождения сотрудника
@@ -33,7 +33,7 @@ public class Employee : DatabaseEntity
     /// <summary>
     /// ИНН сотрудника
     /// </summary>
-    public uint? INN { get; set; }
+    public ulong? INN { get; set; }
 
     /// <summary>
     /// Банковский счет сотрудника
@@ -43,5 +43,5 @@ public class Employee : DatabaseEntity
     /// <summary>
     /// БИК счета сотудника
     /// </summary>
-    public uint? BIK { get; set; }
+    public ulong? BIK { get; set; }
 }

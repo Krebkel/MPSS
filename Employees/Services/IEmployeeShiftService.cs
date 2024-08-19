@@ -46,5 +46,20 @@ public interface IEmployeeShiftService
     /// <param name="arrival">Время прибытия</param>
     /// <param name="departure">Время отъезда</param>
     /// <returns>Общее время смены в часах</returns>
-    float CalculateTotalTime(DateTimeOffset arrival, DateTimeOffset departure);
+    float CalculateTotalTime(DateTimeOffset? arrival, DateTimeOffset? departure);
+
+    /// <summary>
+    /// Расчет зарплаты за проект сотрудника
+    /// </summary>
+    /// <param name="employeeId">ID сотрудника</param>
+    /// <param name="projectId">ID проекта</param>
+    /// <returns></returns>
+    double CalculateTotalWage(int employeeId, int projectId);
+    
+    /// <summary>
+    /// Расчет зарплаты сотрудника
+    /// </summary>
+    /// <param name="employeeId">ID сотрудника</param>
+    /// <returns></returns>
+    double CalculateTotalWageForDoneProjects(int employeeId);
 }

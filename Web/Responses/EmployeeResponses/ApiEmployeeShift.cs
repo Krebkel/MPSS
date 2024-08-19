@@ -11,5 +11,4 @@ public class ApiEmployeeShift
     public float? HoursWorked { get; set; }
     public float? TravelTime { get; set; }
     public bool ConsiderTravel { get; set; }
-    public double? Wage { get; set; }
 }
