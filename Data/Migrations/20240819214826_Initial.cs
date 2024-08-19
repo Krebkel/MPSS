@@ -45,11 +45,11 @@ namespace Data.Migrations
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     IsDriver = table.Column<bool>(type: "boolean", nullable: false),
-                    Passport = table.Column<long>(type: "bigint", nullable: true),
+                    Passport = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    INN = table.Column<long>(type: "bigint", nullable: true),
+                    INN = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
                     AccountNumber = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
-                    BIK = table.Column<long>(type: "bigint", nullable: true)
+                    BIK = table.Column<decimal>(type: "numeric(20,0)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,7 +71,7 @@ namespace Data.Migrations
                     HoursWorked = table.Column<float>(type: "float", nullable: true),
                     TravelTime = table.Column<float>(type: "float", nullable: true),
                     ConsiderTravel = table.Column<bool>(type: "boolean", nullable: false),
-                    Wage = table.Column<double>(type: "numeric(18,2)", nullable: true)
+                    ISN = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,7 +89,8 @@ namespace Data.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Amount = table.Column<double>(type: "numeric(18,2)", nullable: true),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    Type = table.Column<int>(type: "integer", nullable: false)
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    IsPaidByCompany = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -158,23 +159,33 @@ namespace Data.Migrations
                     StartDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     DateSuspended = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     CounteragentId = table.Column<int>(type: "integer", nullable: true),
-                    TotalCost = table.Column<double>(type: "double precision", nullable: false),
+                    TotalCost = table.Column<double>(type: "numeric(18,2)", nullable: false),
                     ResponsibleEmployeeId = table.Column<int>(type: "integer", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                    ManagerShare = table.Column<float>(type: "real", nullable: false),
+                    ProjectStatus = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Projects_Counteragents_CounteragentId",
+                        column: x => x.CounteragentId,
+                        principalSchema: "mpss",
+                        principalTable: "Counteragents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_CounteragentId",
+                schema: "mpss",
+                table: "Projects",
+                column: "CounteragentId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Counteragents",
-                schema: "mpss");
-
             migrationBuilder.DropTable(
                 name: "Employees",
                 schema: "mpss");
@@ -201,6 +212,10 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Projects",
+                schema: "mpss");
+
+            migrationBuilder.DropTable(
+                name: "Counteragents",
                 schema: "mpss");
         }
     }

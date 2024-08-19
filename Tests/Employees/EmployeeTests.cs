@@ -15,9 +15,6 @@ public class EmployeeTests
     private AppDbContext _context;
     private EmployeeService _service;
 
-    /// <summary>
-    /// Инициализация тестовых данных перед каждым тестом.
-    /// </summary>
     [SetUp]
     public void Setup()
     {
@@ -27,12 +24,12 @@ public class EmployeeTests
 
         var dataOptions = Options.Create(new DataOptions
         {
-            ConnectionString = "InMemoryDbConnectionString", // Это значение не используется при InMemoryDatabase, но необходимо для создания объекта
-            ServiceSchema = "test_schema" // Это значение будет использоваться в OnModelCreating
+            ConnectionString = "InMemoryDbConnectionString", 
+            ServiceSchema = "test_schema" 
         });
         
         _context = new AppDbContext(options, dataOptions);
-        _context.Database.EnsureDeleted(); // Удаление базы данных перед каждым тестом для чистоты данных
+        _context.Database.EnsureDeleted(); 
         _context.Database.EnsureCreated();
 
         _context.Employees.AddRange(new List<Employee>
