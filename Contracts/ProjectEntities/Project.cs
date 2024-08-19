@@ -44,9 +44,14 @@ public class Project : DatabaseEntity
     /// Ответственный сотрудник
     /// </summary>
     public int ResponsibleEmployeeId { get; set; }
+    
+    /// <summary>
+    /// Процент, который получает руководитель от прибыли
+    /// </summary>
+    public float ManagerShare { get; set; }
 
     /// <summary>
-    /// Проект в работе
+    /// Статус проекта
     /// </summary>
-    public bool IsActive { get; set; }
+    public ProjectStatus ProjectStatus { get; set; }
 }

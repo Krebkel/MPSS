@@ -46,7 +46,7 @@ public class EmployeeShift : DatabaseEntity
     public bool ConsiderTravel { get; set; }
 
     /// <summary>
-    /// Заработная плата сотрудника за смену
+    /// Индивидуальная стимулирующая надбавка
     /// </summary>
-    public double? Wage { get; set; }
+    public int ISN { get; set; }
 }

@@ -61,7 +61,6 @@ public class EmployeeShiftController : ControllerBase
             HoursWorked = es.HoursWorked,
             TravelTime = es.TravelTime,
             ConsiderTravel = es.ConsiderTravel,
-            Wage = es.Wage
         }).ToList();        
         
         return Ok(response);
