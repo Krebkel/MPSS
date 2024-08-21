@@ -37,6 +37,7 @@ public class EmployeeShiftService : IEmployeeShiftService
     {
         return _context.EmployeeShifts
             .Where(es => es.EmployeeId == employeeId)
+            .OrderBy(es=>es.Date)
             .ToList();
     }
 

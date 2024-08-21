@@ -32,7 +32,8 @@ public class ProjectProductService : IProjectProductService
     public List<ProjectProduct> GetAllProjectProducts(int projectId)
     {
         return _context.ProjectProducts
-            .Where(es => es.ProjectId == projectId)
+            .Where(pp => pp.ProjectId == projectId)
+            .OrderBy(pp=>pp.ProjectId)
             .ToList();
     }
     

@@ -37,7 +37,7 @@ public class ProjectService : IProjectService
     /// <inheritdoc />
     public List<Project> GetAllProjects()
     {
-        return _context.Projects.ToList();
+        return _context.Projects.OrderBy(p=>p.DeadlineDate).ToList();
     }
 
     /// <inheritdoc />

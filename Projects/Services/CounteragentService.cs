@@ -34,7 +34,7 @@ public class CounteragentService : ICounteragentService
     /// <inheritdoc />
     public List<Counteragent> GetAllCounteragents()
     {
-        return _context.Counteragents.ToList();
+        return _context.Counteragents.OrderBy(c=>c.Name).ToList();
     }
     
     /// <inheritdoc />

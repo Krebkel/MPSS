@@ -103,7 +103,7 @@ $(document).ready(function() {
                     <td class="shortcol">${index + 1}</td>
                     <td class="midcol">${project.name}</td>
                     <td class="longcol">${project.address}</td>
-                    <td class="midcol">${new Date(project.deadlineDate).toLocaleDateString()}</td>
+                    <td class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</td>
                     <td class="midcol">${translateStatus(project.projectStatus)}</td>
                     <td class="midcol">
                         <button class="btn btn-danger delete-project-btn" data-project-id="${project.id}">Удалить</button>
@@ -227,6 +227,13 @@ $(document).ready(function() {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
+
+    function formatDateForOutput(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
     
     function submitProjectForm() {
         const projectData = {
@@ -234,7 +241,7 @@ $(document).ready(function() {
             address: $('#projectAddress').val(),
             startDate: $('#projectStartDate').val(),
             deadlineDate: $('#projectDeadline').val(),
-            counteragent: $('#projectCounteragent').val(),
+            counteragent: $('#projectCounteragent').val() || null,
             responsibleEmployeeId: $('#projectResponsibleEmployee').val(),
             managerShare: $('#projectManagerShare').val(),
             projectStatus: $('#projectStatus').val(),

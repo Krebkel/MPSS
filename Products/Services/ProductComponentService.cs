@@ -29,7 +29,7 @@ public class ProductComponentService : IProductComponentService
     /// <inheritdoc />
     public List<ProductComponent> GetAllProductComponents()
     {
-        return _context.ProductComponents.ToList();
+        return _context.ProductComponents.OrderBy(pc=>pc.ProductId).ToList();
     }
 
     /// <inheritdoc />

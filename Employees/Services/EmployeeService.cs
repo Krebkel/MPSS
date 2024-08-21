@@ -34,7 +34,7 @@ public class EmployeeService : IEmployeeService
     /// <inheritdoc />
     public List<Employee> GetAllEmployees()
     {
-        return _context.Employees.ToList();
+        return _context.Employees.OrderBy(e=>e.Name).ToList();
     }
     
     /// <inheritdoc />

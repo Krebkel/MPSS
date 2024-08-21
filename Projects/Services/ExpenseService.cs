@@ -28,7 +28,10 @@ public class ExpenseService : IExpenseService
 
     public List<Expense> GetExpensesByProject(int projectId)
     {
-        return _context.Expenses.Where(e => e.ProjectId == projectId).ToList();
+        return _context.Expenses
+            .Where(e => e.ProjectId == projectId)
+            .OrderBy(e=>e.Name)
+            .ToList();
     }
 
     public void UpdateExpense(Expense expense)

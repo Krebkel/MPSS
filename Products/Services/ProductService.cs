@@ -31,7 +31,7 @@ public class ProductService : IProductService
     /// <inheritdoc />
     public List<Product> GetAllProducts()
     {
-        return _context.Products.ToList();
+        return _context.Products.OrderBy(p=>p.Name).ToList();
     }
 
     /// <inheritdoc />

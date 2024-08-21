@@ -1,72 +1,72 @@
 $(document).ready(function() {
+
+    $('#employeePassport').mask('9999 999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value.replace(/\s/g, ''));
+        }
+    });
+
+    // Маска для ввода ИНН
+    $('#employeeINN').mask('999999999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
+
+    // Маска для ввода номера счета
+    $('#employeeAccountNumber').mask('99999999999999999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
+
+    // Маска для ввода БИК
+    $('#employeeBIK').mask('999999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
     
-    function loadEmployees() {
+    function loadEmployees(fullData = false, tableId = 'employeesTable') {
         $.getJSON('/api/employees', function(employees) {
-            const employeesTableBody = $('#employeesTable tbody');
+            const employeesTableBody = $(`#${tableId} tbody`);
             employeesTableBody.empty();
 
-            employees.sort((a, b) => a.Name.localeCompare(b.Name)).forEach((employee, index) => {
+            employees.forEach((employee, index) => {
                 const employeeRow = `
-                    <tr class="employee-row" data-employee-id="${employee.Id}">
-                        <td class="shortcol">${index + 1}</td>
-                        <td class="midcol">${employee.Name}</td>
-                        <td class="midcol">${employee.Phone}</td>
-                        <td class="midcol">${new Date(employee.DateOfBirth).toLocaleDateString()}</td>
-                        <td class="midcol">${employee.IsDriver ? 'Да' : 'Нет'}</td>
-                        <td class="midcol">
-                            <button class="btn btn-danger delete-employee-btn" data-employee-id="${employee.Id}">Удалить</button>
-                        </td>
-                    </tr>
-                `;
+                <tr class="employee-row" data-employee-id="${employee.id}">
+                  <td class="shortcol">${index + 1}</td>
+                  <td class="midcol">${employee.name}</td>
+                  <td class="midcol">${employee.phone}</td>
+                  <td class="midcol">${formatDateForOutput(new Date(employee.dateOfBirth))}</td>
+                  ${fullData ? '' : `<td class="midcol">${employee.isDriver ? 'Да' : 'Нет'}</td>`}
+                  ${fullData ? `
+                    <td class="midcol">${employee.passport}</td>
+                    <td class="midcol">${employee.inn}</td>
+                    <td class="midcol">${employee.accountNumber}</td>
+                    <td class="midcol">${employee.bik}</td>
+                  ` : ''}
+                  <td class="midcol">
+                    <button class="btn btn-danger delete-employee-btn" data-employee-id="${employee.id}">Удалить</button>
+                  </td>
+                </tr>
+              `;
                 employeesTableBody.append(employeeRow);
             });
 
-            $('.delete-employee-btn').on('click', function(event) {
+            $(`.delete-employee-btn`).off('click').on('click', function(event) {
                 event.stopPropagation();
                 const employeeId = $(this).data('employee-id');
                 deleteEmployee(employeeId);
             });
 
-            $('.employee-row').on('click', function() {
+            $(`.employee-row`).off('click').on('click', function() {
                 const employeeId = $(this).data('employee-id');
                 openEmployeeModal(employeeId);
-            });
-        });
-    }
-
-    function loadData() {
-        $.getJSON('/api/employees', function(employees) {
-            const dataTableBody = $('#dataTable tbody');
-            dataTableBody.empty();
-
-            employees.sort((a, b) => a.Name.localeCompare(b.Name)).forEach((employee, index) => {
-                const dataRow = `
-                    <tr class="data-row" data-employee-id="${employee.Id}">
-                        <td class="shortcol">${index + 1}</td>
-                        <td class="midcol">${employee.Name}</td>
-                        <td class="midcol">${employee.Phone}</td>
-                        <td class="midcol">${new Date(employee.DateOfBirth).toLocaleDateString()}</td>
-                        <td class="midcol">${employee.Passport ? `${Math.floor(employee.Passport / 10000000)} ${employee.Passport % 10000000}` : ''}</td>
-                        <td class="midcol">${employee.INN || ''}</td>
-                        <td class="midcol">${employee.AccountNumber || ''}</td>
-                        <td class="midcol">${employee.BIK || ''}</td>
-                        <td class="midcol">
-                            <button class="btn btn-danger delete-data-btn" data-employee-id="${employee.Id}">Удалить</button>
-                        </td>
-                    </tr>
-                `;
-                dataTableBody.append(dataRow);
-            });
-
-            $('.delete-data-btn').on('click', function(event) {
-                event.stopPropagation();
-                const employeeId = $(this).data('employee-id');
-                deleteEmployee(employeeId);
-            });
-
-            $('.data-row').on('click', function() {
-                const employeeId = $(this).data('employee-id');
-                openDataModal(employeeId);
             });
         });
     }
@@ -78,8 +78,8 @@ $(document).ready(function() {
                 method: 'DELETE',
                 success: function() {
                     alert('Сотрудник успешно удалён');
-                    loadEmployees();
-                    loadData();
+                    loadEmployees(false, 'employeesTable');
+                    loadEmployees(true, 'dataTable');
                 }
             });
         }
@@ -91,34 +91,15 @@ $(document).ready(function() {
             type: 'GET',
             success: function(data) {
                 $('#modalTitle').text('Редактировать сотрудника');
-                $('#employeeId').val(data.Id);
-                $('#employeeName').val(data.Name);
-                $('#employeePhone').val(data.Phone);
-                $('#employeeDateOfBirth').val(formatDateForInput(new Date(data.DateOfBirth)));
-                $('#employeeIsDriver').prop('checked', data.IsDriver);
+                $('#employeeId').val(employeeId);
+                $('#employeeName').val(data.name);
+                $('#employeePhone').val(data.phone);
+                $('#employeeDateOfBirth').val(formatDateForInput(new Date(data.dateOfBirth)));
+                $('#employeeIsDriver').prop('checked', data.isDriver);
+                $('#employeeINN').val(data.inn);
+                $('#employeeAccountNumber').val(data.accountNumber);
+                $('#employeeBIK').val(data.bik);
                 $('#employeeModal').fadeIn();
-            },
-            error: function(err) {
-                console.error('Ошибка при получении данных сотрудника:', err);
-            }
-        });
-    }
-
-    function openDataModal(employeeId) {
-        $.ajax({
-            url: `/api/employees/${employeeId}`,
-            type: 'GET',
-            success: function(data) {
-                $('#dataModalTitle').text('Редактировать данные сотрудника');
-                $('#dataId').val(data.Id);
-                $('#dataName').val(data.Name);
-                $('#dataPhone').val(data.Phone);
-                $('#dataDateOfBirth').val(formatDateForInput(new Date(data.DateOfBirth)));
-                $('#dataPassport').val(data.Passport ? `${Math.floor(data.Passport / 10000000)} ${data.Passport % 10000000}` : '');
-                $('#dataINN').val(data.INN || '');
-                $('#dataAccountNumber').val(data.AccountNumber || '');
-                $('#dataBIK').val(data.BIK || '');
-                $('#dataModal').fadeIn();
             },
             error: function(err) {
                 console.error('Ошибка при получении данных сотрудника:', err);
@@ -132,13 +113,24 @@ $(document).ready(function() {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
+    
+    function formatDateForOutput(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
 
     function submitEmployeeForm() {
         const employeeData = {
             Name: $('#employeeName').val(),
             Phone: $('#employeePhone').val(),
             DateOfBirth: $('#employeeDateOfBirth').val(),
-            IsDriver: $('#employeeIsDriver').prop('checked')
+            IsDriver: $('#employeeIsDriver').prop('checked'),
+            Passport: $('#employeePassport').val() || null,
+            INN: $('#employeeINN').val() || null,
+            AccountNumber: $('#employeeAccountNumber').val() || null,
+            BIK: $('#employeeBIK').val() || null
         };
         const employeeId = $('#employeeId').val();
         const url = employeeId ? `/api/employees/${employeeId}` : '/api/employees';
@@ -151,53 +143,14 @@ $(document).ready(function() {
             data: JSON.stringify(employeeData),
             success: function () {
                 $('#employeeModal').hide();
-                loadEmployees();
+                loadEmployees(false, 'employeesTable');
+                loadEmployees(true, 'dataTable');
                 alert(employeeId ? 'Сотрудник успешно обновлен' : 'Новый сотрудник успешно добавлен');
             },
             error: function () {
                 alert('Ошибка при сохранении данных сотрудника');
             }
         });
-    }
-
-    function submitDataForm() {
-        const dataData = {
-            Name: $('#dataName').val(),
-            Phone: $('#dataPhone').val(),
-            DateOfBirth: $('#dataDateOfBirth').val(),
-            Passport: parsePassport($('#dataPassport').val()),
-            INN: $('#dataINN').val(),
-            AccountNumber: $('#dataAccountNumber').val(),
-            BIK: $('#dataBIK').val()
-        };
-        const dataId = $('#dataId').val();
-        const url = dataId ? '/api/employees/${dataId}' : '/api/employees';
-        const method = dataId ? 'PUT' : 'POST';
-
-        $.ajax({
-            url: url,
-            method: method,
-            contentType: 'application/json',
-            data: JSON.stringify(dataData),
-            success: function () {
-                $('#dataModal').hide();
-                loadData();
-                alert(dataId ? 'Данные сотрудника успешно обновлены' : 'Данные нового сотрудника успешно добавлены');
-            },
-            error: function () {
-                alert('Ошибка при сохранении данных сотрудника');
-            }
-        });
-    }
-    
-    function parsePassport(passportString) {
-        if (!passportString) return null;
-        const parts = passportString.split(' ');
-        if (parts.length !== 2) return null;
-        const series = parseInt(parts[0]);
-        const number = parseInt(parts[1]);
-        if (isNaN(series) || isNaN(number)) return null;
-        return series * 10000000 + number;
     }
 
     $('.close').on('click', function() {
@@ -213,22 +166,15 @@ $(document).ready(function() {
         event.preventDefault();
         submitEmployeeForm();
     });
-    $('#dataForm').on('submit', function(event) {
-        event.preventDefault();
-        submitDataForm();
-    });
-    $('#addEmployeeBtn').on('click', function() {
+    
+    $('#addEmployeeBtn, #addEmployeeBtn2').on('click', function() {
         $('#modalTitle').text('Добавить нового сотрудника');
         $('#employeeForm')[0].reset();
         $('#employeeId').val('');
         $('#employeeDateOfBirth').val(new Date().toISOString().split('T')[0]);
         $('#employeeModal').fadeIn();
     });
-    $('#addDataBtn').on('click', function() {
-        $('#dataModalTitle').text('Добавить данные нового сотрудника');
-        $('#dataForm')[0].reset();
-        $('#dataId').val('');
-        $('#dataDateOfBirth').val(new Date().toISOString().split('T')[0]);
-        $('#dataModal').fadeIn();
-    });
+
+    loadEmployees(false, 'employeesTable');
+    loadEmployees(true, 'dataTable');
 });
