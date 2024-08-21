@@ -22,10 +22,17 @@ public class ProductController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiProduct))]
     public IActionResult CreateProduct([FromBody] CreateProductApiRequest apiRequest)
     {
-        var product = apiRequest.ToProduct();
-        var productId = _productService.CreateProduct(product);
-        var createdProduct = _productService.GetProduct(productId);
-        return Ok(createdProduct.ToApiProduct());
+        try
+        {
+            var product = apiRequest.ToProduct();
+            var productId = _productService.CreateProduct(product);
+            var createdProduct = _productService.GetProduct(productId);
+            return Ok(createdProduct.ToApiProduct());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании изделия");
+        }
     }
 
     [HttpGet("{id}")]

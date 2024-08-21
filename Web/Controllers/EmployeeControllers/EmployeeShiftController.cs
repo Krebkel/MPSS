@@ -22,10 +22,17 @@ public class EmployeeShiftController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiEmployeeShift))]
     public IActionResult CreateEmployeeShift([FromBody] CreateEmployeeShiftApiRequest apiRequest)
     {
-        var employeeShift = apiRequest.ToEmployeeShift();
-        var employeeShiftId = _employeeShiftService.CreateEmployeeShift(employeeShift);
-        var createdEmployeeShift = _employeeShiftService.GetEmployeeShift(employeeShiftId);
-        return Ok(createdEmployeeShift.ToApiEmployeeShift());
+        try
+        {
+            var employeeShift = apiRequest.ToEmployeeShift();
+            var employeeShiftId = _employeeShiftService.CreateEmployeeShift(employeeShift);
+            var createdEmployeeShift = _employeeShiftService.GetEmployeeShift(employeeShiftId);
+            return Ok(createdEmployeeShift.ToApiEmployeeShift());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании смены");
+        }
     }
 
     [HttpPut("{id}")]

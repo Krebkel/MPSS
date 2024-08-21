@@ -23,10 +23,17 @@ public class ProjectController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiProject))]
     public IActionResult CreateProject([FromBody] CreateProjectApiRequest apiRequest)
     {
-        var project = apiRequest.ToProject();
-        var projectId = _projectService.CreateProject(project);
-        var createdProject = _projectService.GetProject(projectId);
-        return Ok(createdProject.ToApiProject());
+        try
+        {
+            var project = apiRequest.ToProject();
+            var projectId = _projectService.CreateProject(project);
+            var createdProject = _projectService.GetProject(projectId);
+            return Ok(createdProject.ToApiProject());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании проекта");
+        }
     }
 
     [HttpGet("{id}")]
@@ -54,7 +61,6 @@ public class ProjectController : ControllerBase
             DateSuspended = p.DateSuspended,
             StartDate = p.StartDate,
             ResponsibleEmployeeId = p.ResponsibleEmployeeId,
-            TotalCost = p.TotalCost
         }).ToList();        
         
         return Ok(apiProjects);

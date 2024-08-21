@@ -15,6 +15,8 @@ public class ProjectProductService : IProjectProductService
     /// <inheritdoc />
     public int CreateProjectProduct(ProjectProduct projectProduct)
     {
+        ValidateProjectProduct(projectProduct);
+        
         _context.ProjectProducts.Add(projectProduct);
         _context.SaveChanges();
         return projectProduct.Id;
@@ -37,11 +39,17 @@ public class ProjectProductService : IProjectProductService
     /// <inheritdoc />
     public void UpdateProjectProduct(ProjectProduct projectProduct)
     {
-        var existingProjectProduct = _context.ProjectProducts.Find(projectProduct.Id);
+        ValidateProjectProduct(projectProduct);
         
+        var existingProjectProduct = _context.ProjectProducts.Find(projectProduct.Id);
+    
         if (existingProjectProduct != null)
         {
-            _context.ProjectProducts.Update(projectProduct);
+            existingProjectProduct.ProjectId = projectProduct.ProjectId;
+            existingProjectProduct.ProductId = projectProduct.ProductId;
+            existingProjectProduct.Quantity = projectProduct.Quantity;
+            existingProjectProduct.Markup = projectProduct.Markup;
+
             _context.SaveChanges();
         }
     }
@@ -55,6 +63,29 @@ public class ProjectProductService : IProjectProductService
         {
             _context.ProjectProducts.Remove(projectProduct);
             _context.SaveChanges();
+        }
+    }
+    
+    private void ValidateProjectProduct(ProjectProduct projectProduct)
+    {
+        if (projectProduct.ProjectId <= 0)
+        {
+            throw new ArgumentException("Ошибка в выборе проекта.");
+        }
+
+        if (projectProduct.ProductId <= 0)
+        {
+            throw new ArgumentException("Ошибка в выборе изделия.");
+        }
+
+        if (projectProduct.Quantity <= 0)
+        {
+            throw new ArgumentException("Некорректное количество изделий.");
+        }
+
+        if (projectProduct.Markup < 0)
+        {
+            throw new ArgumentException("Некорректная наценка.");
         }
     }
 }

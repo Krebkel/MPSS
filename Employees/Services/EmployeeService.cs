@@ -18,6 +18,8 @@ public class EmployeeService : IEmployeeService
     /// <inheritdoc />
     public int CreateEmployee(Employee employee)
     {
+        ValidateEmployee(employee);
+
         _context.Employees.Add(employee);
         _context.SaveChanges();
         return employee.Id;
@@ -38,11 +40,23 @@ public class EmployeeService : IEmployeeService
     /// <inheritdoc />
     public void UpdateEmployee(Employee employee)
     {
-        var existingEmployee = _context.Employees.Find(employee.Id);
+        ValidateEmployee(employee);
         
+        var existingEmployee = _context.Employees.Find(employee.Id);
+    
         if (existingEmployee != null)
         {
-            _context.Employees.Update(employee);
+            existingEmployee.Name = employee.Name ?? existingEmployee.Name;
+            existingEmployee.Phone = employee.Phone ?? existingEmployee.Phone;
+            existingEmployee.IsDriver = employee.IsDriver;
+            existingEmployee.Passport = employee.Passport ?? existingEmployee.Passport;
+            existingEmployee.DateOfBirth = employee.DateOfBirth != default
+                ? employee.DateOfBirth 
+                : existingEmployee.DateOfBirth;
+            existingEmployee.INN = employee.INN ?? existingEmployee.INN;
+            existingEmployee.AccountNumber = employee.AccountNumber ?? existingEmployee.AccountNumber;
+            existingEmployee.BIK = employee.BIK ?? existingEmployee.BIK;
+
             _context.SaveChanges();
         }
     }
@@ -64,5 +78,25 @@ public class EmployeeService : IEmployeeService
         _context.EmployeeShifts.Add(employeeShift);
         _context.SaveChanges();
         return employeeShift.Id;
+    }
+    
+    private void ValidateEmployee(Employee employee)
+    {
+        if (string.IsNullOrWhiteSpace(employee.Name))
+        {
+            throw new ArgumentException("Отсутствует имя сотрудника.");
+        }
+
+        if (string.IsNullOrWhiteSpace(employee.Phone))
+        {
+            throw new ArgumentException("Отсутствует номер телефона сотрудника.");
+        }
+
+        if (employee.DateOfBirth == default)
+        {
+            throw new ArgumentException("Ошибка в дате рождения сотрудника.");
+        }
+        
+        employee.DateOfBirth = employee.DateOfBirth.ToUniversalTime();
     }
 }

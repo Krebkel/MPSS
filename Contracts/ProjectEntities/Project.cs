@@ -36,11 +36,6 @@ public class Project : DatabaseEntity
     public int? CounteragentId { get; set; }
 
     /// <summary>
-    /// Суммарная стоимость проекта
-    /// </summary>
-    public double TotalCost { get; set; }
-
-    /// <summary>
     /// Ответственный сотрудник
     /// </summary>
     public int ResponsibleEmployeeId { get; set; }

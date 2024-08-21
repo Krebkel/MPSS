@@ -35,11 +35,17 @@ public class ProductComponentService : IProductComponentService
     /// <inheritdoc />
     public void UpdateProductComponent(ProductComponent productComponent)
     {
+        ValidateProductComponent(productComponent);
+            
         var existingProductComponent = _context.ProductComponents.Find(productComponent.Id);
 
         if (existingProductComponent != null)
         {
-            _context.ProductComponents.Update(productComponent);
+            existingProductComponent.ProductId = productComponent.ProductId;
+            existingProductComponent.Name = productComponent.Name ?? existingProductComponent.Name;
+            existingProductComponent.Quantity = productComponent.Quantity ?? existingProductComponent.Quantity;
+            existingProductComponent.Weight = productComponent.Weight ?? existingProductComponent.Weight;
+
             _context.SaveChanges();
         }
     }
@@ -61,5 +67,23 @@ public class ProductComponentService : IProductComponentService
         return _context.ProductComponents
             .Where(pc => pc.ProductId == productId)
             .Sum(pc => (pc.Weight ?? 0) * (pc.Quantity ?? 1));
+    }
+    
+    private void ValidateProductComponent(ProductComponent component)
+    {
+        if (component.ProductId <= 0)
+        {
+            throw new ArgumentException("Ошибка выбора изделия.");
+        }
+
+        if (string.IsNullOrWhiteSpace(component.Name))
+        {
+            throw new ArgumentException("Ошибка в названии компонента изделия.");
+        }
+
+        if (component.Quantity.HasValue && component.Quantity < 0)
+        {
+            throw new ArgumentException("Некорректное количество компонентов изделия.");
+        }
     }
 }

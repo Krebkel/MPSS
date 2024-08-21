@@ -22,10 +22,17 @@ public class CounteragentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiCounteragent))]
     public IActionResult CreateCounteragent([FromBody] CreateCounteragentApiRequest apiRequest)
     {
-        var counteragent = apiRequest.ToCounteragent();
-        var counteragentId = _counteragentService.CreateCounteragent(counteragent);
-        var createdCounteragent = _counteragentService.GetCounteragent(counteragentId);
-        return Ok(createdCounteragent.ToApiCounteragent());
+        try
+        {
+            var counteragent = apiRequest.ToCounteragent();
+            var counteragentId = _counteragentService.CreateCounteragent(counteragent);
+            var createdCounteragent = _counteragentService.GetCounteragent(counteragentId);
+            return Ok(createdCounteragent.ToApiCounteragent());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании контрагента");
+        }
     }
 
     [HttpGet("{id}")]

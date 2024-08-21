@@ -22,10 +22,17 @@ public class ProductComponentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiProductComponent))]
     public IActionResult CreateProductComponent([FromBody] CreateProductComponentApiRequest apiRequest)
     {
-        var productComponent = apiRequest.ToProductComponent();
-        var productComponentId = _productComponentService.CreateProductComponent(productComponent);
-        var createdProductComponent = _productComponentService.GetProductComponent(productComponentId);
-        return Ok(createdProductComponent.ToApiProductComponent());
+        try
+        {
+            var productComponent = apiRequest.ToProductComponent();
+            var productComponentId = _productComponentService.CreateProductComponent(productComponent);
+            var createdProductComponent = _productComponentService.GetProductComponent(productComponentId);
+            return Ok(createdProductComponent.ToApiProductComponent());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании расхода");
+        }
     }
 
     [HttpGet("{id}")]

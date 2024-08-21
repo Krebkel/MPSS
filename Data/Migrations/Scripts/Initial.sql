@@ -102,7 +102,6 @@ CREATE TABLE mpss."Projects" (
                                  "StartDate" timestamp with time zone NOT NULL,
                                  "DateSuspended" timestamp with time zone,
                                  "CounteragentId" integer,
-                                 "TotalCost" numeric(18,2) NOT NULL,
                                  "ResponsibleEmployeeId" integer NOT NULL,
                                  "ManagerShare" real NOT NULL,
                                  "ProjectStatus" text NOT NULL,
@@ -113,6 +112,6 @@ CREATE TABLE mpss."Projects" (
 CREATE INDEX "IX_Projects_CounteragentId" ON mpss."Projects" ("CounteragentId");
 
 INSERT INTO mpss."__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20240819214826_Initial', '8.0.7');
+VALUES ('20240820130311_Initial', '8.0.7');
 
 COMMIT;

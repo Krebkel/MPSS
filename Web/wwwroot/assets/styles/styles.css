@@ -1,3 +1,4 @@
+/* Общие стили */
 body {
     font-family: 'Rosatom', sans-serif;
     background-color: #f4f5f7;
@@ -6,13 +7,13 @@ body {
 }
 
 main {
-    padding: 4.375rem 1.25rem 1.25rem 1.25rem; /* Отступы для контента */
-    width: 100%; /* Ширина основного контента */
-    height: 100vh; /* Высота экрана */
-    position: relative; /* Для работы с абсолютным позиционированием внутренних элементов */
+    padding: 4.375rem 1.25rem 1.25rem 1.25rem;
+    width: 100%;
+    height: 100vh;
+    position: relative;
 }
 
-/* Стили для панели вкладок */
+/* Навигация */
 .navbar {
     background-color: #f4f5f7;
     padding: 0;
@@ -45,32 +46,13 @@ main {
     display: inline-block;
 }
 
-.navbar-nav .nav-link:last-child {
-    border-right: none;
-}
-
 .navbar-nav .nav-link.active,
 .navbar-nav .nav-link:hover {
     background-color: #faeedb;
     color: #1e1e2c;
 }
 
-/* Стили для фиксированного контента */
-.content {
-    background-color: #f4f5f7;
-    border-radius: 0.3rem;
-    box-shadow: 0rem 0rem 0.9375rem rgba(0, 0, 0, 0.1);
-    padding: 1.25rem;
-    position: fixed;
-    top: 4.125rem;
-    left: 16rem;
-    width: calc(100% - 20rem);
-    height: calc(100vh - 4.375rem);
-    overflow: auto;
-    z-index: 900;
-}
-
-/* Стили для левого меню */
+/* Сайдбар */
 .sidebar {
     background-color: #f4f5f7;
     padding: 1rem;
@@ -80,13 +62,13 @@ main {
     margin-top: 2rem;
     height: calc(100vh);
     overflow-y: auto;
-    z-index: 800; /* Под content */
+    z-index: 800;
     font-size: 1.125rem;
 }
 
 .sidebar .nav {
-    list-style: none; /* Убирает маркеры (точки) у пунктов списка */
-    padding-left: 0; /* Убирает отступ слева */
+    list-style: none;
+    padding-left: 0;
 }
 
 .sidebar .nav-link {
@@ -103,11 +85,26 @@ main {
 
 .sidebar .nav-link.active,
 .sidebar .nav-link:hover {
-    background-color: #faeedb; /* Фон при наведении или активации */
-    color: #1e1e2c; /* Цвет текста при наведении или активации */
+    background-color: #faeedb;
+    color: #1e1e2c;
 }
 
-/* Стили для таблиц */
+/* Основной контент */
+.content {
+    background-color: #f4f5f7;
+    border-radius: 0.3rem;
+    box-shadow: 0 0 0.9375rem rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    position: fixed;
+    top: 4.125rem;
+    left: 16rem;
+    width: calc(100% - 20rem);
+    height: calc(100vh - 4.375rem);
+    overflow: auto;
+    z-index: 900;
+}
+
+/* Таблицы */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -117,7 +114,7 @@ table {
 th, td {
     border: 0.01rem solid #ddd;
     padding: 0.75rem;
-    text-align: centre;
+    text-align: center;
 }
 
 th {
@@ -145,22 +142,144 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
-/* Стили для кнопок */
+/* Кнопки */
 .btn {
     background-color: #fbfbfb;
     font-family: 'Rosatom', sans-serif;
-    border-color: #faeedb;
     border-radius: 0.3rem;
-    border-width: 0.087rem;
-    position: fixed;
+    border: 0.087rem solid #faeedb;
+    position: absolute;
     margin-top: -0.0875rem;
     margin-left: 1rem;
-}
-
-.btn-primary {
-    padding: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
 }
 
 .btn-primary:hover {
     background-color: #faeedb;
+}
+
+/* Модальные окна */
+.modal {
+    position: fixed;
+    display: none;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 2rem;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 35rem;
+    border-radius: 0.3rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Формы */
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group-checkbox label {
+    margin-right: 0.5rem;
+    white-space: nowrap;
+}
+
+.form-group-inline {
+    display: flex;
+    align-items: center;
+}
+
+.form-group-inline label {
+    margin-right: 1rem;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+}
+
+.form-group-inline input[type="date"] {
+    margin-bottom: 0.5rem;
+    margin-right: 2rem;
+}
+
+.form-group-inline input[type="checkbox"] {
+    margin-left: 0rem;
+    margin-bottom: 0.5rem;
+}
+
+
+input[type="text"], input[type="date"], input[type="checkbox"], select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.3rem;
+}
+
+/* Индивидуальные элементы */
+.gantt-cell {
+    width: 0.5rem;
+    height: 0.5rem;
+    text-align: center;
+    padding: 0;
+}
+
+#projectModal .modal-content,
+#employeeModal .modal-content {
+    width: 100%;
+    max-width: 30rem;
+    padding: 1rem;
+    padding-bottom: 3.6rem;
+}
+
+#projectForm .form-group,
+#employeeForm .form-group {
+    margin: 0.5rem;
+    margin-bottom: 1rem;
+    margin-right: 1.5rem;
+}
+
+#projectForm label,
+#employeeForm label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+#projectForm input,
+#employeeForm input,
+#projectForm select,
+#employeeForm select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.3rem;
+}
+
+#projectForm button[type="submit"],
+#employeeForm button[type="submit"] {
+    display: block;
+    margin: 0.5rem auto 0;
 }

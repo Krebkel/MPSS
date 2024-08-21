@@ -10,7 +10,6 @@ public class UpdateProjectApiRequest
     public required DateTimeOffset StartDate { get; set; }
     public DateTimeOffset? DateSuspended { get; set; }
     public int? CounteragentId { get; set; }
-    public required double TotalCost { get; set; }
     public required int ResponsibleEmployeeId { get; set; }
     public required ProjectStatus ProjectStatus { get; set; }
     public required float ManagerShare { get; set; }

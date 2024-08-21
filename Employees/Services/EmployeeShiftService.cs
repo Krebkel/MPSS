@@ -19,6 +19,8 @@ public class EmployeeShiftService : IEmployeeShiftService
     /// <inheritdoc />
     public int CreateEmployeeShift(EmployeeShift employeeShift)
     {
+        ValidateEmployeeShift(employeeShift);
+
         _context.EmployeeShifts.Add(employeeShift);
         _context.SaveChanges();
         return employeeShift.Id;
@@ -41,11 +43,21 @@ public class EmployeeShiftService : IEmployeeShiftService
     /// <inheritdoc />
     public void UpdateEmployeeShift(EmployeeShift employeeShift)
     {
-        var existingShift = _context.EmployeeShifts.Find(employeeShift);
+        ValidateEmployeeShift(employeeShift);
         
+        var existingShift = _context.EmployeeShifts.Find(employeeShift.Id);
+    
         if (existingShift != null)
         {
-            _context.EmployeeShifts.Update(employeeShift);
+            existingShift.ProjectId = employeeShift.ProjectId;
+            existingShift.EmployeeId = employeeShift.EmployeeId;
+            existingShift.Date = employeeShift.Date;
+            existingShift.Arrival = employeeShift.Arrival ?? existingShift.Arrival;
+            existingShift.Departure = employeeShift.Departure ?? existingShift.Departure;
+            existingShift.HoursWorked = employeeShift.HoursWorked ?? existingShift.HoursWorked;
+            existingShift.TravelTime = employeeShift.TravelTime ?? existingShift.TravelTime;
+            existingShift.ConsiderTravel = employeeShift.ConsiderTravel;
+
             _context.SaveChanges();
         }
     }
@@ -129,5 +141,25 @@ public class EmployeeShiftService : IEmployeeShiftService
         }
 
         return totalWage;
+    }
+    
+    private void ValidateEmployeeShift(EmployeeShift shift)
+    {
+        if (shift.ProjectId <= 0)
+        {
+            throw new ArgumentException("Ошибка выбора проекта.");
+        }
+
+        if (shift.EmployeeId <= 0)
+        {
+            throw new ArgumentException("Ошибка выбора сотрудника.");
+        }
+
+        if (shift.Date == default)
+        {
+            throw new ArgumentException("Ошибка в дате смены.");
+        }
+        
+        shift.Date = shift.Date.ToUniversalTime();
     }
 }

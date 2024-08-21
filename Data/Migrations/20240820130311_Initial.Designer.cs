@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240819214826_Initial")]
+    [Migration("20240820130311_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -290,9 +290,6 @@ namespace Data.Migrations
 
                     b.Property<DateTimeOffset>("StartDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<double>("TotalCost")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

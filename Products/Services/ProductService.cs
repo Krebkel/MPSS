@@ -15,6 +15,8 @@ public class ProductService : IProductService
     /// <inheritdoc />
     public int CreateProduct(Product product)
     {
+        ValidateProduct(product);
+        
         _context.Products.Add(product);
         _context.SaveChanges();
         return product.Id;
@@ -35,11 +37,15 @@ public class ProductService : IProductService
     /// <inheritdoc />
     public void UpdateProduct(Product product)
     {
-        var existingProduct = _context.Products.Find(product.Id);
+        ValidateProduct(product);
         
+        var existingProduct = _context.Products.Find(product.Id);
+    
         if (existingProduct != null)
         {
-            _context.Products.Update(product);
+            existingProduct.Name = product.Name ?? existingProduct.Name;
+            existingProduct.Cost = product.Cost != default ? product.Cost : existingProduct.Cost;
+
             _context.SaveChanges();
         }
     }
@@ -54,4 +60,18 @@ public class ProductService : IProductService
             _context.SaveChanges();
         }
     }
+    
+    private void ValidateProduct(Product product)
+    {
+        if (string.IsNullOrWhiteSpace(product.Name))
+        {
+            throw new ArgumentException("Ошибка в названии изделия");
+        }
+
+        if (product.Cost <= 0)
+        {
+            throw new ArgumentException("Некорректная стоимость изделия.");
+        }
+    }
+
 }

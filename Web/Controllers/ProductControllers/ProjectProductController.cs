@@ -22,10 +22,17 @@ public class ProjectProductController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiProjectProduct))]
     public IActionResult CreateProjectProduct([FromBody] CreateProjectProductApiRequest apiRequest)
     {
-        var projectProduct = apiRequest.ToProjectProduct();
-        var projectProductId = _projectProductService.CreateProjectProduct(projectProduct);
-        var createdProjectProduct = _projectProductService.GetProjectProduct(projectProductId);
-        return Ok(createdProjectProduct.ToApiProjectProduct());
+        try
+        {
+            var projectProduct = apiRequest.ToProjectProduct();
+            var projectProductId = _projectProductService.CreateProjectProduct(projectProduct);
+            var createdProjectProduct = _projectProductService.GetProjectProduct(projectProductId);
+            return Ok(createdProjectProduct.ToApiProjectProduct());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании изделия на проекте");
+        }
     }
 
     [HttpGet("{id}")]

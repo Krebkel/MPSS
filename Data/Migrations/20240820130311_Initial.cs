@@ -159,7 +159,6 @@ namespace Data.Migrations
                     StartDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     DateSuspended = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     CounteragentId = table.Column<int>(type: "integer", nullable: true),
-                    TotalCost = table.Column<double>(type: "numeric(18,2)", nullable: false),
                     ResponsibleEmployeeId = table.Column<int>(type: "integer", nullable: false),
                     ManagerShare = table.Column<float>(type: "real", nullable: false),
                     ProjectStatus = table.Column<string>(type: "text", nullable: false)

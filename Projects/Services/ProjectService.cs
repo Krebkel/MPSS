@@ -48,10 +48,30 @@ public class ProjectService : IProjectService
         var existingProject = _context.Projects.Find(project.Id);
         if (existingProject != null)
         {
-            _context.Projects.Update(project);
+            existingProject.Name = project.Name ?? existingProject.Name;
+            existingProject.Address = project.Address ?? existingProject.Address;
+            existingProject.DeadlineDate = project.DeadlineDate != default
+                ? project.DeadlineDate 
+                : existingProject.DeadlineDate;
+            existingProject.StartDate = project.StartDate != default
+                ? project.StartDate 
+                : existingProject.StartDate;
+            existingProject.DateSuspended = project.DateSuspended ?? existingProject.DateSuspended;
+            existingProject.CounteragentId = project.CounteragentId ?? existingProject.CounteragentId;
+            existingProject.ResponsibleEmployeeId = project.ResponsibleEmployeeId != default
+                ? project.ResponsibleEmployeeId 
+                : existingProject.ResponsibleEmployeeId;
+            existingProject.ProjectStatus = project.ProjectStatus != default
+                ? project.ProjectStatus 
+                : existingProject.ProjectStatus;
+            existingProject.ManagerShare = project.ManagerShare != default
+                ? project.ManagerShare 
+                : existingProject.ManagerShare;
+
             _context.SaveChanges();
         }
     }
+
 
     /// <inheritdoc />
     public void DeleteProject(int projectId)
@@ -173,20 +193,23 @@ public class ProjectService : IProjectService
     {
         if (string.IsNullOrWhiteSpace(project.Name))
         {
-            throw new ArgumentException("Project name is required.");
+            throw new ArgumentException("Отсутствует название проекта.");
         }
 
         if (project.CounteragentId <= 0)
         {
-            throw new ArgumentException("Valid CounteragentId is required.");
+            throw new ArgumentException("Не выбран контрагент.");
         }
 
         if (string.IsNullOrWhiteSpace(project.Address))
         {
-            throw new ArgumentException("Project address is required.");
+            throw new ArgumentException("Отсутствует адрес проекта.");
         }
 
         if (project.DeadlineDate == default)
-            throw new ArgumentException("Project deadline is required.");
+            throw new ArgumentException("Отсутствует дедлайн проекта.");
+        
+        project.StartDate = project.StartDate.ToUniversalTime();
+        project.DeadlineDate = project.DeadlineDate.ToUniversalTime();
     }
 }

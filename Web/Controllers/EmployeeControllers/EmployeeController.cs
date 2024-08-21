@@ -19,13 +19,19 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiEmployee))]
     public IActionResult CreateEmployee([FromBody] CreateEmployeeApiRequest apiRequest)
     {
-        var employee = apiRequest.ToEmployee();
-        var employeeId = _employeeService.CreateEmployee(employee);
-        var createdEmployee = _employeeService.GetEmployee(employeeId);
-        return Ok(createdEmployee.ToApiEmployee());
+        try
+        {
+            var employee = apiRequest.ToEmployee();
+            var employeeId = _employeeService.CreateEmployee(employee);
+            var createdEmployee = _employeeService.GetEmployee(employeeId);
+            return Ok(createdEmployee.ToApiEmployee());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании сотрудника");
+        }
     }
     
     [HttpGet("{id}")]

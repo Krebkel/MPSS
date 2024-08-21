@@ -22,10 +22,17 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiExpense))]
     public IActionResult CreateExpense([FromBody] CreateExpenseApiRequest apiRequest)
     {
-        var expense = apiRequest.ToExpense();
-        var expenseId = _expenseService.CreateExpense(expense);
-        var createdExpense = _expenseService.GetExpense(expenseId);
-        return Ok(createdExpense.ToApiExpense());
+        try
+        {
+            var expense = apiRequest.ToExpense();
+            var expenseId = _expenseService.CreateExpense(expense);
+            var createdExpense = _expenseService.GetExpense(expenseId);
+            return Ok(createdExpense.ToApiExpense());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Ошибка при создании расхода");
+        }
     }
 
     [HttpGet("{id}")]

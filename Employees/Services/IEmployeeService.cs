@@ -45,5 +45,4 @@ public interface IEmployeeService
     /// <param name="employeeShift">Смена сотрудника</param>
     /// <returns>ID созданной смены</returns>
     int AssignShift(EmployeeShift employeeShift);
-
 }

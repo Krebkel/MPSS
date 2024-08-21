@@ -16,7 +16,6 @@ public static class ProjectExtension
             StartDate = apiRequest.StartDate,
             DateSuspended = apiRequest.DateSuspended,
             CounteragentId = apiRequest.CounteragentId,
-            TotalCost = apiRequest.TotalCost,
             ResponsibleEmployeeId = apiRequest.ResponsibleEmployeeId,
             ProjectStatus = apiRequest.ProjectStatus,
             ManagerShare = apiRequest.ManagerShare
@@ -34,7 +33,6 @@ public static class ProjectExtension
             StartDate = apiRequest.StartDate,
             DateSuspended = apiRequest.DateSuspended,
             CounteragentId = apiRequest.CounteragentId,
-            TotalCost = apiRequest.TotalCost,
             ResponsibleEmployeeId = apiRequest.ResponsibleEmployeeId,
             ProjectStatus = apiRequest.ProjectStatus,
             ManagerShare = apiRequest.ManagerShare
@@ -52,7 +50,6 @@ public static class ProjectExtension
             StartDate = project.StartDate,
             DateSuspended = project.DateSuspended,
             CounteragentId = project.CounteragentId,
-            TotalCost = project.TotalCost,
             ResponsibleEmployeeId = project.ResponsibleEmployeeId,
             ProjectStatus = project.ProjectStatus,
             ManagerShare = project.ManagerShare

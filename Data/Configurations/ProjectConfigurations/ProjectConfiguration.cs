@@ -15,13 +15,15 @@ namespace Data.Configurations.ProjectConfigurations
             builder.Property(p => p.StartDate).IsRequired();
             builder.Property(p => p.DateSuspended).IsRequired(false);
             builder.Property(p => p.CounteragentId).IsRequired(false);
-            builder.Property(p => p.TotalCost).IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(p => p.ResponsibleEmployeeId).IsRequired();
             builder.Property(p => p.ManagerShare).IsRequired();
 
             builder.Property(p => p.ProjectStatus)
                 .IsRequired()
-                .HasConversion<string>();
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (ProjectStatus)Enum.Parse(typeof(ProjectStatus), v)
+                );
             
             builder.HasOne<Counteragent>()
                 .WithMany()
