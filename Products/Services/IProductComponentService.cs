@@ -4,41 +4,28 @@ namespace Products.Services;
 
 public interface IProductComponentService
 {
-    /// <summary>
-    /// Добавление компонента изделия в базу данных
-    /// </summary>
-    /// <param name="productComponent">Компонент изделия</param>
-    /// <returns>ID созданного компонента изделия</returns>
-    int CreateProductComponent(ProductComponent productComponent);
+    Task<ProductComponent> CreateProductComponentAsync(CreateProductComponentRequest productComponent, CancellationToken cancellationToken);
     
+    Task<ProductComponent> UpdateProductComponentAsync(UpdateProductComponentRequest productComponent, CancellationToken cancellationToken);
     
-    /// <summary>
-    /// Получение компонента изделия из базы данных
-    /// </summary>
-    /// <param name="productComponentId">ID компонента изделия</param>
-    ProductComponent GetProductComponent(int productComponentId);
-
-    /// <summary>
-    /// Получение всех компонентов изделий из базы данных
-    /// </summary>
-    public List<ProductComponent> GetAllProductComponents();
+    Task<ProductComponent?> GetProductComponentByIdAsync(int id, CancellationToken cancellationToken);
     
-    /// <summary>
-    /// Обновление компонента изделия в базе данных
-    /// </summary>
-    /// <param name="productComponent">Компонент изделия</param>
-    void UpdateProductComponent(ProductComponent productComponent);
+    Task<bool> DeleteProductComponentAsync(int id, CancellationToken cancellationToken);
+}
 
-    /// <summary>
-    /// Удаление компонента изделия из базы данных
-    /// </summary>
-    /// <param name="productComponentId">ID компонента изделия</param>
-    void DeleteProductComponent(int productComponentId);
+public class UpdateProductComponentRequest
+{
+    public required int Id { get; set; }
+    public required Product Product { get; set; }
+    public required string Name { get; set; }
+    public int? Quantity { get; set; }
+    public float? Weight { get; set; }
+}
 
-    /// <summary>
-    /// Расчет веса компонентов изделия по количеству
-    /// </summary>
-    /// <param name="productId">ID изделия</param>
-    /// <returns>Вес в килограммах</returns>
-    double CalculateTotalWeight(int productId);
+public class CreateProductComponentRequest
+{
+    public required Product Product { get; set; }
+    public required string Name { get; set; }
+    public int? Quantity { get; set; }
+    public float? Weight { get; set; }
 }

@@ -1,49 +1,34 @@
-using Contracts.ProjectEntities;
+using Projects.Services;
 using Web.Requests.ProjectRequests;
-using Web.Responses.ProjectResponses;
 
 namespace Web.Extensions.ProjectExtensions;
 
 public static class ExpenseExtensions
 {
-    public static Expense ToExpense(this CreateExpenseApiRequest apiRequest)
+    internal static CreateExpenseRequest ToCreateExpenseApiRequest(this CreateExpenseApiRequest request)
     {
-        return new Expense
+        return new CreateExpenseRequest
         {
-            ProjectId = apiRequest.ProjectId,
-            Name = apiRequest.Name,
-            Amount = apiRequest.Amount,
-            Description = apiRequest.Description,
-            Type = apiRequest.Type,
-            IsPaidByCompany = apiRequest.IsPaidByCompany
+            Project = request.Project,
+            Name = request.Name,
+            Amount = request.Amount,
+            Description = request.Description,
+            Type = request.Type,
+            IsPaidByCompany = request.IsPaidByCompany
         };
     }
-
-    public static Expense ToExpense(this UpdateExpenseApiRequest apiRequest, int id)
+    
+    internal static UpdateExpenseRequest ToUpdateExpenseApiRequest(this UpdateExpenseApiRequest request)
     {
-        return new Expense
+        return new UpdateExpenseRequest
         {
-            Id = id,
-            ProjectId = apiRequest.ProjectId,
-            Name = apiRequest.Name,
-            Amount = apiRequest.Amount,
-            Description = apiRequest.Description,
-            Type = apiRequest.Type,
-            IsPaidByCompany = apiRequest.IsPaidByCompany
-        };
-    }
-
-    public static ApiExpense ToApiExpense(this Expense expense)
-    {
-        return new ApiExpense
-        {
-            Id = expense.Id,
-            ProjectId = expense.ProjectId,
-            Name = expense.Name,
-            Amount = expense.Amount,
-            Description = expense.Description,
-            Type = expense.Type,
-            IsPaidByCompany = expense.IsPaidByCompany
+            Id = request.Id,
+            Project = request.Project,
+            Name = request.Name,
+            Amount = request.Amount,
+            Description = request.Description,
+            Type = request.Type,
+            IsPaidByCompany = request.IsPaidByCompany
         };
     }
 }

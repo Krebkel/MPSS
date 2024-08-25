@@ -7,35 +7,34 @@ namespace Projects.Services;
 /// </summary>
 public interface ICounteragentService
 {
-    /// <summary>
-    /// Добавление контрагента в базу данных
-    /// </summary>
-    /// <param name="counteragent">Контрагент</param>
-    /// <returns>ID созданного контрагента</returns>
-    int CreateCounteragent(Counteragent counteragent);
-
-    /// <summary>
-    /// Получение данных контрагента из базы данных
-    /// </summary>
-    /// <param name="counteragentId">ID контрагента</param>
-    /// <returns>Контрагент</returns>
-    Counteragent GetCounteragent(int counteragentId);
-
-    /// <summary>
-    /// Получение данных всех контрагентов из базы данных
-    /// </summary>
-    /// <returns>Список контрагентов</returns>
-    List<Counteragent> GetAllCounteragents();
+    Task<Counteragent> CreateCounteragentAsync(CreateCounteragentRequest counteragent, CancellationToken cancellationToken);
     
-    /// <summary>
-    /// Обновление данных контрагента в базе данных
-    /// </summary>
-    /// <param name="counteragent">Контрагент</param>
-    void UpdateCounteragent(Counteragent counteragent);
+    Task<Counteragent> UpdateCounteragentAsync(UpdateCounteragentRequest counteragent, CancellationToken cancellationToken);
+    
+    Task<Counteragent?> GetCounteragentByIdAsync(int id, CancellationToken cancellationToken);
+    
+    Task<bool> DeleteCounteragentAsync(int id, CancellationToken cancellationToken);
+}
 
-    /// <summary>
-    /// Удаление контрагента из базы данных
-    /// </summary>
-    /// <param name="counteragentId">ID контрагента</param>
-    void DeleteCounteragent(int counteragentId);
+public class UpdateCounteragentRequest
+{
+    public required int Id { get; set; }
+    public required string Name { get; set; }
+    public required string? Contact { get; set; }
+    public required string? Phone { get; set; }
+    public uint? INN { get; set; }
+    public uint? OGRN { get; set; }
+    public ulong? AccountNumber { get; set; }
+    public uint? BIK { get; set; }
+}
+
+public class CreateCounteragentRequest
+{
+    public required string Name { get; set; }
+    public required string Contact { get; set; }
+    public required string Phone { get; set; }
+    public uint? INN { get; set; }
+    public uint? OGRN { get; set; }
+    public ulong? AccountNumber { get; set; }
+    public uint? BIK { get; set; }
 }

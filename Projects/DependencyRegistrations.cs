@@ -1,5 +1,5 @@
-using Projects.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Projects.Services;
 
 namespace Projects;
 

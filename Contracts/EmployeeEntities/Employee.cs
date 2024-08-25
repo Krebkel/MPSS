@@ -1,3 +1,5 @@
+using DataContracts;
+
 namespace Contracts.EmployeeEntities;
 
 /// <summary>

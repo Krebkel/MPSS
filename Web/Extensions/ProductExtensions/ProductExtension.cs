@@ -1,37 +1,28 @@
-using Contracts.ProductEntities;
+using Products.Services;
 using Web.Requests.ProductRequests;
-using Web.Responses.ProductResponses;
 
 namespace Web.Extensions.ProductExtensions;
 
 public static class ProductExtension
 {
-    public static Product ToProduct(this CreateProductApiRequest apiRequest)
+    internal static CreateProductRequest ToCreateProductApiRequest(this CreateProductApiRequest request)
     {
-        return new Product
+        return new CreateProductRequest
         {
-            Name = apiRequest.Name,
-            Cost = apiRequest.Cost
+            Name = request.Name,
+            Cost = request.Cost,
+            Type = request.Type
         };
     }
-
-    public static Product ToProduct(this UpdateProductApiRequest apiRequest, int id)
+    
+    internal static UpdateProductRequest ToUpdateProductApiRequest(this UpdateProductApiRequest request)
     {
-        return new Product
+        return new UpdateProductRequest
         {
-            Id = id,
-            Name = apiRequest.Name,
-            Cost = apiRequest.Cost
-        };
-    }
-
-    public static ApiProduct ToApiProduct(this Product product)
-    {
-        return new ApiProduct
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Cost = product.Cost
+            Id = request.Id,
+            Name = request.Name,
+            Cost = request.Cost,
+            Type = request.Type
         };
     }
 }

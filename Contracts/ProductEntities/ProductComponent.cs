@@ -1,3 +1,5 @@
+using DataContracts;
+
 namespace Contracts.ProductEntities;
 
 /// <summary>
@@ -8,7 +10,7 @@ public class ProductComponent : DatabaseEntity
     /// <summary>
     /// ID производимого продукта
     /// </summary>
-    public int ProductId { get; set; }
+    public Product Product { get; set; }
 
     /// <summary>
     /// Наименование производимого продукта

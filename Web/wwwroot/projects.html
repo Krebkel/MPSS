@@ -4,23 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Проекты - МПСС</title>
-    <link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/styles/styles.css">
     <style>
         @font-face {
             font-family: 'Rosatom';
-            src: url('/assets/fonts/Rosatom-Bold.ttf') format('truetype');
+            src: local("/assets/fonts/Rosatom-Bold.ttf");
             font-weight: bold;
         }
         @font-face {
             font-family: 'Rosatom';
-            src: url('/assets/fonts/Rosatom-Regular.ttf') format('truetype');
+            src: local("/assets/fonts/Rosatom-Regular.ttf");
             font-weight: normal;
         }
     </style>
 </head>
 <body>
-<!-- Верхняя панель навигации -->
+
 <nav class="navbar">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -40,76 +39,116 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Левое меню -->
         <nav class="col-md-2 d-none d-md-block sidebar">
             <div class="sidebar-sticky">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#main">
-                            Главное
-                        </a>
+                        <a class="nav-link" href="#main">Главное</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#employee-shifts">
-                            Смены
-                        </a>
+                        <a class="nav-link" href="#projects">Проекты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#employee-shifts">Смены</a>
                     </li>
                 </ul>
             </div>
         </nav>
 
-        <!-- Основной контент -->
         <main role="main" class="col-md-10 ml-sm-auto px-4 content">
-            <div id="main " class="content-section">
-                <h2> Проекты
-                    <button id="addProjectBtn" class="btn btn-primary">Добавить</button>
-                </h2>
-
-                <!-- Таблица проектов -->
-                <table id="projectsTable" class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th class="shortcol">№</th>
-                        <th class="midcol">Название</th>
-                        <th class="longcol">Адрес</th>
-                        <th class="midcol">Дедлайн</th>
-                        <th class="midcol">Статус</th>
-                        <th class="midcol">Действия</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- Данные будут загружены с помощью JavaScript -->
-                    </tbody>
-                </table>
+            <div id="main" class="content-section">
             </div>
-
             <div id="employee-shifts" class="content-section" style="display: none;">
-                <h2>Смены</h2>
-                <!-- Таблица смен сотрудников -->
-                <table id="employeeShiftsTable" class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Сотрудник</th>
-                        <th>Проект</th>
-                        <th>Дата</th>
-                        <th>Часы работы</th>
-                        <th>Действия</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- Данные будут загружены с помощью JavaScript -->
-                    </tbody>
-                </table>
-                <button id="addEmployeeShiftBtn" class="btn btn-primary">Добавить смену</button>
+            </div>
+            <div id="projects" class="content-section" style="display: none;">
+                <div id="ganttChart"></div>
+                <hr/>
+                <div id="projectTable">
+                    <h2 id="projectsHeader">Проекты
+                        <button id="addProjectBtn" class="btn btn-primary btn-add">+</button>
+                        <button id="showAllProjectsBtn" class="btn btn-primary btn-showall">Показать все</button>
+                    </h2>
+                    <table id="projectsTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="shortcol">№</th>
+                            <th class="midcol">Название</th>
+                            <th class="longcol">Адрес</th>
+                            <th class="midcol">Дедлайн</th>
+                            <th class="midcol">Статус</th>
+                            <th class="shortcol"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 </div>
 
-<!-- Скрипты -->
-<script src="/libs/jquery/jquery.min.js"></script>
-<script src="/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<div id="shiftModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Управление сменами</h3>
+        <div id="shiftList">
+        </div>
+        <div id="addShiftForm">
+        </div>
+    </div>
+</div>
+
+<div id="projectModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="modalTitle">Добавить новый проект</h3>
+        <form id="projectForm">
+            <input type="hidden" id="projectId" name="projectId">
+            <div class="form-group">
+                <label for="projectName">Название проекта:</label>
+                <input type="text" id="projectName" name="projectName" required>
+            </div>
+            <div class="form-group">
+                <label for="projectAddress">Адрес:</label>
+                <input type="text" id="projectAddress" name="projectAddress" required>
+            </div>
+            <div class="form-group">
+                <label for="projectStartDate">Дата начала:</label>
+                <input type="date" id="projectStartDate" name="projectStartDate" required>
+            </div>
+            <div class="form-group">
+                <label for="projectDeadline">Дедлайн:</label>
+                <input type="date" id="projectDeadline" name="projectDeadline" required>
+            </div>
+            <div class="form-group">
+                <label for="projectCounteragent">Контрагент:</label>
+                <input type="text" id="projectCounteragent" name="projectCounteragent">
+            </div>
+            <div class="form-group">
+                <label for="projectResponsibleEmployee">Ответственный:</label>
+                <input type="text" id="projectResponsibleEmployee" name="projectResponsibleEmployee">
+            </div>
+            <div class="form-group">
+                <label for="projectManagerShare">Процент руководителю:</label>
+                <input type="text" id="projectManagerShare" name="projectManagerShare">
+            </div>
+            <div class="form-group">
+                <label for="projectStatus">Статус:</label>
+                <select id="projectStatus" name="projectStatus" required>
+                    <option value="Active">Активен</option>
+                    <option value="Standby">Ожидание</option>
+                    <option value="Done">Завершен</option>
+                    <option value="Paid">Оплачен</option>
+                </select>
+            </div>
+            <button type="submit" id="modalSubmitButton" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<script src="/libs/jquery.js"></script>
+<script src="/libs/bootstrap.js"></script>
 <script src="/js/script.js"></script>
 <script src="/js/projects.js"></script>
 </body>

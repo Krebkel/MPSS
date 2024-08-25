@@ -8,10 +8,14 @@ internal class ProjectProductConfiguration : IEntityTypeConfiguration<ProjectPro
 {
     public void Configure(EntityTypeBuilder<ProjectProduct> builder)
     {
-        builder.HasKey(m => m.Id);
-        builder.Property(es => es.ProjectId).IsRequired();
-        builder.Property(m => m.ProductId).IsRequired();
-        builder.Property(pc => pc.Quantity).IsRequired();
-        builder.Property(m => m.Markup).IsRequired().HasColumnType("decimal(18,2)");
+        builder.HasKey(pp => pp.Id);
+        builder.HasOne(pp => pp.Project)
+            .WithMany()
+            .IsRequired();
+        builder.HasOne(pp => pp.Product)
+            .WithMany()
+            .IsRequired();
+        builder.Property(pp => pp.Quantity).IsRequired();
+        builder.Property(pp => pp.Markup).IsRequired().HasColumnType("decimal(18,2)");
     }
 }

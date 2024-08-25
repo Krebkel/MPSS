@@ -1,19 +1,18 @@
 using Contracts.EmployeeEntities;
 using Data;
-using Employees.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Tests.Employees;
 
 /// <summary>
-/// Набор тестов для класса <see cref="EmployeeService"/>.
+/// Набор тестов для класса <see cref="EmployeeRepository"/>.
 /// </summary>
 [TestFixture]
 public class EmployeeTests
 {
     private AppDbContext _context;
-    private EmployeeService _service;
+    private EmployeeRepository _repository;
 
     [SetUp]
     public void Setup()
@@ -51,7 +50,7 @@ public class EmployeeTests
         });
         _context.SaveChanges();
 
-        _service = new EmployeeService(_context);
+        _repository = new EmployeeRepository(_context);
     }
     
     [TearDown]
@@ -61,7 +60,7 @@ public class EmployeeTests
     }
 
     /// <summary>
-    /// Тест для метода <see cref="EmployeeService.CreateEmployee(Employee)"/>.
+    /// Тест для метода <see cref="EmployeeRepository.CreateEmployee(Employee)"/>.
     /// </summary>
     [Test]
     public void CreateEmployee_ShouldAddEmployeeToDatabase()
@@ -73,7 +72,7 @@ public class EmployeeTests
             IsDriver = false
         };
             
-        var employeeId = _service.CreateEmployee(employee);
+        var employeeId = _repository.CreateEmployee(employee);
         var createdEmployee = _context.Employees.Find(employeeId);
 
         Assert.IsNotNull(createdEmployee);
@@ -81,28 +80,28 @@ public class EmployeeTests
     }
 
     /// <summary>
-    /// Тест для метода <see cref="EmployeeService.GetEmployee(int)"/>.
+    /// Тест для метода <see cref="EmployeeRepository.GetEmployee(int)"/>.
     /// </summary>
     [Test]
     public void GetEmployee_ShouldReturnCorrectEmployee()
     {
-        var employee = _service.GetEmployee(1);
+        var employee = _repository.GetEmployee(1);
         Assert.IsNotNull(employee);
         Assert.AreEqual(1, employee.Id);
     }
 
     /// <summary>
-    /// Тест для метода <see cref="EmployeeService.GetAllEmployees()"/>.
+    /// Тест для метода <see cref="EmployeeRepository.GetAllEmployees()"/>.
     /// </summary>
     [Test]
     public void GetAllEmployees_ShouldReturnAllEmployees()
     {
-        var employees = _service.GetAllEmployees();
+        var employees = _repository.GetAllEmployees();
         Assert.AreEqual(2, employees.Count);
     }
 
     /// <summary>
-    /// Тест для метода <see cref="EmployeeService.UpdateEmployee(Employee)"/>.
+    /// Тест для метода <see cref="EmployeeRepository.UpdateEmployee(Employee)"/>.
     /// </summary>
     [Test]
     public void UpdateEmployee_ShouldUpdateEmployeeInDatabase()
@@ -126,12 +125,12 @@ public class EmployeeTests
 
 
     /// <summary>
-    /// Тест для метода <see cref="EmployeeService.DeleteEmployee(int)"/>.
+    /// Тест для метода <see cref="EmployeeRepository.DeleteEmployee(int)"/>.
     /// </summary>
     [Test]
     public void DeleteEmployee_ShouldRemoveEmployeeFromDatabase()
     {
-        _service.DeleteEmployee(1);
+        _repository.DeleteEmployee(1);
 
         var deletedEmployee = _context.Employees.Find(1);
         Assert.IsNull(deletedEmployee);

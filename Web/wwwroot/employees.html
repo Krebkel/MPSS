@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест - МПСС</title>
-    <link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">
+    <title>Сотрудники - МПСС</title>
     <link rel="stylesheet" href="/assets/styles/styles.css">
     <style>
         @font-face {
             font-family: 'Rosatom';
-            src: url('/assets/fonts/Rosatom-Bold.ttf') format('truetype');
+            src: local("/assets/fonts/Rosatom-Bold.ttf");
             font-weight: bold;
         }
         @font-face {
             font-family: 'Rosatom';
-            src: url('/assets/fonts/Rosatom-Regular.ttf') format('truetype');
+            src: local("/assets/fonts/Rosatom-Regular.ttf");
             font-weight: normal;
         }
     </style>
 </head>
 <body>
-<!-- Верхняя панель навигации -->
 <nav class="navbar">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -37,42 +35,120 @@
         </li>
     </ul>
 </nav>
-
 <div class="container-fluid">
     <div class="row">
-        <!-- Левое меню -->
         <nav class="col-md-2 d-none d-md-block sidebar">
             <div class="sidebar-sticky">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#main">
-                            Главное
-                        </a>
+                        <a class="nav-link" href="#main">Главное</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#test">
-                            Тест
-                        </a>
+                        <a class="nav-link" href="#employees">Сотрудники</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#data">Данные</a>
                     </li>
                 </ul>
             </div>
         </nav>
-
-        <!-- Основной контент -->
         <main role="main" class="col-md-10 ml-sm-auto px-4 content">
-            <div id="main " class="content-section">
-                <h2> Тест
-                    <button id="addProjectBtn" class="btn btn-primary">Добавить</button>
-                </h2>
+            <div id="main" class="content-section">
+            </div>
+            <div id="employees" class="content-section" style="display: none;">
+                <div id="employeeTable">
+                    <h2>Сотрудники
+                        <button id="addEmployeeBtn" class="btn btn-primary btn-add">+</button>
+                    </h2>
+                    <table id="employeesTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="shortcol">№</th>
+                            <th class="midcol">ФИО</th>
+                            <th class="midcol">Телефон</th>
+                            <th class="midcol">Дата рождения</th>
+                            <th class="midcol">Водитель</th>
+                            <th class="shortcol"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="data" class="content-section" style="display: none;">
+                <div id="dataTableDiv">
+                    <h2>Данные сотрудников
+                        <button id="addEmployeeBtn2" class="btn btn-primary btn-add">+</button>
+                    </h2>
+                    <table id="dataTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="shortcol">№</th>
+                            <th class="midcol">ФИО</th>
+                            <th class="midcol">Телефон</th>
+                            <th class="midcol">Дата рождения</th>
+                            <th class="midcol">Паспорт</th>
+                            <th class="midcol">ИНН</th>
+                            <th class="midcol">Счёт</th>
+                            <th class="midcol">БИК</th>
+                            <th class="shortcol"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 </div>
+<div id="employeeModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="modalTitle">Добавить нового сотрудника</h3>
+        <form id="employeeForm">
+            <input type="hidden" id="employeeId" name="employeeId">
+            <div class="form-group">
+                <label for="employeeName">ФИО:</label>
+                <input type="text" id="employeeName" name="employeeName" required>
+            </div>
+            <div class="form-group">
+                <label for="employeePhone">Телефон:</label>
+                <input type="text" id="employeePhone" name="employeePhone" required>
+            </div>
+            <div class="form-group-inline">
+                <label for="employeeDateOfBirth">Дата рождения:</label>
+                <input type="date" id="employeeDateOfBirth" name="employeeDateOfBirth" required>
 
-<!-- Скрипты -->
-<script src="/libs/jquery/jquery.min.js"></script>
-<script src="/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+                <label for="employeeIsDriver">Водитель:</label>
+                <input type="checkbox" id="employeeIsDriver" name="employeeIsDriver">
+            </div>
+
+            <div class="form-group">
+                <label for="employeePassport">Паспорт:</label>
+                <input type="text" id="employeePassport" name="employeePassport">
+            </div>
+            <div class="form-group">
+                <label for="employeeINN">ИНН:</label>
+                <input type="text" id="employeeINN" name="employeeINN">
+            </div>
+            <div class="form-group">
+                <label for="employeeAccountNumber">Номер счёта:</label>
+                <input type="text" id="employeeAccountNumber" name="employeeAccountNumber">
+            </div>
+            <div class="form-group">
+                <label for="employeeBIK">БИК счёта:</label>
+                <input type="text" id="employeeBIK" name="employeeBIK">
+            </div>
+            <button type="submit" id="modalSubmitButton" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+<script src="/libs/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="/libs/bootstrap.js"></script>
 <script src="/js/script.js"></script>
-<script src="/js/projects.js"></script>
+<script src="/js/employees.js"></script>
 </body>
 </html>

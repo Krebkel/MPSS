@@ -1,3 +1,4 @@
+using Contracts;
 using Contracts.ProductEntities;
 
 namespace Products.Services;
@@ -7,33 +8,26 @@ namespace Products.Services;
 /// </summary>
 public interface IProductService
 {
-    /// <summary>
-    /// Добавление изделия в базу данных
-    /// </summary>
-    /// <param name="product">Изделие</param>
-    /// <returns>ID созданного изделия</returns>
-    int CreateProduct(Product product);
+    Task<Product> CreateProductAsync(CreateProductRequest product, CancellationToken cancellationToken);
     
-    /// <summary>
-    /// Получение данных изделия из базы данных
-    /// </summary>
-    /// <param name="productId">ID изделия</param>
-    Product GetProduct(int productId);
+    Task<Product> UpdateProductAsync(UpdateProductRequest product, CancellationToken cancellationToken);
+    
+    Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken);
+    
+    Task<bool> DeleteProductAsync(int id, CancellationToken cancellationToken);
+}
 
-    /// <summary>
-    /// Получение данных о всех изделиях из базы данных
-    /// </summary>
-    List<Product> GetAllProducts();
+public class UpdateProductRequest
+{
+    public required int Id { get; set; }
+    public required string Name { get; set; }
+    public required double Cost { get; set; }
+    public required ProductType Type { get; set; }
+}
 
-    /// <summary>
-    /// Обновление данных изделия в базе данных
-    /// </summary>
-    /// <param name="product">Изделие</param>
-    void UpdateProduct(Product product);
-
-    /// <summary>
-    /// Обновление данных изделия в базе данных
-    /// </summary>
-    /// <param name="productId">ID изделия</param>
-    void DeleteProduct(int productId);
+public class CreateProductRequest
+{
+    public required string Name { get; set; }
+    public required double Cost { get; set; }
+    public required ProductType Type { get; set; }
 }

@@ -1,12 +1,14 @@
+using DataContracts;
+
 namespace Contracts.ProductEntities;
 
 /// <summary>
-/// Производимый продукт
+/// Производимое изделие
 /// </summary>
 public class Product : DatabaseEntity
 {
     /// <summary>
-    /// Наименование продукта
+    /// Наименование изделия
     /// </summary>
     public string Name { get; set; }
 
@@ -14,4 +16,9 @@ public class Product : DatabaseEntity
     /// Стоимость единицы в рублях
     /// </summary>
     public double Cost { get; set; }
+    
+    /// <summary>
+    /// Вид изделия
+    /// </summary>
+    public ProductType Type { get; set; }
 }

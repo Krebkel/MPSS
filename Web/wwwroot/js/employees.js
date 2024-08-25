@@ -1,0 +1,187 @@
+$(document).ready(function() {
+
+    $('#employeePassport').mask('9999 999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value.replace(/\s/g, ''));
+        }
+    });
+
+    $('#employeePhone').mask('+7(999)999-99-99', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
+
+    // Маска для ввода ИНН
+    $('#employeeINN').mask('999999999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
+
+    // Маска для ввода номера счета
+    $('#employeeAccountNumber').mask('99999999999999999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
+
+    // Маска для ввода БИК
+    $('#employeeBIK').mask('999999999', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
+    
+    function loadEmployees(fullData = false, tableId = 'employeesTable') {
+        $.getJSON('/api/employees/base', function(employees) {
+            const employeesTableBody = $(`#${tableId} tbody`);
+            employeesTableBody.empty();
+
+            employees.forEach((employee, index) => {
+                const employeeRow = `
+                <tr class="employee-row" data-employee-id="${employee.id}">
+                  <td class="shortcol">${index + 1}</td>
+                  <td class="midcol">${employee.name}</td>
+                  <td class="midcol">${employee.phone}</td>
+                  <td class="midcol">${formatDateForOutput(new Date(employee.dateOfBirth))}</td>
+                  ${fullData ? '' : `<td class="midcol">${employee.isDriver ? 'Да' : 'Нет'}</td>`}
+                  ${fullData ? `
+                    <td class="midcol">${employee.passport}</td>
+                    <td class="midcol">${employee.inn}</td>
+                    <td class="midcol">${employee.accountNumber}</td>
+                    <td class="midcol">${employee.bik}</td>
+                  ` : ''}
+                  <td class="midcol">
+                    <button class="btn btn-danger delete-employee-btn" data-employee-id="${employee.id}">⛌</button>
+                  </td>
+                </tr>
+              `;
+                employeesTableBody.append(employeeRow);
+            });
+
+            $(`.delete-employee-btn`).off('click').on('click', function(event) {
+                event.stopPropagation();
+                const employeeId = $(this).data('employee-id');
+                deleteEmployee(employeeId);
+            });
+
+            $(`.employee-row`).off('click').on('click', function() {
+                const employeeId = $(this).data('employee-id');
+                openEmployeeModal(employeeId);
+            });
+        });
+    }
+
+    function deleteEmployee(employeeId) {
+        if (confirm('Вы уверены, что хотите удалить этого сотрудника?')) {
+            $.ajax({
+                url: `/api/employees/base/${employeeId}`,
+                method: 'DELETE',
+                success: function() {
+                    alert('Сотрудник успешно удалён');
+                    loadEmployees(false, 'employeesTable');
+                    loadEmployees(true, 'dataTable');
+                }
+            });
+        }
+    }
+
+    function openEmployeeModal(employeeId) {
+        $.ajax({
+            url: `/api/employees/base/${employeeId}`,
+            type: 'GET',
+            success: function(data) {
+                $('#modalTitle').text('Редактировать сотрудника');
+                $('#employeeId').val(employeeId);
+                $('#employeeName').val(data.name);
+                $('#employeePhone').val(data.phone);
+                $('#employeeDateOfBirth').val(formatDateForInput(new Date(data.dateOfBirth)));
+                $('#employeeIsDriver').prop('checked', data.isDriver);
+                $('#employeeINN').val(data.inn);
+                $('#employeeAccountNumber').val(data.accountNumber);
+                $('#employeeBIK').val(data.bik);
+                $('#employeeModal').fadeIn();
+            },
+            error: function(err) {
+                console.error('Ошибка при получении данных сотрудника:', err);
+            }
+        });
+    }
+
+    function formatDateForInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    function formatDateForOutput(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
+
+    function submitEmployeeForm() {
+        const employeeData = {
+            Name: $('#employeeName').val(),
+            Phone: $('#employeePhone').val(),
+            DateOfBirth: $('#employeeDateOfBirth').val(),
+            IsDriver: $('#employeeIsDriver').prop('checked'),
+            Passport: $('#employeePassport').val().replace(/\s/g, '') || null,
+            INN: $('#employeeINN').val() || null,
+            AccountNumber: $('#employeeAccountNumber').val() || null,
+            BIK: $('#employeeBIK').val() || null
+        };
+        const employeeId = $('#employeeId').val();
+        const url = employeeId ? `/api/employees/base/${employeeId}` : '/api/employees/base';
+        const method = employeeId ? 'PUT' : 'POST';
+
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: 'application/json',
+            data: JSON.stringify(employeeData),
+            success: function () {
+                $('#employeeModal').hide();
+                loadEmployees(false, 'employeesTable');
+                loadEmployees(true, 'dataTable');
+                alert(employeeId ? 'Сотрудник успешно обновлен' : 'Новый сотрудник успешно добавлен');
+            },
+            error: function () {
+                alert('Ошибка при сохранении данных сотрудника');
+            }
+        });
+    }
+
+    $('.close').on('click', function() {
+        $(this).closest('.modal').fadeOut();
+    });
+    $(window).on('click', function(event) {
+        if ($(event.target).hasClass('modal')) {
+            $(event.target).fadeOut();
+        }
+    });
+    
+    $('#employeeForm').on('submit', function(event) {
+        event.preventDefault();
+        submitEmployeeForm();
+    });
+    
+    $('#addEmployeeBtn, #addEmployeeBtn2').on('click', function() {
+        $('#modalTitle').text('Добавить нового сотрудника');
+        $('#employeeForm')[0].reset();
+        $('#employeeId').val('');
+        $('#employeeDateOfBirth').val(new Date().toISOString().split('T')[0]);
+        $('#employeeModal').fadeIn();
+    });
+
+    loadEmployees(false, 'employeesTable');
+    loadEmployees(true, 'dataTable');
+});

@@ -1,37 +1,32 @@
 using Contracts.ProductEntities;
+using Contracts.ProjectEntities;
 
 namespace Products.Services;
 
 public interface IProjectProductService
 {
-    /// <summary>
-    /// Добавление изделия в проекте в базу данных
-    /// </summary>
-    /// <param name="projectProduct">Изделие в проекте</param>
-    /// <returns>ID созданного изделия в проекте</returns>
-    int CreateProjectProduct(ProjectProduct projectProduct);
-
-    /// <summary>
-    /// Получение изделия в проекте из базы данных
-    /// </summary>
-    /// <param name="projectProductId">ID изделия в проекте</param>
-    ProjectProduct GetProjectProduct(int projectProductId);
-
-    /// <summary>
-    /// Получение данных всех изделий в проекте
-    /// </summary>
-    /// <param name="projectId">ID проекта</param>
-    List<ProjectProduct> GetAllProjectProducts(int projectId);
+    Task<ProjectProduct> CreateProjectProductAsync(CreateProjectProductRequest projectProduct, CancellationToken cancellationToken);
     
-    /// <summary>
-    /// Обновление изделия в проекте в базе данных
-    /// </summary>
-    /// <param name="projectProduct">Изделие в проекте</param>
-    void UpdateProjectProduct(ProjectProduct projectProduct);
+    Task<ProjectProduct> UpdateProjectProductAsync(UpdateProjectProductRequest projectProduct, CancellationToken cancellationToken);
+    
+    Task<ProjectProduct?> GetProjectProductByIdAsync(int id, CancellationToken cancellationToken);
+    
+    Task<bool> DeleteProjectProductAsync(int id, CancellationToken cancellationToken);
+}
 
-    /// <summary>
-    /// Добавление изделия в проекте в базу данных
-    /// </summary>
-    /// <param name="projectProductId">ID изделия в проекте</param>
-    void DeleteProjectProduct(int projectProductId);
+public class UpdateProjectProductRequest
+{
+    public required int Id { get; set; }
+    public required Project Project { get; set; }
+    public required Product Product { get; set; }
+    public required int Quantity { get; set; }
+    public required double Markup { get; set; }
+}
+
+public class CreateProjectProductRequest
+{
+    public required Project Project { get; set; }
+    public required Product Product { get; set; }
+    public required int Quantity { get; set; }
+    public required double Markup { get; set; }
 }

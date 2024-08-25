@@ -7,43 +7,36 @@ namespace Employees.Services;
 /// </summary>
 public interface IEmployeeService
 {
-    /// <summary>
-    /// Создание нового сотрудника в базе данных
-    /// </summary>
-    /// <param name="employee">Сотрудник</param>
-    /// <returns>ID созданного сотрудника</returns>
-    int CreateEmployee(Employee employee);
-
-    /// <summary>
-    /// Получение данных сотрудника из базы данных
-    /// </summary>
-    /// <param name="employeeId">ID сотрудника</param>
-    /// <returns>Сотрудник</returns>
-    Employee GetEmployee(int employeeId);
-
-    /// <summary>
-    /// Получение данных всех сотрудников из базы данных
-    /// </summary>
-    /// <returns>Сотрудники</returns>
-    List<Employee> GetAllEmployees();
+    Task<Employee> CreateEmployeeAsync(CreateEmployeeRequest employee, CancellationToken cancellationToken);
     
-    /// <summary>
-    /// Обновление данных сотрудника в базе данных
-    /// </summary>
-    /// <param name="employee">Сотрудник</param>
-    void UpdateEmployee(Employee employee);
+    Task<Employee> UpdateEmployeeAsync(UpdateEmployeeRequest employee, CancellationToken cancellationToken);
+    
+    Task<Employee?> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken);
+    
+    Task<bool> DeleteEmployeeAsync(int id, CancellationToken cancellationToken);
+}
 
-    /// <summary>
-    /// Удаление данных сотрудника из базы данных
-    /// </summary>
-    /// <param name="employeeId">ID сотрудника</param>
-    void DeleteEmployee(int employeeId);
+public class UpdateEmployeeRequest
+{
+    public required int Id { get; set; }
+    public required string Name { get; set; }
+    public required string Phone { get; set; }
+    public bool IsDriver { get; set; }
+    public ulong? Passport { get; set; }
+    public DateTimeOffset DateOfBirth { get; set; }
+    public ulong? INN { get; set; }
+    public ulong? AccountNumber { get; set; }
+    public ulong? BIK { get; set; }
+}
 
-    /// <summary>
-    /// Назначение смены сотруднику
-    /// </summary>
-    /// <param name="employeeShift">Смена сотрудника</param>
-    /// <returns>ID созданной смены</returns>
-    int AssignShift(EmployeeShift employeeShift);
-
+public class CreateEmployeeRequest
+{
+    public required string Name { get; set; }
+    public required string Phone { get; set; }
+    public bool IsDriver { get; set; }
+    public ulong? Passport { get; set; }
+    public DateTimeOffset DateOfBirth { get; set; }
+    public ulong? INN { get; set; }
+    public ulong? AccountNumber { get; set; }
+    public ulong? BIK { get; set; }
 }

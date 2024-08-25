@@ -1,3 +1,6 @@
+using Contracts.ProjectEntities;
+using DataContracts;
+
 namespace Contracts.ProductEntities;
 
 /// <summary>
@@ -8,12 +11,12 @@ public class ProjectProduct : DatabaseEntity
     /// <summary>
     /// ID проекта
     /// </summary>
-    public int ProjectId { get; set; }
+    public Project Project { get; set; }
 
     /// <summary>
     /// Производимая единица
     /// </summary>
-    public int ProductId { get; set; }
+    public Product Product { get; set; }
 
     /// <summary>
     /// Количество единиц в штуках

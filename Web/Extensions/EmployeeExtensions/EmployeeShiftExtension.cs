@@ -1,55 +1,40 @@
-using Contracts.EmployeeEntities;
+using Employees.Services;
 using Web.Requests.EmployeeRequests;
-using Web.Responses.EmployeeResponses;
 
 namespace Web.Extensions.EmployeeExtensions;
 
 public static class EmployeeShiftExtension
 {
-    public static EmployeeShift ToEmployeeShift(this CreateEmployeeShiftApiRequest apiRequest)
+    internal static CreateEmployeeShiftRequest ToCreateEmployeeShiftApiRequest(this CreateEmployeeShiftApiRequest request)
     {
-        return new EmployeeShift
+        return new CreateEmployeeShiftRequest
         {
-            ProjectId = apiRequest.ProjectId,
-            EmployeeId = apiRequest.EmployeeId,
-            Date = apiRequest.Date,
-            Arrival = apiRequest.Arrival,
-            Departure = apiRequest.Departure,
-            HoursWorked = apiRequest.HoursWorked,
-            TravelTime = apiRequest.TravelTime,
-            ConsiderTravel = apiRequest.ConsiderTravel
+            Project = request.Project,
+            Employee = request.Employee,
+            Date = request.Date,
+            Arrival = request.Arrival,
+            Departure = request.Departure,
+            HoursWorked = request.HoursWorked,
+            TravelTime = request.TravelTime,
+            ConsiderTravel = request.ConsiderTravel,
+            ISN = request.ISN
         };
     }
-
-    public static EmployeeShift ToEmployeeShift(this UpdateEmployeeShiftApiRequest apiRequest, int id)
+    
+    internal static UpdateEmployeeShiftRequest ToUpdateEmployeeShiftApiRequest(this UpdateEmployeeShiftApiRequest request)
     {
-        return new EmployeeShift
+        return new UpdateEmployeeShiftRequest
         {
-            Id = id,
-            ProjectId = apiRequest.ProjectId,
-            EmployeeId = apiRequest.EmployeeId,
-            Date = apiRequest.Date,
-            Arrival = apiRequest.Arrival,
-            Departure = apiRequest.Departure,
-            HoursWorked = apiRequest.HoursWorked,
-            TravelTime = apiRequest.TravelTime,
-            ConsiderTravel = apiRequest.ConsiderTravel
-        };
-    }
-
-    public static ApiEmployeeShift ToApiEmployeeShift(this EmployeeShift employeeShift)
-    {
-        return new ApiEmployeeShift
-        {
-            Id = employeeShift.Id,
-            ProjectId = employeeShift.ProjectId,
-            EmployeeId = employeeShift.EmployeeId,
-            Date = employeeShift.Date,
-            Arrival = employeeShift.Arrival,
-            Departure = employeeShift.Departure,
-            HoursWorked = employeeShift.HoursWorked,
-            TravelTime = employeeShift.TravelTime,
-            ConsiderTravel = employeeShift.ConsiderTravel
+            Id = request.Id,
+            Project = request.Project,
+            Employee = request.Employee,
+            Date = request.Date,
+            Arrival = request.Arrival,
+            Departure = request.Departure,
+            HoursWorked = request.HoursWorked,
+            TravelTime = request.TravelTime,
+            ConsiderTravel = request.ConsiderTravel,
+            ISN = request.ISN
         };
     }
 }

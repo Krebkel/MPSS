@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Logging;
 using Contracts.EmployeeEntities;
-using Data;
+using DataContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Services;
 
@@ -8,61 +10,75 @@ namespace Employees.Services;
 /// </summary>
 public class EmployeeService : IEmployeeService
 {
-    private readonly AppDbContext _context;
+    private readonly IRepository<Employee> _employeeRepository;
+    private readonly ILogger<EmployeeService> _logger;
 
-    public EmployeeService(AppDbContext context)
+    public EmployeeService(
+        IRepository<Employee> employeeRepository,
+        ILogger<EmployeeService> logger)
     {
-        _context = context;
-    }
-
-    /// <inheritdoc />
-    public int CreateEmployee(Employee employee)
-    {
-        _context.Employees.Add(employee);
-        _context.SaveChanges();
-        return employee.Id;
-    }
-
-    /// <inheritdoc />
-    public Employee GetEmployee(int employeeId)
-    {
-        return _context.Employees.Find(employeeId);
+        _employeeRepository = employeeRepository;
+        _logger = logger;
     }
     
-    /// <inheritdoc />
-    public List<Employee> GetAllEmployees()
+    public async Task<Employee> CreateEmployeeAsync(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
-        return _context.Employees.ToList();
-    }
-    
-    /// <inheritdoc />
-    public void UpdateEmployee(Employee employee)
-    {
-        var existingEmployee = _context.Employees.Find(employee.Id);
+        var createdEmployee = new Employee
+        {
+            Name = null,
+            Phone = null,
+            IsDriver = false,
+            Passport = null,
+            DateOfBirth = default,
+            INN = null,
+            AccountNumber = null,
+            BIK = null
+        };
         
-        if (existingEmployee != null)
-        {
-            _context.Employees.Update(employee);
-            _context.SaveChanges();
-        }
+        _logger.LogInformation("Сотрудник успешно добавлен: {@Employee}", createdEmployee);
+        return createdEmployee;
+    }
+    
+    public async Task<Employee?> UpdateEmployeeAsync(UpdateEmployeeRequest request, CancellationToken cancellationToken)
+    {
+        var employee = await _employeeRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        
+        if (employee == null) return null;
+
+        employee.Name = request.Name;
+        employee.Phone = request.Phone;
+        employee.IsDriver = request.IsDriver;
+        employee.Passport = request.Passport;
+        employee.DateOfBirth = request.DateOfBirth;
+        employee.INN = request.INN;
+        employee.AccountNumber = request.AccountNumber;
+        employee.BIK = request.BIK;
+
+        await _employeeRepository.UpdateAsync(employee, cancellationToken);
+
+        _logger.LogInformation("Сотрудник успешно обновлен: {@Employee}", employee);
+        return employee;
+    }
+    
+    public async Task<Employee?> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await _employeeRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    /// <inheritdoc />
-    public void DeleteEmployee(int employeeId)
+    public async Task<bool> DeleteEmployeeAsync(int id, CancellationToken cancellationToken)
     {
-        var employee = _context.Employees.Find(employeeId);
-        if (employee != null)
-        {
-            _context.Employees.Remove(employee);
-            _context.SaveChanges();
-        }
-    }
+        var employee = await _employeeRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        
+        if (employee == null) return false;
 
-    /// <inheritdoc />
-    public int AssignShift(EmployeeShift employeeShift)
-    {
-        _context.EmployeeShifts.Add(employeeShift);
-        _context.SaveChanges();
-        return employeeShift.Id;
+        await _employeeRepository.DeleteAsync(employee, cancellationToken);
+        _logger.LogInformation("Сотрудник с ID {Id} успешно удален", id);
+        return true;
     }
 }

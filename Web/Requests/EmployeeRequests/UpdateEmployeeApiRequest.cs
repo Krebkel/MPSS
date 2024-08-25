@@ -2,6 +2,7 @@ namespace Web.Requests.EmployeeRequests;
 
 public class UpdateEmployeeApiRequest
 {
+    public required int Id { get; set; }
     public required string Name { get; set; }
     public required string Phone { get; set; }
     public bool IsDriver { get; set; }

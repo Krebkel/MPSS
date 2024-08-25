@@ -1,3 +1,6 @@
+using Contracts.EmployeeEntities;
+using DataContracts;
+
 namespace Contracts.ProjectEntities;
 
 /// <summary>
@@ -26,24 +29,14 @@ public class Project : DatabaseEntity
     public DateTimeOffset StartDate { get; set; }
 
     /// <summary>
-    /// Дата приостановки работы на объекте
-    /// </summary>
-    public DateTimeOffset? DateSuspended { get; set; }
-
-    /// <summary>
     /// ID организации-заказчика
     /// </summary>
-    public int? CounteragentId { get; set; }
-
-    /// <summary>
-    /// Суммарная стоимость проекта
-    /// </summary>
-    public double TotalCost { get; set; }
+    public Counteragent? Counteragent { get; set; }
 
     /// <summary>
     /// Ответственный сотрудник
     /// </summary>
-    public int ResponsibleEmployeeId { get; set; }
+    public Employee ResponsibleEmployee { get; set; }
     
     /// <summary>
     /// Процент, который получает руководитель от прибыли

@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Logging;
 using Contracts.EmployeeEntities;
-using Contracts.ProjectEntities;
-using Data;
+using DataContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Services;
 
@@ -9,125 +10,74 @@ namespace Employees.Services;
 /// </summary>
 public class EmployeeShiftService : IEmployeeShiftService
 {
-    private readonly AppDbContext _context;
+    private readonly IRepository<EmployeeShift> _employeeShiftRepository;
+    private readonly ILogger<EmployeeShiftService> _logger;
 
-    public EmployeeShiftService(AppDbContext context)
+    public EmployeeShiftService(
+        IRepository<EmployeeShift> employeeShiftRepository,
+        ILogger<EmployeeShiftService> logger)
     {
-        _context = context;
-    }
-
-    /// <inheritdoc />
-    public int CreateEmployeeShift(EmployeeShift employeeShift)
-    {
-        _context.EmployeeShifts.Add(employeeShift);
-        _context.SaveChanges();
-        return employeeShift.Id;
-    }
-    
-    /// <inheritdoc />
-    public EmployeeShift GetEmployeeShift(int employeeShiftId)
-    {
-        return _context.EmployeeShifts.Find(employeeShiftId);
-    }
-    
-    /// <inheritdoc />
-    public List<EmployeeShift> GetAllEmployeeShifts(int employeeId)
-    {
-        return _context.EmployeeShifts
-            .Where(es => es.EmployeeId == employeeId)
-            .ToList();
+        _employeeShiftRepository = employeeShiftRepository;
+        _logger = logger;
     }
 
-    /// <inheritdoc />
-    public void UpdateEmployeeShift(EmployeeShift employeeShift)
+    public async Task<EmployeeShift> CreateEmployeeShiftAsync(CreateEmployeeShiftRequest request, CancellationToken cancellationToken)
     {
-        var existingShift = _context.EmployeeShifts.Find(employeeShift);
+        var createdEmployeeShift = new EmployeeShift
+        {
+            Project = request.Project,
+            Employee = request.Employee,
+            Date = request.Date,
+            Arrival = request.Arrival,
+            Departure = request.Departure,
+            HoursWorked = request.HoursWorked,
+            TravelTime = request.TravelTime,
+            ConsiderTravel = request.ConsiderTravel,
+            ISN = request.ISN ?? null
+        };
         
-        if (existingShift != null)
-        {
-            _context.EmployeeShifts.Update(employeeShift);
-            _context.SaveChanges();
-        }
+        _logger.LogInformation("Смена успешно добавлена: {@Date}", createdEmployeeShift.Date);
+        return createdEmployeeShift;
+    }
+    
+    public async Task<EmployeeShift?> UpdateEmployeeShiftAsync(UpdateEmployeeShiftRequest request, CancellationToken cancellationToken)
+    {
+        var employeeShift = await _employeeShiftRepository.GetAll().FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        if (employeeShift == null) return null;
+
+        employeeShift.Project = request.Project;
+        employeeShift.Employee = request.Employee;
+        employeeShift.Date = request.Date;
+        employeeShift.Arrival = request.Arrival;
+        employeeShift.Departure = request.Departure;
+        employeeShift.HoursWorked = request.HoursWorked;
+        employeeShift.TravelTime = request.TravelTime;
+        employeeShift.ConsiderTravel = request.ConsiderTravel;
+        employeeShift.ISN = request.ISN;
+
+        await _employeeShiftRepository.UpdateAsync(employeeShift, cancellationToken);
+
+        _logger.LogInformation("Смена успешно обновлена: {@EmployeeShift}", employeeShift);
+        return employeeShift;
+    }
+    
+    public async Task<EmployeeShift?> GetEmployeeShiftByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await _employeeShiftRepository
+            .GetAll()
+            .FirstOrDefaultAsync(es => es.Id == id, cancellationToken);
     }
 
-    /// <inheritdoc />
-    public void DeleteEmployeeShift(int employeeShiftId)
+    public async Task<bool> DeleteEmployeeShiftAsync(int id, CancellationToken cancellationToken)
     {
-        var employeeShift = _context.EmployeeShifts.Find(employeeShiftId);
+        var employeeShift = await _employeeShiftRepository
+            .GetAll()
+            .FirstOrDefaultAsync(es => es.Id == id, cancellationToken);
         
-        if (employeeShift != null)
-        {
-            _context.EmployeeShifts.Remove(employeeShift);
-            _context.SaveChanges();
-        }
-    }
+        if (employeeShift == null) return false;
 
-    /// <inheritdoc />
-    public float CalculateTotalTime(DateTimeOffset? arrival, DateTimeOffset? departure)
-    {
-        if (arrival.HasValue && departure.HasValue)
-        {
-            return (float)(departure.Value - arrival.Value).TotalHours;
-        }
-        return 0;
-    }
-    
-    /// <inheritdoc />
-    public double CalculateTotalWage(int employeeId, int projectId)
-    {
-        var employeeShifts = _context.EmployeeShifts
-            .Where(es => es.EmployeeId == employeeId && es.ProjectId == projectId)
-            .ToList();
-
-        if (employeeShifts.Count == 0)
-        {
-            return 0;
-        }
-
-        var project = _context.Projects.Find(projectId);
-        if (project == null)
-        {
-            throw new ArgumentException("Project not found");
-        }
-
-        double totalBaseWage = employeeShifts.Sum(es => CalculateTotalTime(es.Arrival, es.Departure) * 300);
-
-        double totalMarkup = _context.ProjectProducts
-            .Where(pp => pp.ProjectId == projectId)
-            .Sum(pp => pp.Markup * pp.Quantity);
-
-        double expensesNotPaidByCompany = _context.Expenses
-            .Where(e => e.ProjectId == projectId && !e.IsPaidByCompany)
-            .Sum(e => e.Amount ?? 0);
-
-        double managerShare = totalMarkup * (project.ManagerShare / 100);
-        double distributableAmount = totalMarkup - expensesNotPaidByCompany - managerShare;
-
-        var totalISN = _context.EmployeeShifts
-            .Where(es => es.ProjectId == projectId)
-            .Sum(es => es.ISN);
-
-        double employeeISN = employeeShifts.Sum(es => es.ISN);
-        double totalBonus = (distributableAmount * employeeISN) / totalISN;
-
-        return totalBaseWage + totalBonus;
-    }
-    
-    /// <inheritdoc />
-    public double CalculateTotalWageForDoneProjects(int employeeId)
-    {
-        var doneProjects = _context.Projects
-            .Where(p => p.ProjectStatus == ProjectStatus.Done)
-            .Select(p => p.Id)
-            .ToList();
-
-        double totalWage = 0;
-
-        foreach (var projectId in doneProjects)
-        {
-            totalWage += CalculateTotalWage(employeeId, projectId);
-        }
-
-        return totalWage;
+        await _employeeShiftRepository.DeleteAsync(employeeShift, cancellationToken);
+        _logger.LogInformation("Смена с ID {Id} успешно удален", id);
+        return true;
     }
 }
