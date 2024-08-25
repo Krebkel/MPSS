@@ -1,3 +1,6 @@
+using Contracts.ProjectEntities;
+using DataContracts;
+
 namespace Contracts.EmployeeEntities;
 
 /// <summary>
@@ -8,12 +11,12 @@ public class EmployeeShift : DatabaseEntity
     /// <summary>
     /// ID проекта
     /// </summary>
-    public int ProjectId { get; set; }
+    public Project Project { get; set; }
 
     /// <summary>
     /// ID сотрудника
     /// </summary>
-    public int EmployeeId { get; set; }
+    public Employee Employee { get; set; }
 
     /// <summary>
     /// Дата смены
@@ -48,5 +51,5 @@ public class EmployeeShift : DatabaseEntity
     /// <summary>
     /// Индивидуальная стимулирующая надбавка
     /// </summary>
-    public int ISN { get; set; }
+    public int? ISN { get; set; }
 }

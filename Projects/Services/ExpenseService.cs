@@ -1,88 +1,79 @@
+using Contracts;
+using Microsoft.Extensions.Logging;
 using Contracts.ProjectEntities;
-using Data;
+using DataContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Projects.Services;
 
 public class ExpenseService : IExpenseService
 {
-    private readonly AppDbContext _context;
+    private readonly IRepository<Expense> _expenseRepository;
+    private readonly ILogger<ExpenseService> _logger;
 
-    public ExpenseService(AppDbContext context)
+    public ExpenseService(
+        IRepository<Expense> expenseRepository,
+        ILogger<ExpenseService> logger)
     {
-        _context = context;
+        _expenseRepository = expenseRepository;
+        _logger = logger;
     }
 
-    public int CreateExpense(Expense expense)
+    public async Task<Expense> CreateExpenseAsync(CreateExpenseRequest request, CancellationToken cancellationToken)
     {
-        ValidateExpense(expense);
-        
-        _context.Expenses.Add(expense);
-        _context.SaveChanges();
-        return expense.Id;
-    }
-
-    public Expense GetExpense(int expenseId)
-    {
-        return _context.Expenses.Find(expenseId);
-    }
-
-    public List<Expense> GetExpensesByProject(int projectId)
-    {
-        return _context.Expenses
-            .Where(e => e.ProjectId == projectId)
-            .OrderBy(e=>e.Name)
-            .ToList();
-    }
-
-    public void UpdateExpense(Expense expense)
-    {
-        ValidateExpense(expense);
-        
-        var existingExpense = _context.Expenses.Find(expense.Id);
-    
-        if (existingExpense != null)
+        var createdExpense = new Expense
         {
-            existingExpense.ProjectId = expense.ProjectId;
-            existingExpense.Name = expense.Name ?? existingExpense.Name;
-            existingExpense.Amount = expense.Amount ?? existingExpense.Amount;
-            existingExpense.Description = expense.Description ?? existingExpense.Description;
-            existingExpense.Type = expense.Type;
-            existingExpense.IsPaidByCompany = expense.IsPaidByCompany;
-
-            _context.SaveChanges();
-        }
-    }
-
-    public void DeleteExpense(int expenseId)
-    {
-        var expense = _context.Expenses.Find(expenseId);
-        if (expense != null)
-        {
-            _context.Expenses.Remove(expense);
-            _context.SaveChanges();
-        }
+            Project = request.Project,
+            Name = request.Name,
+            Amount = request.Amount,
+            Description = request.Description,
+            Type = request.Type,
+            IsPaidByCompany = request.IsPaidByCompany
+        };
+        
+        _logger.LogInformation("Расход успешно добавлен: {@Expense}", createdExpense);
+        return createdExpense;
     }
     
-    private void ValidateExpense(Expense expense)
+    public async Task<Expense?> UpdateExpenseAsync(UpdateExpenseRequest request, CancellationToken cancellationToken)
     {
-        if (expense.ProjectId <= 0)
-        {
-            throw new ArgumentException("Ошибка выбора проекта.");
-        }
+        var expense = await _expenseRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        
+        if (expense == null) return null;
 
-        if (string.IsNullOrWhiteSpace(expense.Name))
-        {
-            throw new ArgumentException("Ошибка в наименовании затрат");
-        }
+        expense.Id = request.Id;
+        expense.Project = request.Project;
+        expense.Name = request.Name;
+        expense.Amount = request.Amount;
+        expense.Description = request.Description;
+        expense.Type = request.Type;
+        expense.IsPaidByCompany = request.IsPaidByCompany;
 
-        if (expense.Amount.HasValue && expense.Amount <= 0)
-        {
-            throw new ArgumentException("Некорректное значение количества потраченных средств.");
-        }
+        await _expenseRepository.UpdateAsync(expense, cancellationToken);
 
-        if (!Enum.IsDefined(typeof(ExpenseType), expense.Type))
-        {
-            throw new ArgumentException("Ошибка в типе затрат.");
-        }
+        _logger.LogInformation("Расход успешно обновлен: {@Expense}", expense);
+        return expense;
+    }
+    
+    public async Task<Expense?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await _expenseRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
+    public async Task<bool> DeleteExpenseAsync(int id, CancellationToken cancellationToken)
+    {
+        var expense = await _expenseRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        
+        if (expense == null) return false;
+
+        await _expenseRepository.DeleteAsync(expense, cancellationToken);
+        _logger.LogInformation("Расход с ID {Id} успешно удален", id);
+        return true;
     }
 }

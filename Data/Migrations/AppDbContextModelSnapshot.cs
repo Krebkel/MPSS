@@ -90,7 +90,7 @@ namespace Data.Migrations
                     b.Property<float?>("HoursWorked")
                         .HasColumnType("float");
 
-                    b.Property<int>("ISN")
+                    b.Property<int?>("ISN")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProjectId")
@@ -100,6 +100,10 @@ namespace Data.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("EmployeeShifts", "mpss");
                 });
@@ -119,6 +123,10 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -149,6 +157,8 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProductId");
+
                     b.ToTable("ProductComponents", "mpss");
                 });
 
@@ -173,6 +183,10 @@ namespace Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectProducts", "mpss");
                 });
@@ -242,10 +256,13 @@ namespace Data.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("Expenses", "mpss");
                 });
@@ -264,9 +281,6 @@ namespace Data.Migrations
 
                     b.Property<int?>("CounteragentId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset?>("DateSuspended")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("DeadlineDate")
                         .HasColumnType("timestamp with time zone");
@@ -292,15 +306,118 @@ namespace Data.Migrations
 
                     b.HasIndex("CounteragentId");
 
+                    b.HasIndex("ResponsibleEmployeeId");
+
                     b.ToTable("Projects", "mpss");
+                });
+
+            modelBuilder.Entity("Contracts.ProjectEntities.ProjectSuspension", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("DateSuspended")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectSuspensions", "mpss");
+                });
+
+            modelBuilder.Entity("Contracts.EmployeeEntities.EmployeeShift", b =>
+                {
+                    b.HasOne("Contracts.EmployeeEntities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Contracts.ProjectEntities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Contracts.ProductEntities.ProductComponent", b =>
+                {
+                    b.HasOne("Contracts.ProductEntities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Contracts.ProductEntities.ProjectProduct", b =>
+                {
+                    b.HasOne("Contracts.ProductEntities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Contracts.ProjectEntities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Contracts.ProjectEntities.Expense", b =>
+                {
+                    b.HasOne("Contracts.ProjectEntities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Contracts.ProjectEntities.Project", b =>
                 {
-                    b.HasOne("Contracts.ProjectEntities.Counteragent", null)
+                    b.HasOne("Contracts.ProjectEntities.Counteragent", "Counteragent")
                         .WithMany()
-                        .HasForeignKey("CounteragentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CounteragentId");
+
+                    b.HasOne("Contracts.EmployeeEntities.Employee", "ResponsibleEmployee")
+                        .WithMany()
+                        .HasForeignKey("ResponsibleEmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Counteragent");
+
+                    b.Navigation("ResponsibleEmployee");
+                });
+
+            modelBuilder.Entity("Contracts.ProjectEntities.ProjectSuspension", b =>
+                {
+                    b.HasOne("Contracts.ProjectEntities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 #pragma warning restore 612, 618
         }

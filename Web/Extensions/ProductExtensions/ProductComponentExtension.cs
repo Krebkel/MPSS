@@ -1,43 +1,32 @@
-using Contracts.ProductEntities;
+using Products.Services;
 using Web.Requests.ProductRequests;
-using Web.Responses.ProductResponses;
 
 namespace Web.Extensions.ProductExtensions;
 
 public static class ProductComponentExtension
 {
-    public static ProductComponent ToProductComponent(this CreateProductComponentApiRequest apiRequest)
+    internal static CreateProductComponentRequest ToCreateProductComponentApiRequest(
+        this CreateProductComponentApiRequest request)
     {
-        return new ProductComponent
+        return new CreateProductComponentRequest
         {
-            ProductId = apiRequest.ProductId,
-            Name = apiRequest.Name,
-            Quantity = apiRequest.Quantity,
-            Weight = apiRequest.Weight
+            Product = request.Product,
+            Name = request.Name,
+            Quantity = request.Quantity,
+            Weight = request.Weight
         };
     }
-
-    public static ProductComponent ToProductComponent(this UpdateProductComponentApiRequest apiRequest, int id)
+    
+    internal static UpdateProductComponentRequest ToUpdateProductComponentApiRequest(
+        this UpdateProductComponentApiRequest request)
     {
-        return new ProductComponent
+        return new UpdateProductComponentRequest
         {
-            Id = id,
-            ProductId = apiRequest.ProductId,
-            Name = apiRequest.Name,
-            Quantity = apiRequest.Quantity,
-            Weight = apiRequest.Weight
-        };
-    }
-
-    public static ApiProductComponent ToApiProductComponent(this ProductComponent productComponent)
-    {
-        return new ApiProductComponent
-        {
-            Id = productComponent.Id,
-            ProductId = productComponent.ProductId,
-            Name = productComponent.Name,
-            Quantity = productComponent.Quantity,
-            Weight = productComponent.Weight
+            Id = request.Id,
+            Product = request.Product,
+            Name = request.Name,
+            Quantity = request.Quantity,
+            Weight = request.Weight
         };
     }
 }

@@ -1,6 +1,5 @@
 using Contracts.ProductEntities;
 using Data;
-using Products.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +9,7 @@ namespace Tests.Products;
 public class ProductTests
 {
     private AppDbContext _context;
-    private ProductService _service;
+    private ProductRepository _repository;
 
     [SetUp]
     public void Setup()
@@ -42,7 +41,7 @@ public class ProductTests
         });
         _context.SaveChanges();
 
-        _service = new ProductService(_context);
+        _repository = new ProductRepository(_context);
     }
     
     [TearDown]
@@ -56,7 +55,7 @@ public class ProductTests
     {
         var product = new Product { Name = "Table", Cost = 150 };
             
-        var productId = _service.CreateProduct(product);
+        var productId = _repository.CreateProduct(product);
         var createdProduct = _context.Products.Find(productId);
 
         Assert.IsNotNull(createdProduct);
@@ -66,7 +65,7 @@ public class ProductTests
     [Test]
     public void GetProduct_ShouldReturnCorrectProduct()
     {
-        var product = _service.GetProduct(1);
+        var product = _repository.GetProduct(1);
         Assert.IsNotNull(product);
         Assert.AreEqual(1, product.Id);
     }
@@ -74,7 +73,7 @@ public class ProductTests
     [Test]
     public void GetAllProducts_ShouldReturnAllProducts()
     {
-        var products = _service.GetAllProducts();
+        var products = _repository.GetAllProducts();
         Assert.AreEqual(2, products.Count);
     }
 
@@ -85,7 +84,7 @@ public class ProductTests
         if (product != null)
         {
             product.Name = "Updated Shelf";
-            _service.UpdateProduct(product);
+            _repository.UpdateProduct(product);
         }
 
         var updatedProduct = _context.Products.Find(1);
@@ -96,7 +95,7 @@ public class ProductTests
     [Test]
     public void DeleteProduct_ShouldRemoveProductFromDatabase()
     {
-        _service.DeleteProduct(1);
+        _repository.DeleteProduct(1);
         var deletedProduct = _context.Products.Find(1);
         Assert.IsNull(deletedProduct);
     }

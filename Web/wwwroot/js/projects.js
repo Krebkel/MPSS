@@ -5,9 +5,9 @@ $(document).ready(function() {
         chartContainer.empty();
         const today = new Date();
         const startDate = new Date();
-        startDate.setDate(today.getDate() - 15);
+        startDate.setDate(today.getDate() - 3);
         const endDate = new Date();
-        endDate.setDate(today.getDate() + 15);
+        endDate.setDate(today.getDate() + 30);
 
         let monthRow = '<tr><th rowspan="2">Проект</th>';
         let currentMonth = startDate.getMonth();
@@ -92,12 +92,23 @@ $(document).ready(function() {
     }
 
     function loadProjects() {
-        $.getJSON('/api/projects', function(projects) {
-            createGanttChart(projects);
+        $.getJSON('/api/projects/base', function(allProjects) {
+            const today = new Date();
+            const startDate = new Date(today);
+            startDate.setDate(today.getDate() - 3);
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + 30);
+
+            const filteredProjects = allProjects.filter(project => {
+                const deadlineDate = new Date(project.deadlineDate);
+                return deadlineDate >= startDate && deadlineDate <= endDate;
+            });
+
+            createGanttChart(filteredProjects);
             const projectsTableBody = $('#projectsTable tbody');
             projectsTableBody.empty();
 
-            projects.forEach((project, index) => {
+            filteredProjects.forEach((project, index) => {
                 const projectRow = `
                 <tr class="project-row" data-project-id="${project.id}">
                     <td class="shortcol">${index + 1}</td>
@@ -106,7 +117,7 @@ $(document).ready(function() {
                     <td class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</td>
                     <td class="midcol">${translateStatus(project.projectStatus)}</td>
                     <td class="midcol">
-                        <button class="btn btn-danger delete-project-btn" data-project-id="${project.id}">Удалить</button>
+                        <button class="btn btn-danger delete-project-btn" data-project-id="${project.id}">⛌</button>
                     </td>
                 </tr>
             `;
@@ -139,7 +150,7 @@ $(document).ready(function() {
     function deleteProject(projectId) {
         if (confirm('Вы уверены, что хотите удалить этот проект?')) {
             $.ajax({
-                url: `/api/projects/${projectId}`,
+                url: `/api/projects/base/${projectId}`,
                 method: 'DELETE',
                 success: function() {
                     alert('Проект успешно удален');
@@ -157,7 +168,7 @@ $(document).ready(function() {
         shiftList.empty();
         addShiftForm.empty();
 
-        $.getJSON(`/api/employeeShifts/project/${projectId}/date/${date}`, function(shifts) {
+        $.getJSON(`/api/employeeShifts/logic/project/${projectId}/date/${date}`, function(shifts) {
             if (shifts.length > 0) {
                 shifts.forEach((shift) => {
                     shiftList.append(`<div>${shift.name}</div>`);
@@ -183,7 +194,7 @@ $(document).ready(function() {
 
     function saveShift(projectId, date, shiftName) {
         $.ajax({
-            url: '/api/employeeShifts',
+            url: '/api/employeeShifts/base',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
@@ -200,7 +211,7 @@ $(document).ready(function() {
 
     function openProjectModal(projectId) {
         $.ajax({
-            url: `/api/projects/${projectId}`,
+            url: `/api/projects/base/${projectId}`,
             type: 'GET',
             success: function(data) {
                 $('#modalTitle').text('Редактировать проект');
@@ -248,7 +259,7 @@ $(document).ready(function() {
         };
 
         const projectId = $('#projectId').val();
-        const url = projectId ? `/api/projects/${projectId}` : '/api/projects';
+        const url = projectId ? `/api/projects/base/${projectId}` : '/api/projects/base';
         const method = projectId ? 'PUT' : 'POST';
 
         $.ajax({

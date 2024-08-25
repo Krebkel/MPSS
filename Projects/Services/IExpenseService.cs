@@ -1,16 +1,36 @@
+using Contracts;
 using Contracts.ProjectEntities;
 
 namespace Projects.Services;
 
 public interface IExpenseService
 {
-    int CreateExpense(Expense expense);
+    Task<Expense> CreateExpenseAsync(CreateExpenseRequest expense, CancellationToken cancellationToken);
     
-    Expense GetExpense(int expenseId);
+    Task<Expense> UpdateExpenseAsync(UpdateExpenseRequest expense, CancellationToken cancellationToken);
     
-    List<Expense> GetExpensesByProject(int projectId);
+    Task<Expense?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken);
     
-    void UpdateExpense(Expense expense);
-    
-    void DeleteExpense(int expenseId);
+    Task<bool> DeleteExpenseAsync(int id, CancellationToken cancellationToken);
+}
+
+public class UpdateExpenseRequest
+{
+    public int Id { get; set; }
+    public Project Project { get; set; }
+    public string Name { get; set; }
+    public double? Amount { get; set; }
+    public string? Description { get; set; }
+    public ExpenseType Type { get; set; }
+    public bool IsPaidByCompany { get; set; }
+}
+
+public class CreateExpenseRequest
+{
+    public required Project Project { get; set; }
+    public required string Name { get; set; }
+    public required double Amount { get; set; }
+    public string? Description { get; set; }
+    public required ExpenseType Type { get; set; }
+    public required bool IsPaidByCompany { get; set; }
 }

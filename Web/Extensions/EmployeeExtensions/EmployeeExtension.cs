@@ -1,55 +1,38 @@
-using Contracts.EmployeeEntities;
+using Employees.Services;
 using Web.Requests.EmployeeRequests;
-using Web.Responses.EmployeeResponses;
 
 namespace Web.Extensions.EmployeeExtensions;
 
 public static class EmployeeExtension
 {
-    public static Employee ToEmployee(this CreateEmployeeApiRequest apiRequest)
+    internal static CreateEmployeeRequest ToCreateEmployeeRequest(this CreateEmployeeApiRequest request)
     {
-        return new Employee
+        return new CreateEmployeeRequest
         {
-            Name = apiRequest.Name,
-            Phone = apiRequest.Phone,
-            IsDriver = apiRequest.IsDriver,
-            Passport = apiRequest.Passport,
-            DateOfBirth = apiRequest.DateOfBirth,
-            INN = apiRequest.INN,
-            AccountNumber = apiRequest.AccountNumber,
-            BIK = apiRequest.BIK
+            Name = request.Name,
+            Phone = request.Phone,
+            IsDriver = request.IsDriver,
+            Passport = request.Passport,
+            DateOfBirth = request.DateOfBirth,
+            INN = request.INN,
+            AccountNumber = request.AccountNumber,
+            BIK = request.BIK
         };
     }
-
-    public static Employee ToEmployee(this UpdateEmployeeApiRequest apiRequest, int id)
+    
+    internal static UpdateEmployeeRequest ToUpdateEmployeeRequest(this UpdateEmployeeApiRequest request)
     {
-        return new Employee
+        return new UpdateEmployeeRequest
         {
-            Id = id,
-            Name = apiRequest.Name,
-            Phone = apiRequest.Phone,
-            IsDriver = apiRequest.IsDriver,
-            Passport = apiRequest.Passport,
-            DateOfBirth = apiRequest.DateOfBirth,
-            INN = apiRequest.INN,
-            AccountNumber = apiRequest.AccountNumber,
-            BIK = apiRequest.BIK
-        };
-    }
-
-    public static ApiEmployee ToApiEmployee(this Employee employee)
-    {
-        return new ApiEmployee
-        {
-            Id = employee.Id,
-            Name = employee.Name,
-            Phone = employee.Phone,
-            IsDriver = employee.IsDriver,
-            Passport = employee.Passport,
-            DateOfBirth = employee.DateOfBirth,
-            INN = employee.INN,
-            AccountNumber = employee.AccountNumber,
-            BIK = employee.BIK
+            Id = request.Id,
+            Name = request.Name,
+            Phone = request.Phone,
+            IsDriver = request.IsDriver,
+            Passport = request.Passport,
+            DateOfBirth = request.DateOfBirth,
+            INN = request.INN,
+            AccountNumber = request.AccountNumber,
+            BIK = request.BIK
         };
     }
 }

@@ -1,52 +1,36 @@
-using Contracts.ProjectEntities;
+using Projects.Services;
 using Web.Requests.ProjectRequests;
-using Web.Responses.ProjectResponses;
 
 namespace Web.Extensions.ProjectExtensions;
 
 public static class CounteragentExtension
 {
-    public static Counteragent ToCounteragent(this CreateCounteragentApiRequest apiRequest)
+    internal static CreateCounteragentRequest ToCreateCounteragentApiRequest(this CreateCounteragentApiRequest request)
     {
-        return new Counteragent
+        return new CreateCounteragentRequest
         {
-            Name = apiRequest.Name,
-            Contact = apiRequest.Contact,
-            Phone = apiRequest.Phone,
-            INN = apiRequest.INN,
-            OGRN = apiRequest.OGRN,
-            AccountNumber = apiRequest.AccountNumber,
-            BIK = apiRequest.BIK
+            Name = request.Name,
+            Contact = request.Contact,
+            Phone = request.Phone,
+            INN = request.INN,
+            OGRN = request.OGRN,
+            AccountNumber = request.AccountNumber,
+            BIK = request.BIK
         };
     }
-
-    public static Counteragent ToCounteragent(this UpdateCounteragentApiRequest apiRequest, int id)
+    
+    internal static UpdateCounteragentRequest ToUpdateCounteragentApiRequest(this UpdateCounteragentApiRequest request)
     {
-        return new Counteragent
+        return new UpdateCounteragentRequest
         {
-            Id = id,
-            Name = apiRequest.Name,
-            Contact = apiRequest.Contact,
-            Phone = apiRequest.Phone,
-            INN = apiRequest.INN,
-            OGRN = apiRequest.OGRN,
-            AccountNumber = apiRequest.AccountNumber,
-            BIK = apiRequest.BIK
-        };
-    }
-
-    public static ApiCounteragent ToApiCounteragent(this Counteragent counteragent)
-    {
-        return new ApiCounteragent
-        {
-            Id = counteragent.Id,
-            Name = counteragent.Name,
-            Contact = counteragent.Contact,
-            Phone = counteragent.Phone,
-            INN = counteragent.INN,
-            OGRN = counteragent.OGRN,
-            AccountNumber = counteragent.AccountNumber,
-            BIK = counteragent.BIK
-        };
+            Id = request.Id,
+            Name = request.Name,
+            Contact = request.Contact,
+            Phone = request.Phone,
+            INN = request.INN,
+            OGRN = request.OGRN,
+            AccountNumber = request.AccountNumber,
+            BIK = request.BIK
+        };;
     }
 }

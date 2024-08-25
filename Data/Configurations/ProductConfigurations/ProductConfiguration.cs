@@ -1,3 +1,4 @@
+using Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -7,8 +8,14 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Contracts.Product
 {
     public void Configure(EntityTypeBuilder<Contracts.ProductEntities.Product> builder)
     {
-        builder.HasKey(m => m.Id);
-        builder.Property(es => es.Name).IsRequired().HasMaxLength(100);
-        builder.Property(m => m.Cost).IsRequired().HasColumnType("decimal(18,2)");
+        builder.HasKey(p => p.Id);
+        builder.Property(p => p.Name).IsRequired().HasMaxLength(100);
+        builder.Property(p => p.Cost).IsRequired().HasColumnType("decimal(18,2)");
+        builder.Property(p => p.Type)
+            .IsRequired()
+            .HasConversion(
+                pt => pt.ToString(),
+                s => (ProductType)Enum.Parse(typeof(ProductType), s)
+            );
     }
 }

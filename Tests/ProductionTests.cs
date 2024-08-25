@@ -1,12 +1,10 @@
+using Contracts;
 using Contracts.EmployeeEntities;
 using Contracts.ProductEntities;
 using Contracts.ProjectEntities;
 using Data;
-using Employees.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Products.Services;
-using Projects.Services;
 
 namespace Tests;
 
@@ -14,14 +12,14 @@ namespace Tests;
 public class ProductionTests
 {
     private AppDbContext _context;
-    private EmployeeService _employeeService;
-    private EmployeeShiftService _employeeShiftService;
-    private CounteragentService _counteragentService;
-    private ProjectService _projectService;
-    private ProductService _productService;
-    private ProductComponentService _productComponentService;
-    private ProjectProductService _projectProductService;
-    private ExpenseService _expenseService;
+    private EmployeeRepository _employeeRepository;
+    private EmployeeShiftRepository _employeeShiftRepository;
+    private CounteragentRepository _counteragentRepository;
+    private ProjectRepository _projectRepository;
+    private ProductRepository _productRepository;
+    private ProductComponentRepository _productComponentRepository;
+    private ProjectProductRepository _projectProductRepository;
+    private ExpenseRepository _expenseRepository;
     
     [SetUp]
     public void Setup()
@@ -40,8 +38,8 @@ public class ProductionTests
         _context.Database.EnsureDeleted();
         _context.Database.EnsureCreated();
 
-        _employeeShiftService = new EmployeeShiftService(_context);
-        _projectService = new ProjectService(_context, _employeeShiftService);
+        _employeeShiftRepository = new EmployeeShiftRepository(_context);
+        _projectRepository = new ProjectRepository(_context, _employeeShiftRepository);
 
         SeedTestData();
     }
@@ -304,7 +302,7 @@ public class ProductionTests
         double expectedTotalWage = expectedEmployee1Wage1 + expectedEmployee1Wage2 + expectedEmployee1Wage3;
         // 11156.25 + 30000 + 26250 = 67406.25
 
-        var actualTotalWage = _projectService.CalculateTotalWageForDoneProjects(employeeId);
+        var actualTotalWage = _projectRepository.CalculateTotalWageForDoneProjects(employeeId);
 
         Assert.AreEqual(expectedTotalWage, actualTotalWage, 0.01);
         Console.WriteLine($"Expected: {expectedTotalWage}, Actual: {actualTotalWage}");

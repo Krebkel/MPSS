@@ -1,7 +1,6 @@
+using Contracts;
 using Contracts.ProjectEntities;
 using Data;
-using Employees.Services;
-using Projects.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -11,8 +10,8 @@ namespace Tests.Projects;
 public class ProjectTests
 {
     private AppDbContext _context;
-    private ProjectService _service;
-    private IEmployeeShiftService _employeeShiftService;
+    private ProjectRepository _repository;
+    private IEmployeeShiftRepository _employeeShiftRepository;
 
     [SetUp]
     public void Setup()
@@ -24,11 +23,11 @@ public class ProjectTests
         var dataOptions = Options.Create(new DataOptions { ConnectionString = "InMemoryDbConnectionString", ServiceSchema = "test_schema" });
         
         _context = new AppDbContext(options, dataOptions);
-        _employeeShiftService = new EmployeeShiftService(_context);
+        _employeeShiftRepository = new EmployeeShiftRepository(_context);
         _context.Database.EnsureDeleted();
         _context.Database.EnsureCreated();
 
-        _service = new ProjectService(_context, _employeeShiftService);
+        _repository = new ProjectRepository(_context, _employeeShiftRepository);
 
         var project = new Project
         {
@@ -60,7 +59,7 @@ public class ProjectTests
             Address = "Chekhov"
         };
 
-        var projectId = _service.CreateProject(project);
+        var projectId = _repository.CreateProject(project);
         var createdProject = _context.Projects.Find(projectId);
 
         Assert.IsNotNull(createdProject);
@@ -71,7 +70,7 @@ public class ProjectTests
     [Test]
     public void GetProject_ShouldReturnCorrectProject()
     {
-        var project = _service.GetProject(1);
+        var project = _repository.GetProject(1);
         Assert.IsNotNull(project);
         Assert.AreEqual(1, project.Id);
     }
@@ -79,7 +78,7 @@ public class ProjectTests
     [Test]
     public void GetAllProjects_ShouldReturnAllProjects()
     {
-        var projects = _service.GetAllProjects();
+        var projects = _repository.GetAllProjects();
         Assert.AreEqual(1, projects.Count);
     }
 
@@ -90,7 +89,7 @@ public class ProjectTests
         if (project != null)
         {
             project.Name = "Updated Project A";
-            _service.UpdateProject(project);
+            _repository.UpdateProject(project);
         }
 
         var updatedProject = _context.Projects.Find(1);
@@ -101,7 +100,7 @@ public class ProjectTests
     [Test]
     public void DeleteProject_ShouldRemoveProjectFromDatabase()
     {
-        _service.DeleteProject(1);
+        _repository.DeleteProject(1);
         var deletedProject = _context.Projects.Find(1);
         Assert.IsNull(deletedProject);
     }
@@ -109,7 +108,7 @@ public class ProjectTests
     [Test]
     public void SuspendProject_ShouldSetProjectInactive()
     {
-        _service.ChangeProjectStatus(1, ProjectStatus.Standby);
+        _repository.ChangeProjectStatus(1, ProjectStatus.Standby);
         var project = _context.Projects.Find(1);
         Assert.IsTrue(project.ProjectStatus == ProjectStatus.Standby);
     }

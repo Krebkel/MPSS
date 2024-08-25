@@ -7,6 +7,13 @@ $(document).ready(function() {
         }
     });
 
+    $('#employeePhone').mask('+7(999)999-99-99', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
+
     // Маска для ввода ИНН
     $('#employeeINN').mask('999999999999', {
         clearIfNotMatch: true,
@@ -32,7 +39,7 @@ $(document).ready(function() {
     });
     
     function loadEmployees(fullData = false, tableId = 'employeesTable') {
-        $.getJSON('/api/employees', function(employees) {
+        $.getJSON('/api/employees/base', function(employees) {
             const employeesTableBody = $(`#${tableId} tbody`);
             employeesTableBody.empty();
 
@@ -51,7 +58,7 @@ $(document).ready(function() {
                     <td class="midcol">${employee.bik}</td>
                   ` : ''}
                   <td class="midcol">
-                    <button class="btn btn-danger delete-employee-btn" data-employee-id="${employee.id}">Удалить</button>
+                    <button class="btn btn-danger delete-employee-btn" data-employee-id="${employee.id}">⛌</button>
                   </td>
                 </tr>
               `;
@@ -74,7 +81,7 @@ $(document).ready(function() {
     function deleteEmployee(employeeId) {
         if (confirm('Вы уверены, что хотите удалить этого сотрудника?')) {
             $.ajax({
-                url: `/api/employees/${employeeId}`,
+                url: `/api/employees/base/${employeeId}`,
                 method: 'DELETE',
                 success: function() {
                     alert('Сотрудник успешно удалён');
@@ -87,7 +94,7 @@ $(document).ready(function() {
 
     function openEmployeeModal(employeeId) {
         $.ajax({
-            url: `/api/employees/${employeeId}`,
+            url: `/api/employees/base/${employeeId}`,
             type: 'GET',
             success: function(data) {
                 $('#modalTitle').text('Редактировать сотрудника');
@@ -127,13 +134,13 @@ $(document).ready(function() {
             Phone: $('#employeePhone').val(),
             DateOfBirth: $('#employeeDateOfBirth').val(),
             IsDriver: $('#employeeIsDriver').prop('checked'),
-            Passport: $('#employeePassport').val() || null,
+            Passport: $('#employeePassport').val().replace(/\s/g, '') || null,
             INN: $('#employeeINN').val() || null,
             AccountNumber: $('#employeeAccountNumber').val() || null,
             BIK: $('#employeeBIK').val() || null
         };
         const employeeId = $('#employeeId').val();
-        const url = employeeId ? `/api/employees/${employeeId}` : '/api/employees';
+        const url = employeeId ? `/api/employees/base/${employeeId}` : '/api/employees/base';
         const method = employeeId ? 'PUT' : 'POST';
 
         $.ajax({

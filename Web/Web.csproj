@@ -98,4 +98,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Controllers\Base\" />
+    </ItemGroup>
+
 </Project>

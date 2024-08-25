@@ -1,89 +1,79 @@
+using Microsoft.Extensions.Logging;
 using Contracts.ProductEntities;
-using Data;
+using DataContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Products.Services;
 
 public class ProductComponentService : IProductComponentService
 {
-    private readonly AppDbContext _context;
+    private readonly IRepository<ProductComponent> _productComponentRepository;
+    private readonly ILogger<ProductComponentService> _logger;
 
-    public ProductComponentService(AppDbContext context)
+    public ProductComponentService(
+        IRepository<ProductComponent> productComponentRepository,
+        ILogger<ProductComponentService> logger)
     {
-        _context = context;
+        _productComponentRepository = productComponentRepository;
+        _logger = logger;
     }
 
-    /// <inheritdoc />
-    public int CreateProductComponent(ProductComponent productComponent)
+   public async Task<ProductComponent> CreateProductComponentAsync(
+       CreateProductComponentRequest request, 
+       CancellationToken cancellationToken)
     {
-        _context.ProductComponents.Add(productComponent);
-        _context.SaveChanges();
-        return productComponent.Id;
+        var createdProductComponent = new ProductComponent
+        {
+            Product = request.Product,
+            Name = request.Name,
+            Quantity = request.Quantity,
+            Weight = request.Weight
+        };
+        
+        _logger.LogInformation("Компонент изделия успешно добавлен: {@ProductComponent}", 
+            createdProductComponent);
+        return createdProductComponent;
     }
     
-    /// <inheritdoc />
-    public ProductComponent GetProductComponent(int productComponentId)
+    public async Task<ProductComponent?> UpdateProductComponentAsync(
+        UpdateProductComponentRequest request,
+        CancellationToken cancellationToken)
     {
-        return _context.ProductComponents.Find(productComponentId);
-    }
+        var productComponent = await _productComponentRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        
+        if (productComponent == null) return null;
 
-    /// <inheritdoc />
-    public List<ProductComponent> GetAllProductComponents()
-    {
-        return _context.ProductComponents.OrderBy(pc=>pc.ProductId).ToList();
-    }
+        productComponent.Id = request.Id;
+        productComponent.Name = request.Name;
+        productComponent.Product = request.Product;
+        productComponent.Quantity = request.Quantity;
+        productComponent.Weight = request.Weight;
 
-    /// <inheritdoc />
-    public void UpdateProductComponent(ProductComponent productComponent)
-    {
-        ValidateProductComponent(productComponent);
-            
-        var existingProductComponent = _context.ProductComponents.Find(productComponent.Id);
+        await _productComponentRepository.UpdateAsync(productComponent, cancellationToken);
 
-        if (existingProductComponent != null)
-        {
-            existingProductComponent.ProductId = productComponent.ProductId;
-            existingProductComponent.Name = productComponent.Name ?? existingProductComponent.Name;
-            existingProductComponent.Quantity = productComponent.Quantity ?? existingProductComponent.Quantity;
-            existingProductComponent.Weight = productComponent.Weight ?? existingProductComponent.Weight;
-
-            _context.SaveChanges();
-        }
-    }
-
-    /// <inheritdoc />
-    public void DeleteProductComponent(int productComponentId)
-    {
-        var productComponent = _context.ProductComponents.Find(productComponentId);
-        if (productComponent != null)
-        {
-            _context.ProductComponents.Remove(productComponent);
-            _context.SaveChanges();
-        }
-    }
-
-    /// <inheritdoc />
-    public double CalculateTotalWeight(int productId)
-    {
-        return _context.ProductComponents
-            .Where(pc => pc.ProductId == productId)
-            .Sum(pc => (pc.Weight ?? 0) * (pc.Quantity ?? 1));
+        _logger.LogInformation("Компонент изделия успешно обновлен: {@ProductComponent}", productComponent);
+        return productComponent;
     }
     
-    private void ValidateProductComponent(ProductComponent component)
+    public async Task<ProductComponent?> GetProductComponentByIdAsync(int id, CancellationToken cancellationToken)
     {
-        if (component.ProductId <= 0)
-        {
-            throw new ArgumentException("Ошибка выбора изделия.");
-        }
+        return await _productComponentRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
 
-        if (string.IsNullOrWhiteSpace(component.Name))
-        {
-            throw new ArgumentException("Ошибка в названии компонента изделия.");
-        }
+    public async Task<bool> DeleteProductComponentAsync(int id, CancellationToken cancellationToken)
+    {
+        var productComponent = await _productComponentRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        
+        if (productComponent == null) return false;
 
-        if (component.Quantity.HasValue && component.Quantity < 0)
-        {
-            throw new ArgumentException("Некорректное количество компонентов изделия.");
-        }
+        await _productComponentRepository.DeleteAsync(productComponent, cancellationToken);
+        _logger.LogInformation("Компонент изделия с ID {Id} успешно удален", id);
+        return true;
     }
 }

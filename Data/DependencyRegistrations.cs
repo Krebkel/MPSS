@@ -1,3 +1,4 @@
+using DataContracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,8 @@ public static class DependencyRegistrations
             opt.UseNpgsql(options.ConnectionString,
                 builder => builder.MigrationsHistoryTable("__EFMigrationsHistory", options.ServiceSchema));
         });
+        
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         return services;
     }

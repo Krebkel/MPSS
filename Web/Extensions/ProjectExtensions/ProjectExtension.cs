@@ -1,58 +1,38 @@
-using Contracts.ProjectEntities;
+using Projects.Services;
 using Web.Requests.ProjectRequests;
-using Web.Responses.ProjectResponses;
 
 namespace Web.Extensions.ProjectExtensions;
 
 public static class ProjectExtension
 {
-    public static Project ToProject(this CreateProjectApiRequest apiRequest)
+    internal static CreateProjectRequest ToCreateProjectApiRequest(this CreateProjectApiRequest request)
     {
-        return new Project
+        return new CreateProjectRequest
         {
-            Name = apiRequest.Name,
-            Address = apiRequest.Address,
-            DeadlineDate = apiRequest.DeadlineDate,
-            StartDate = apiRequest.StartDate,
-            DateSuspended = apiRequest.DateSuspended,
-            CounteragentId = apiRequest.CounteragentId,
-            ResponsibleEmployeeId = apiRequest.ResponsibleEmployeeId,
-            ProjectStatus = apiRequest.ProjectStatus,
-            ManagerShare = apiRequest.ManagerShare
+            Name = request.Name,
+            Address = request.Address,
+            DeadlineDate = request.DeadlineDate,
+            StartDate = request.StartDate,
+            Counteragent = request.Counteragent,
+            ResponsibleEmployee = request.ResponsibleEmployee,
+            ProjectStatus = request.ProjectStatus,
+            ManagerShare = request.ManagerShare
         };
     }
-
-    public static Project ToProject(this UpdateProjectApiRequest apiRequest, int id)
+    
+    internal static UpdateProjectRequest ToUpdateProjectApiRequest(this UpdateProjectApiRequest request)
     {
-        return new Project
+        return new UpdateProjectRequest()
         {
-            Id = id,
-            Name = apiRequest.Name,
-            Address = apiRequest.Address,
-            DeadlineDate = apiRequest.DeadlineDate,
-            StartDate = apiRequest.StartDate,
-            DateSuspended = apiRequest.DateSuspended,
-            CounteragentId = apiRequest.CounteragentId,
-            ResponsibleEmployeeId = apiRequest.ResponsibleEmployeeId,
-            ProjectStatus = apiRequest.ProjectStatus,
-            ManagerShare = apiRequest.ManagerShare
-        };
-    }
-
-    public static ApiProject ToApiProject(this Project project)
-    {
-        return new ApiProject
-        {
-            Id = project.Id,
-            Name = project.Name,
-            Address = project.Address,
-            DeadlineDate = project.DeadlineDate,
-            StartDate = project.StartDate,
-            DateSuspended = project.DateSuspended,
-            CounteragentId = project.CounteragentId,
-            ResponsibleEmployeeId = project.ResponsibleEmployeeId,
-            ProjectStatus = project.ProjectStatus,
-            ManagerShare = project.ManagerShare
+            Id = request.Id,
+            Name = request.Name,
+            Address = request.Address,
+            DeadlineDate = request.DeadlineDate,
+            StartDate = request.StartDate,
+            Counteragent = request.Counteragent,
+            ResponsibleEmployee = request.ResponsibleEmployee,
+            ProjectStatus = request.ProjectStatus,
+            ManagerShare = request.ManagerShare
         };
     }
 }

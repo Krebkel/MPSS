@@ -1,92 +1,74 @@
+using Microsoft.Extensions.Logging;
 using Contracts.ProductEntities;
-using Data;
+using DataContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Products.Services;
 
 public class ProjectProductService : IProjectProductService
 {
-    private readonly AppDbContext _context;
+    private readonly IRepository<ProjectProduct> _projectProductRepository;
+    private readonly ILogger<ProjectProductService> _logger;
 
-    public ProjectProductService(AppDbContext context)
+    public ProjectProductService(
+        IRepository<ProjectProduct> projectProductRepository,
+        ILogger<ProjectProductService> logger)
     {
-        _context = context;
+        _projectProductRepository = projectProductRepository;
+        _logger = logger;
     }
 
-    /// <inheritdoc />
-    public int CreateProjectProduct(ProjectProduct projectProduct)
+    public async Task<ProjectProduct> CreateProjectProductAsync(CreateProjectProductRequest request, CancellationToken cancellationToken)
     {
-        ValidateProjectProduct(projectProduct);
+        var createdProjectProduct = new ProjectProduct
+        {
+            Project = request.Project,
+            Product = request.Product,
+            Quantity = request.Quantity,
+            Markup = request.Markup
+        };
         
-        _context.ProjectProducts.Add(projectProduct);
-        _context.SaveChanges();
-        return projectProduct.Id;
-    }
-
-    /// <inheritdoc />
-    public ProjectProduct GetProjectProduct(int projectProductId)
-    {
-        return _context.ProjectProducts.Find(projectProductId);
+        _logger.LogInformation("Изделие успешно добавлено на проект: {@ProjectProduct}", createdProjectProduct);
+        return createdProjectProduct;
     }
     
-    /// <inheritdoc />
-    public List<ProjectProduct> GetAllProjectProducts(int projectId)
+    public async Task<ProjectProduct?> UpdateProjectProductAsync(UpdateProjectProductRequest request, CancellationToken cancellationToken)
     {
-        return _context.ProjectProducts
-            .Where(pp => pp.ProjectId == projectId)
-            .OrderBy(pp=>pp.ProjectId)
-            .ToList();
-    }
-    
-    /// <inheritdoc />
-    public void UpdateProjectProduct(ProjectProduct projectProduct)
-    {
-        ValidateProjectProduct(projectProduct);
+        var projectProduct = await _projectProductRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         
-        var existingProjectProduct = _context.ProjectProducts.Find(projectProduct.Id);
-    
-        if (existingProjectProduct != null)
-        {
-            existingProjectProduct.ProjectId = projectProduct.ProjectId;
-            existingProjectProduct.ProductId = projectProduct.ProductId;
-            existingProjectProduct.Quantity = projectProduct.Quantity;
-            existingProjectProduct.Markup = projectProduct.Markup;
+        if (projectProduct == null) return null;
 
-            _context.SaveChanges();
-        }
+        projectProduct.Id = request.Id;
+        projectProduct.Project = request.Project;
+        projectProduct.Product = request.Product;
+        projectProduct.Quantity = request.Quantity;
+        projectProduct.Markup = request.Markup;
+
+        await _projectProductRepository.UpdateAsync(projectProduct, cancellationToken);
+
+        _logger.LogInformation("Изделие на проекте успешно обновлено: {@ProjectProduct}", projectProduct);
+        return projectProduct;
+    }
+    
+    public async Task<ProjectProduct?> GetProjectProductByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await _projectProductRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    /// <inheritdoc />
-    public void DeleteProjectProduct(int projectProductId)
+    public async Task<bool> DeleteProjectProductAsync(int id, CancellationToken cancellationToken)
     {
-        var projectProduct = _context.ProjectProducts.Find(projectProductId);
+        var projectProduct = await _projectProductRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         
-        if (projectProduct != null)
-        {
-            _context.ProjectProducts.Remove(projectProduct);
-            _context.SaveChanges();
-        }
-    }
-    
-    private void ValidateProjectProduct(ProjectProduct projectProduct)
-    {
-        if (projectProduct.ProjectId <= 0)
-        {
-            throw new ArgumentException("Ошибка в выборе проекта.");
-        }
+        if (projectProduct == null) return false;
 
-        if (projectProduct.ProductId <= 0)
-        {
-            throw new ArgumentException("Ошибка в выборе изделия.");
-        }
-
-        if (projectProduct.Quantity <= 0)
-        {
-            throw new ArgumentException("Некорректное количество изделий.");
-        }
-
-        if (projectProduct.Markup < 0)
-        {
-            throw new ArgumentException("Некорректная наценка.");
-        }
+        await _projectProductRepository.DeleteAsync(projectProduct, cancellationToken);
+        _logger.LogInformation("Изделие на проекте с ID {Id} успешно удален", id);
+        return true;
     }
 }

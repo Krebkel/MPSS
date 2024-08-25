@@ -1,43 +1,32 @@
-using Contracts.ProductEntities;
+using Products.Services;
 using Web.Requests.ProductRequests;
-using Web.Responses.ProductResponses;
 
 namespace Web.Extensions.ProductExtensions;
 
 public static class ProjectProductExtension
 {
-    public static ProjectProduct ToProjectProduct(this CreateProjectProductApiRequest apiRequest)
+    internal static CreateProjectProductRequest ToCreateProjectProductRequest(
+        this CreateProjectProductApiRequest request)
     {
-        return new ProjectProduct
+        return new CreateProjectProductRequest
         {
-            ProjectId = apiRequest.ProjectId,
-            ProductId = apiRequest.ProductId,
-            Quantity = apiRequest.Quantity,
-            Markup = apiRequest.Markup
+            Project = request.Project,
+            Product = request.Product,
+            Quantity = request.Quantity,
+            Markup = request.Markup
         };
     }
-
-    public static ProjectProduct ToProjectProduct(this UpdateProjectProductApiRequest apiRequest, int id)
+    
+    internal static UpdateProjectProductRequest ToUpdateProjectProductRequest(
+        this UpdateProjectProductApiRequest request)
     {
-        return new ProjectProduct
+        return new UpdateProjectProductRequest
         {
-            Id = id,
-            ProjectId = apiRequest.ProjectId,
-            ProductId = apiRequest.ProductId,
-            Quantity = apiRequest.Quantity,
-            Markup = apiRequest.Markup
-        };
-    }
-
-    public static ApiProjectProduct ToApiProjectProduct(this ProjectProduct projectProduct)
-    {
-        return new ApiProjectProduct
-        {
-            Id = projectProduct.Id,
-            ProjectId = projectProduct.ProjectId,
-            ProductId = projectProduct.ProductId,
-            Quantity = projectProduct.Quantity,
-            Markup = projectProduct.Markup
+            Id = request.Id,
+            Project = request.Project,
+            Product = request.Product,
+            Quantity = request.Quantity,
+            Markup = request.Markup
         };
     }
 }

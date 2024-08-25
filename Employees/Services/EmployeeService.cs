@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Logging;
 using Contracts.EmployeeEntities;
-using Data;
+using DataContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Services;
 
@@ -8,95 +10,75 @@ namespace Employees.Services;
 /// </summary>
 public class EmployeeService : IEmployeeService
 {
-    private readonly AppDbContext _context;
+    private readonly IRepository<Employee> _employeeRepository;
+    private readonly ILogger<EmployeeService> _logger;
 
-    public EmployeeService(AppDbContext context)
+    public EmployeeService(
+        IRepository<Employee> employeeRepository,
+        ILogger<EmployeeService> logger)
     {
-        _context = context;
-    }
-
-    /// <inheritdoc />
-    public int CreateEmployee(Employee employee)
-    {
-        ValidateEmployee(employee);
-
-        _context.Employees.Add(employee);
-        _context.SaveChanges();
-        return employee.Id;
-    }
-
-    /// <inheritdoc />
-    public Employee GetEmployee(int employeeId)
-    {
-        return _context.Employees.Find(employeeId);
+        _employeeRepository = employeeRepository;
+        _logger = logger;
     }
     
-    /// <inheritdoc />
-    public List<Employee> GetAllEmployees()
+    public async Task<Employee> CreateEmployeeAsync(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
-        return _context.Employees.OrderBy(e=>e.Name).ToList();
-    }
-    
-    /// <inheritdoc />
-    public void UpdateEmployee(Employee employee)
-    {
-        ValidateEmployee(employee);
+        var createdEmployee = new Employee
+        {
+            Name = null,
+            Phone = null,
+            IsDriver = false,
+            Passport = null,
+            DateOfBirth = default,
+            INN = null,
+            AccountNumber = null,
+            BIK = null
+        };
         
-        var existingEmployee = _context.Employees.Find(employee.Id);
-    
-        if (existingEmployee != null)
-        {
-            existingEmployee.Name = employee.Name ?? existingEmployee.Name;
-            existingEmployee.Phone = employee.Phone ?? existingEmployee.Phone;
-            existingEmployee.IsDriver = employee.IsDriver;
-            existingEmployee.Passport = employee.Passport ?? existingEmployee.Passport;
-            existingEmployee.DateOfBirth = employee.DateOfBirth != default
-                ? employee.DateOfBirth 
-                : existingEmployee.DateOfBirth;
-            existingEmployee.INN = employee.INN ?? existingEmployee.INN;
-            existingEmployee.AccountNumber = employee.AccountNumber ?? existingEmployee.AccountNumber;
-            existingEmployee.BIK = employee.BIK ?? existingEmployee.BIK;
-
-            _context.SaveChanges();
-        }
-    }
-
-    /// <inheritdoc />
-    public void DeleteEmployee(int employeeId)
-    {
-        var employee = _context.Employees.Find(employeeId);
-        if (employee != null)
-        {
-            _context.Employees.Remove(employee);
-            _context.SaveChanges();
-        }
-    }
-
-    /// <inheritdoc />
-    public int AssignShift(EmployeeShift employeeShift)
-    {
-        _context.EmployeeShifts.Add(employeeShift);
-        _context.SaveChanges();
-        return employeeShift.Id;
+        _logger.LogInformation("Сотрудник успешно добавлен: {@Employee}", createdEmployee);
+        return createdEmployee;
     }
     
-    private void ValidateEmployee(Employee employee)
+    public async Task<Employee?> UpdateEmployeeAsync(UpdateEmployeeRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(employee.Name))
-        {
-            throw new ArgumentException("Отсутствует имя сотрудника.");
-        }
-
-        if (string.IsNullOrWhiteSpace(employee.Phone))
-        {
-            throw new ArgumentException("Отсутствует номер телефона сотрудника.");
-        }
-
-        if (employee.DateOfBirth == default)
-        {
-            throw new ArgumentException("Ошибка в дате рождения сотрудника.");
-        }
+        var employee = await _employeeRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         
-        employee.DateOfBirth = employee.DateOfBirth.ToUniversalTime();
+        if (employee == null) return null;
+
+        employee.Name = request.Name;
+        employee.Phone = request.Phone;
+        employee.IsDriver = request.IsDriver;
+        employee.Passport = request.Passport;
+        employee.DateOfBirth = request.DateOfBirth;
+        employee.INN = request.INN;
+        employee.AccountNumber = request.AccountNumber;
+        employee.BIK = request.BIK;
+
+        await _employeeRepository.UpdateAsync(employee, cancellationToken);
+
+        _logger.LogInformation("Сотрудник успешно обновлен: {@Employee}", employee);
+        return employee;
+    }
+    
+    public async Task<Employee?> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await _employeeRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
+    public async Task<bool> DeleteEmployeeAsync(int id, CancellationToken cancellationToken)
+    {
+        var employee = await _employeeRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        
+        if (employee == null) return false;
+
+        await _employeeRepository.DeleteAsync(employee, cancellationToken);
+        _logger.LogInformation("Сотрудник с ID {Id} успешно удален", id);
+        return true;
     }
 }

@@ -159,6 +159,14 @@ tr:hover {
     background-color: #faeedb;
 }
 
+.btn-add {
+    font-weight: bold;
+}
+
+.btn-showall {
+    margin-left: 4rem;
+}
+
 /* Модальные окна */
 .modal {
     position: fixed;

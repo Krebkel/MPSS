@@ -1,3 +1,5 @@
+using DataContracts;
+
 namespace Contracts.ProjectEntities;
 
 /// <summary>
@@ -8,7 +10,7 @@ public class Expense : DatabaseEntity
     /// <summary>
     /// ID проекта
     /// </summary>
-    public int ProjectId { get; set; }
+    public Project Project { get; set; }
 
     /// <summary>
     /// Назначение расхода

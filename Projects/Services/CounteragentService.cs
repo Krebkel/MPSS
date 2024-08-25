@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Logging;
 using Contracts.ProjectEntities;
-using Data;
+using DataContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Projects.Services;
 
@@ -8,82 +10,74 @@ namespace Projects.Services;
 /// </summary>
 public class CounteragentService : ICounteragentService
 {
-    private readonly AppDbContext _context;
+    private readonly IRepository<Counteragent> _counteragentRepository;
+    private readonly ILogger<CounteragentService> _logger;
 
-    public CounteragentService(AppDbContext context)
+    public CounteragentService(
+        IRepository<Counteragent> counteragentRepository,
+        ILogger<CounteragentService> logger)
     {
-        _context = context;
+        _counteragentRepository = counteragentRepository;
+        _logger = logger;
     }
 
-    /// <inheritdoc />
-    public int CreateCounteragent(Counteragent counteragent)
+    public async Task<Counteragent> CreateCounteragentAsync(CreateCounteragentRequest request, CancellationToken cancellationToken)
     {
-        ValidateCounteragent(counteragent);
+        var createdCounteragent = new Counteragent
+        {
+            Name = request.Name,
+            Contact = request.Contact,
+            Phone = request.Phone,
+            INN = request.INN,
+            OGRN = request.OGRN,
+            AccountNumber = request.AccountNumber,
+            BIK = request.BIK
+        };
         
-        _context.Counteragents.Add(counteragent);
-        _context.SaveChanges();
-        return counteragent.Id;
-    }
-
-    /// <inheritdoc />
-    public Counteragent GetCounteragent(int counteragentId)
-    {
-        return _context.Counteragents.Find(counteragentId);
+        _logger.LogInformation("Контрагент успешно добавлен: {@Counteragent}", createdCounteragent);
+        return createdCounteragent;
     }
     
-    /// <inheritdoc />
-    public List<Counteragent> GetAllCounteragents()
+    public async Task<Counteragent?> UpdateCounteragentAsync(UpdateCounteragentRequest request, CancellationToken cancellationToken)
     {
-        return _context.Counteragents.OrderBy(c=>c.Name).ToList();
-    }
-    
-    /// <inheritdoc />
-    public void UpdateCounteragent(Counteragent counteragent)
-    {
-        ValidateCounteragent(counteragent);
+        var counteragent = await _counteragentRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
         
-        var existingCounteragent = _context.Counteragents.Find(counteragent.Id);
-    
-        if (existingCounteragent != null)
-        {
-            existingCounteragent.Name = counteragent.Name ?? existingCounteragent.Name;
-            existingCounteragent.Contact = counteragent.Contact ?? existingCounteragent.Contact;
-            existingCounteragent.Phone = counteragent.Phone ?? existingCounteragent.Phone;
-            existingCounteragent.INN = counteragent.INN ?? existingCounteragent.INN;
-            existingCounteragent.OGRN = counteragent.OGRN ?? existingCounteragent.OGRN;
-            existingCounteragent.AccountNumber = counteragent.AccountNumber ?? existingCounteragent.AccountNumber;
-            existingCounteragent.BIK = counteragent.BIK ?? existingCounteragent.BIK;
+        if (counteragent == null) return null;
 
-            _context.SaveChanges();
-        }
-    }
+        counteragent.Id = request.Id;
+        counteragent.Name = request.Name;
+        counteragent.Contact = request.Contact;
+        counteragent.Phone = request.Phone;
+        counteragent.INN = request.INN;
+        counteragent.OGRN = request.OGRN;
+        counteragent.AccountNumber = request.AccountNumber;
+        counteragent.BIK = request.BIK;
 
-    /// <inheritdoc />
-    public void DeleteCounteragent(int counteragentId)
-    {
-        var counteragent = _context.Counteragents.Find(counteragentId);
-        if (counteragent != null)
-        {
-            _context.Counteragents.Remove(counteragent);
-            _context.SaveChanges();
-        }
+        await _counteragentRepository.UpdateAsync(counteragent, cancellationToken);
+
+        _logger.LogInformation("Контрагент успешно обновлен: {@Counteragent}", counteragent);
+        return counteragent;
     }
     
-    private void ValidateCounteragent(Counteragent counteragent)
+    public async Task<Counteragent?> GetCounteragentByIdAsync(int id, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(counteragent.Name))
-        {
-            throw new ArgumentException("Ошибка в наименовании контрагента");
-        }
+        return await _counteragentRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
 
-        if (string.IsNullOrWhiteSpace(counteragent.Contact))
-        {
-            throw new ArgumentException("Ошибка в контактном лице контрагента.");
-        }
+    public async Task<bool> DeleteCounteragentAsync(int id, CancellationToken cancellationToken)
+    {
+        var counteragent = await _counteragentRepository
+            .GetAll()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        
+        if (counteragent == null) return false;
 
-        if (string.IsNullOrWhiteSpace(counteragent.Phone))
-        {
-            throw new ArgumentException("Некорректно введен телефон контактного лица.");
-        }
+        await _counteragentRepository.DeleteAsync(counteragent, cancellationToken);
+        _logger.LogInformation("Контрагент с ID {Id} успешно удален", id);
+        return true;
     }
 }

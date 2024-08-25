@@ -9,8 +9,12 @@ internal class EmployeeShiftConfiguration : IEntityTypeConfiguration<EmployeeShi
     public void Configure(EntityTypeBuilder<EmployeeShift> builder)
     {
         builder.HasKey(es => es.Id);
-        builder.Property(es => es.ProjectId).IsRequired();
-        builder.Property(es => es.EmployeeId).IsRequired();
+        builder.HasOne(es => es.Project)
+            .WithMany()
+            .IsRequired();
+        builder.HasOne(es => es.Employee)
+            .WithMany()
+            .IsRequired();
         builder.Property(es => es.Date).IsRequired();
         builder.Property(es => es.Arrival).IsRequired(false);
         builder.Property(es => es.Departure).IsRequired(false);

@@ -1,4 +1,5 @@
 using Contracts.EmployeeEntities;
+using Contracts.ProjectEntities;
 
 namespace Employees.Services;
 
@@ -7,59 +8,38 @@ namespace Employees.Services;
 /// </summary>
 public interface IEmployeeShiftService
 {
-    /// <summary>
-    /// Добавление смены сотрудника в базу данных
-    /// </summary>
-    /// <param name="employeeShift">Смена сотрудника</param>
-    /// <returns>ID созданной смены</returns>
-    int CreateEmployeeShift(EmployeeShift employeeShift);
-
-    /// <summary>
-    /// Получение данных смены сотрудника из базы данных
-    /// </summary>
-    /// <param name="employeeShiftId">ID смены сотрудника</param>
-    /// <returns>Смена</returns>
-    EmployeeShift GetEmployeeShift(int employeeShiftId);
-
-    /// <summary>
-    /// Получение данных всех смен сотрудника из базы данных
-    /// </summary>
-    /// <param name="employeeId">ID сотрудника</param>
-    /// <returns>Список смен</returns>
-    List<EmployeeShift> GetAllEmployeeShifts(int employeeId);
-
-    /// <summary>
-    /// Обновление данных смены сотрудника в базе данных
-    /// </summary>
-    /// <param name="employeeShift">Смена сотрудника</param>
-    void UpdateEmployeeShift(EmployeeShift employeeShift);
-
-    /// <summary>
-    /// Удаление смены сотрудника из базы данных
-    /// </summary>
-    /// <param name="employeeShiftId">ID смены сотрудника</param>
-    void DeleteEmployeeShift(int employeeShiftId);
-
-    /// <summary>
-    /// Расчет времени смены в часах по времени прибытия на объект и отъезда с него
-    /// </summary>
-    /// <param name="arrival">Время прибытия</param>
-    /// <param name="departure">Время отъезда</param>
-    /// <returns>Общее время смены в часах</returns>
-    float CalculateTotalTime(DateTimeOffset? arrival, DateTimeOffset? departure);
-
-    /// <summary>
-    /// Расчет зарплаты за проект сотрудника
-    /// </summary>
-    /// <param name="employeeId">ID сотрудника</param>
-    /// <param name="projectId">ID проекта</param>
-    /// <returns></returns>
-    double CalculateTotalWage(int employeeId, int projectId);
+    Task<EmployeeShift> CreateEmployeeShiftAsync(CreateEmployeeShiftRequest employeeShift, CancellationToken cancellationToken);
     
-    /// <summary>
-    /// Расчет зарплаты сотрудника
-    /// </summary>
-    /// <param name="employeeId">ID сотрудника</param>
-    /// <returns></returns>
-    double CalculateTotalWageForDoneProjects(int employeeId);
+    Task<EmployeeShift> UpdateEmployeeShiftAsync(UpdateEmployeeShiftRequest employeeShift, CancellationToken cancellationToken);
+    
+    Task<EmployeeShift?> GetEmployeeShiftByIdAsync(int id, CancellationToken cancellationToken);
+    
+    Task<bool> DeleteEmployeeShiftAsync(int id, CancellationToken cancellationToken);
+}
+
+public class UpdateEmployeeShiftRequest
+{
+    public required int Id { get; set; }
+    public required Project Project { get; set; }
+    public required Employee Employee { get; set; }
+    public required DateTimeOffset Date { get; set; }
+    public DateTimeOffset? Arrival { get; set; }
+    public DateTimeOffset? Departure { get; set; }
+    public float? HoursWorked { get; set; }
+    public float? TravelTime { get; set; }
+    public bool ConsiderTravel { get; set; }
+    public int? ISN { get; set; }
+}
+
+public class CreateEmployeeShiftRequest
+{
+    public required Project Project { get; set; }
+    public required Employee Employee { get; set; }
+    public required DateTimeOffset Date { get; set; }
+    public DateTimeOffset? Arrival { get; set; }
+    public DateTimeOffset? Departure { get; set; }
+    public float? HoursWorked { get; set; }
+    public float? TravelTime { get; set; }
+    public bool ConsiderTravel { get; set; }
+    public int? ISN { get; set; }
 }
