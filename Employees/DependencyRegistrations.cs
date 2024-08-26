@@ -9,6 +9,7 @@ public static class DependencyRegistrations
     {
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<IEmployeeShiftService, EmployeeShiftService>();
+        
 
         return services;
     }

@@ -72,11 +72,11 @@
                         <thead>
                         <tr>
                             <th class="shortcol">№</th>
-                            <th class="midcol">Название</th>
+                            <th>Название</th>
                             <th class="longcol">Адрес</th>
                             <th class="midcol">Дедлайн</th>
                             <th class="midcol">Статус</th>
-                            <th class="shortcol"></th>
+                            <th class="btncol"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -123,11 +123,13 @@
             </div>
             <div class="form-group">
                 <label for="projectCounteragent">Контрагент:</label>
-                <input type="text" id="projectCounteragent" name="projectCounteragent">
+                <select id="projectCounteragent" name="projectCounteragent" required>
+                </select>
             </div>
             <div class="form-group">
                 <label for="projectResponsibleEmployee">Ответственный:</label>
-                <input type="text" id="projectResponsibleEmployee" name="projectResponsibleEmployee">
+                <select id="projectResponsibleEmployee" name="projectResponsibleEmployee" required>
+                </select>
             </div>
             <div class="form-group">
                 <label for="projectManagerShare">Процент руководителю:</label>

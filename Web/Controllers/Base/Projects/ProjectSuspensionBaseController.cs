@@ -1,7 +1,9 @@
 using Contracts.ProjectEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using Projects.Services;
 using Web.Extensions.ProjectExtensions;
 using Web.Requests.ProjectRequests;
@@ -15,9 +17,11 @@ public class ProjectSuspensionBaseController : ControllerBase
     private readonly ILogger<ProjectSuspensionBaseController> _logger;
     private readonly IProjectSuspensionService _projectSuspensionService;
 
-    public ProjectSuspensionBaseController(ILogger<ProjectSuspensionBaseController> logger)
+    public ProjectSuspensionBaseController(ILogger<ProjectSuspensionBaseController> logger, 
+        IProjectSuspensionService projectSuspensionService)
     {
         _logger = logger;
+        _projectSuspensionService = projectSuspensionService;
     }
 
     [HttpPost]
@@ -43,7 +47,7 @@ public class ProjectSuspensionBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectSuspension))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProjectSuspension(
@@ -56,7 +60,7 @@ public class ProjectSuspensionBaseController : ControllerBase
             await _projectSuspensionService.UpdateProjectSuspensionAsync(updatedProjectSuspension, ct);
 
             _logger.LogInformation("Информация о приостановке проекта {@ProjectName} успешно обновлена", 
-                request.Project.Name);
+                request.Project);
             
             return Ok(updatedProjectSuspension);
         }
@@ -93,6 +97,7 @@ public class ProjectSuspensionBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteProjectSuspension(int id, CancellationToken ct)
     {
         try
@@ -107,10 +112,39 @@ public class ProjectSuspensionBaseController : ControllerBase
             _logger.LogInformation("Приостановка проекта с ID {Id} успешно удалена", id);
             return Ok();
         }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgresEx && postgresEx.SqlState == "23503")
+        {
+            _logger.LogError(ex, "Ошибка при удалении информации о приостановке из-за внешних ключей");
+            return BadRequest("Невозможно удалить информацию о приостановке, так как он связан с другими записями.");
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении приостановки проекта");
             return BadRequest($"Ошибка при удалении приостановки проекта: {ex.Message}");
+        }
+    }
+    
+    [HttpGet("byProject/{projectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectSuspension>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProjectSuspensionsByProjectId(int projectId, CancellationToken ct)
+    {
+        try
+        {
+            var projectSuspensions = 
+                await _projectSuspensionService.GetProjectSuspensionsByProjectIdAsync(projectId, ct);
+            if (!projectSuspensions.Any())
+            {
+                _logger.LogWarning("Проекта с ID {ProjectId} не найдено или нет приостановок", projectId);
+                return NotFound($"Проекта с ID {projectId} не найдено или нет приостановок");
+            }
+
+            return Ok(projectSuspensions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении приостановок по ID проекта");
+            return BadRequest($"Ошибка при получении приостановок по ID проекта: {ex.Message}");
         }
     }
 }

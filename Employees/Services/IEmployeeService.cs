@@ -14,6 +14,8 @@ public interface IEmployeeService
     Task<Employee?> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteEmployeeAsync(int id, CancellationToken cancellationToken);
+
+    Task<IEnumerable<Employee>> GetAllEmployeesAsync(CancellationToken cancellationToken);
 }
 
 public class UpdateEmployeeRequest
@@ -22,11 +24,11 @@ public class UpdateEmployeeRequest
     public required string Name { get; set; }
     public required string Phone { get; set; }
     public bool IsDriver { get; set; }
-    public ulong? Passport { get; set; }
+    public string? Passport { get; set; }
     public DateTimeOffset DateOfBirth { get; set; }
-    public ulong? INN { get; set; }
-    public ulong? AccountNumber { get; set; }
-    public ulong? BIK { get; set; }
+    public string? INN { get; set; }
+    public string? AccountNumber { get; set; }
+    public string? BIK { get; set; }
 }
 
 public class CreateEmployeeRequest
@@ -34,9 +36,9 @@ public class CreateEmployeeRequest
     public required string Name { get; set; }
     public required string Phone { get; set; }
     public bool IsDriver { get; set; }
-    public ulong? Passport { get; set; }
+    public string? Passport { get; set; }
     public DateTimeOffset DateOfBirth { get; set; }
-    public ulong? INN { get; set; }
-    public ulong? AccountNumber { get; set; }
-    public ulong? BIK { get; set; }
+    public string? INN { get; set; }
+    public string? AccountNumber { get; set; }
+    public string? BIK { get; set; }
 }

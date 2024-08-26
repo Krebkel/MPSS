@@ -25,20 +25,20 @@ public class Counteragent : DatabaseEntity
     /// <summary>
     /// ИНН организации-контрагента
     /// </summary>
-    public uint? INN { get; set; }
+    public string? INN { get; set; }
 
     /// <summary>
     /// ОГРН организации-контрагента
     /// </summary>
-    public uint? OGRN { get; set; }
+    public string? OGRN { get; set; }
 
     /// <summary>
     /// Банковский счет организации-контрагента
     /// </summary>
-    public ulong? AccountNumber { get; set; }
+    public string? AccountNumber { get; set; }
 
     /// <summary>
     /// БИК счета организации-контрагента
     /// </summary>
-    public uint? BIK { get; set; }
+    public string? BIK { get; set; }
 }

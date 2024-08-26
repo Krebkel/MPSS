@@ -15,9 +15,11 @@ public class ProductComponentBaseController : ControllerBase
     private readonly ILogger<ProductComponentBaseController> _logger;
     private readonly IProductComponentService _productComponentService;
 
-    public ProductComponentBaseController(ILogger<ProductComponentBaseController> logger)
+    public ProductComponentBaseController(ILogger<ProductComponentBaseController> logger, 
+        IProductComponentService productComponentService)
     {
         _logger = logger;
+        _productComponentService = productComponentService;
     }
 
     [HttpPost]
@@ -32,7 +34,7 @@ public class ProductComponentBaseController : ControllerBase
                 .CreateProductComponentAsync(addProductComponentRequest, ct);
             
             _logger.LogInformation("Компонент изделия {@ProductName} успешно добавлен: {@Name}",
-                createdProductComponent.Product.Name, createdProductComponent.Name);
+                createdProductComponent.Product, createdProductComponent.Name);
 
             return Ok(createdProductComponent);
         }
@@ -43,7 +45,7 @@ public class ProductComponentBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductComponent))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProductComponent(
@@ -56,7 +58,7 @@ public class ProductComponentBaseController : ControllerBase
             await _productComponentService.UpdateProductComponentAsync(updatedProductComponent, ct);
 
             _logger.LogInformation("Компонент изделия {@ProductName} успешно обновлен: {@Name}", 
-                request.Product.Name, request.Name);
+                request.Product, request.Name);
             
             return Ok(updatedProductComponent);
         }
@@ -64,6 +66,77 @@ public class ProductComponentBaseController : ControllerBase
         {
             _logger.LogError(ex, "Ошибка при обновлении информации о компоненте изделия");
             return BadRequest($"Ошибка при обновлении информации о компоненте изделия {ex.Message}");
+        }
+    }
+    
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProductComponent(int id, CancellationToken ct)
+    {
+        try
+        {
+            var productComponent = await _productComponentService.GetProductComponentByIdAsync(id, ct);
+            if (productComponent == null)
+            {
+                _logger.LogWarning("Компонент изделия с ID {Id} не найден", id);
+                return NotFound($"Компонент изделия с ID {id} не найден");
+            }
+
+            return Ok(productComponent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении данных о компоненте изделия");
+            return BadRequest($"Ошибка при получении данных о компоненте изделия: {ex.Message}");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteProductComponent(int id, CancellationToken ct)
+    {
+        try
+        {
+            var deleteResult = await _productComponentService.DeleteProductComponentAsync(id, ct);
+            if (!deleteResult)
+            {
+                _logger.LogWarning("Компонент изделия с ID {Id} не найден", id);
+                return NotFound($"Компонент изделия с ID {id} не найден");
+            }
+
+            _logger.LogInformation("Компонент изделия с ID {Id} успешно удален", id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении компонента изделия");
+            return BadRequest($"Ошибка при удалении компонента изделия: {ex.Message}");
+        }
+    }
+    
+    [HttpGet("byProduct/{productId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductComponent>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProductComponentsByProductId(int productId, CancellationToken ct)
+    {
+        try
+        {
+            var productComponents = 
+                await _productComponentService.GetProductComponentsByProductIdAsync(productId, ct);
+            if (!productComponents.Any())
+            {
+                _logger.LogWarning("Изделие с ID {ProductId} не найдено или нет компонентов изделия", productId);
+                return NotFound($"Изделие с ID {productId} не найдено или нет компонентов изделия");
+            }
+
+            return Ok(productComponents);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении компонентов по ID изделия");
+            return BadRequest($"Ошибка при получении компонентов по ID изделия: {ex.Message}");
         }
     }
 }

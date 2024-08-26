@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест - МПСС</title>
+    <title>Контрагенты - МПСС</title>
     <link rel="stylesheet" href="/assets/styles/styles.css">
     <style>
         @font-face {
@@ -19,7 +19,6 @@
     </style>
 </head>
 <body>
-<!-- Верхняя панель навигации -->
 <nav class="navbar">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -36,39 +35,111 @@
         </li>
     </ul>
 </nav>
-
 <div class="container-fluid">
     <div class="row">
-        <!-- Левое меню -->
         <nav class="col-md-2 d-none d-md-block sidebar">
             <div class="sidebar-sticky">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#main">
-                            Главное
-                        </a>
+                        <a class="nav-link" href="#main">Главное</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#test">
-                            Тест
-                        </a>
+                        <a class="nav-link" href="#counteragents">Контрагенты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#data">Данные</a>
                     </li>
                 </ul>
             </div>
         </nav>
-
-        <!-- Основной контент -->
         <main role="main" class="col-md-10 ml-sm-auto px-4 content">
-            <div id="main " class="content-section">
-                <h2> Тест
-                    <button id="addProjectBtn" class="btn btn-primary">Добавить</button>
-                </h2>
+            <div id="main" class="content-section">
+            </div>
+            <div id="counteragents" class="content-section" style="display: none;">
+                <div id="counteragentTable">
+                    <h2>Контрагенты
+                        <button id="addCounteragentBtn" class="btn btn-primary btn-add">+</button>
+                    </h2>
+                    <table id="counteragentsTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="shortcol">№</th>
+                            <th>Название</th>
+                            <th class="midcol">Контакт</th>
+                            <th class="midcol">Телефон</th>
+                            <th class="btncol"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="data" class="content-section" style="display: none;">
+                <div id="dataTableDiv">
+                    <h2>Данные контрагентов
+                        <button id="addCounteragentBtn2" class="btn btn-primary btn-add">+</button>
+                    </h2>
+                    <table id="dataTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="shortcol">№</th>
+                            <th>Название</th>
+                            <th class="midcol">ИНН</th>
+                            <th class="midcol">ОГРН</th>
+                            <th class="midcol">Счёт</th>
+                            <th class="midcol">БИК</th>
+                            <th class="btncol"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 </div>
-
+<div id="counteragentModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="modalTitle">Добавить нового контрагента</h3>
+        <form id="counteragentForm">
+            <input type="hidden" id="counteragentId" name="counteragentId">
+            <div class="form-group">
+                <label for="counteragentName">Название:</label>
+                <input type="text" id="counteragentName" name="counteragentName" required>
+            </div>
+            <div class="form-group">
+                <label for="counteragentContact">Контактное лицо:</label>
+                <input type="text" id="counteragentContact" name="counteragentContact" required>
+            </div>
+            <div class="form-group">
+                <label for="counteragentPhone">Телефон:</label>
+                <input type="text" id="counteragentPhone" name="counteragentPhone" required>
+            </div>
+            <div class="form-group">
+                <label for="counteragentINN">ИНН:</label>
+                <input type="text" id="counteragentINN" name="counteragentINN">
+            </div>
+            <div class="form-group">
+                <label for="counteragentOGRN">ОГРН:</label>
+                <input type="text" id="counteragentOGRN" name="counteragentOGRN">
+            </div>
+            <div class="form-group">
+                <label for="counteragentAccountNumber">Номер счёта:</label>
+                <input type="text" id="counteragentAccountNumber" name="counteragentAccountNumber">
+            </div>
+            <div class="form-group">
+                <label for="counteragentBIK">БИК счёта:</label>
+                <input type="text" id="counteragentBIK" name="counteragentBIK">
+            </div>
+            <button type="submit" id="modalSubmitButton" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
 <script src="/libs/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="/libs/bootstrap.js"></script>
 <script src="/js/script.js"></script>
 <script src="/js/counteragents.js"></script>

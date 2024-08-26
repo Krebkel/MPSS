@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Data;
+using DataContracts;
 using Employees;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(opts =>
     {
         opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });;
+    });
 
 // Добавление Swagger для документации API
 builder.Services.AddEndpointsApiExplorer()

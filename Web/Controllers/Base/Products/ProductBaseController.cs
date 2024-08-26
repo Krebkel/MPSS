@@ -1,7 +1,9 @@
 using Contracts.ProductEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using Products.Services;
 using Web.Extensions.ProductExtensions;
 using Web.Requests.ProductRequests;
@@ -15,9 +17,10 @@ public class ProductBaseController : ControllerBase
     private readonly ILogger<ProductBaseController> _logger;
     private readonly IProductService _productService;
 
-    public ProductBaseController(ILogger<ProductBaseController> logger)
+    public ProductBaseController(ILogger<ProductBaseController> logger, IProductService productService)
     {
         _logger = logger;
+        _productService = productService;
     }
 
     [HttpPost]
@@ -40,7 +43,7 @@ public class ProductBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductApiRequest request, CancellationToken ct)
@@ -73,7 +76,7 @@ public class ProductBaseController : ControllerBase
             if (product == null)
             {
                 _logger.LogWarning("Изделие с ID {Id} не найдено", id);
-                return NotFound($"Изделин с ID {id} не найдено");
+                return NotFound($"Изделие с ID {id} не найдено");
             }
 
             return Ok(product);
@@ -88,6 +91,7 @@ public class ProductBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteProduct(int id, CancellationToken ct)
     {
         try
@@ -95,17 +99,38 @@ public class ProductBaseController : ControllerBase
             var deleteResult = await _productService.DeleteProductAsync(id, ct);
             if (!deleteResult)
             {
-                _logger.LogWarning("Изделин с ID {Id} не найдено", id);
+                _logger.LogWarning("Изделие с ID {Id} не найдено", id);
                 return NotFound($"Изделин с ID {id} не найдено");
             }
 
             _logger.LogInformation("Изделие с ID {Id} успешно удалено", id);
             return Ok();
         }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgresEx && postgresEx.SqlState == "23503")
+        {
+            _logger.LogError(ex, "Ошибка при удалении изделия из-за внешних ключей");
+            return BadRequest("Невозможно удалить изделие, так как он связан с другими записями.");
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении изделия");
             return BadRequest($"Ошибка при удалении изделия: {ex.Message}");
+        }
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Product>))]
+    public async Task<IActionResult> GetAllProducts(CancellationToken ct)
+    {
+        try
+        {
+            var products = await _productService.GetAllProductsAsync(ct);
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении списка изделий");
+            return BadRequest($"Ошибка при получении списка изделий: {ex.Message}");
         }
     }
 }

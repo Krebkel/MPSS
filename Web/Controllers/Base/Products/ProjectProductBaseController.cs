@@ -1,7 +1,9 @@
 using Contracts.ProductEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using Products.Services;
 using Web.Extensions.ProductExtensions;
 using Web.Requests.ProductRequests;
@@ -15,9 +17,11 @@ public class ProjectProductBaseController : ControllerBase
     private readonly ILogger<ProjectProductBaseController> _logger;
     private readonly IProjectProductService _projectProductService;
 
-    public ProjectProductBaseController(ILogger<ProjectProductBaseController> logger)
+    public ProjectProductBaseController(ILogger<ProjectProductBaseController> logger, 
+        IProjectProductService projectProductService)
     {
         _logger = logger;
+        _projectProductService = projectProductService;
     }
 
     [HttpPost]
@@ -43,7 +47,7 @@ public class ProjectProductBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProjectProduct(
@@ -56,7 +60,7 @@ public class ProjectProductBaseController : ControllerBase
             await _projectProductService.UpdateProjectProductAsync(updatedProjectProduct, ct);
 
             _logger.LogInformation("Изделие {@ProductName} успешно обновлено на проекте {@ProjectName}",
-                request.Product.Name, request.Project.Name);
+                request.Product, request.Project);
             
             return Ok(updatedProjectProduct);
         }
@@ -93,6 +97,7 @@ public class ProjectProductBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteProjectProduct(int id, CancellationToken ct)
     {
         try
@@ -100,17 +105,46 @@ public class ProjectProductBaseController : ControllerBase
             var deleteResult = await _projectProductService.DeleteProjectProductAsync(id, ct);
             if (!deleteResult)
             {
-                _logger.LogWarning("Компонент изделия с ID {Id} не найден", id);
-                return NotFound($"Сотрудник с ID {id} не найден");
+                _logger.LogWarning("Проектного изделия с ID {Id} не найден", id);
+                return NotFound($"Проектное изделие с ID {id} не найден");
             }
 
-            _logger.LogInformation("Компонент изделия с ID {Id} успешно удален", id);
+            _logger.LogInformation("Проектное изделие с ID {Id} успешно удален", id);
             return Ok();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgresEx && postgresEx.SqlState == "23503")
+        {
+            _logger.LogError(ex, "Ошибка при удалении проектного изделия из-за внешних ключей");
+            return BadRequest("Невозможно удалить проектного изделия, так как он связан с другими записями.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при удалении компонента изделия");
-            return BadRequest($"Ошибка при удалении компонента изделия: {ex.Message}");
+            _logger.LogError(ex, "Ошибка при удалении изделия на проекте");
+            return BadRequest($"Ошибка при удалении изделия на проекте: {ex.Message}");
+        }
+    }
+    
+    [HttpGet("byProject/{projectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectProduct>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProjectProductsByProjectId(int projectId, CancellationToken ct)
+    {
+        try
+        {
+            var projectProducts = await _projectProductService
+                .GetProjectProductsByProjectIdAsync(projectId, ct);
+            if (!projectProducts.Any())
+            {
+                _logger.LogWarning("Проект с ID {ProjectId} не найден или не содержит изделий", projectId);
+                return NotFound($"Проект с ID {projectId} не найден или не содержит изделий");
+            }
+
+            return Ok(projectProducts);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении изделий по ID проекта");
+            return BadRequest($"Ошибка при получении изделий по ID проекта: {ex.Message}");
         }
     }
 }

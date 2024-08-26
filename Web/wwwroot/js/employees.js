@@ -47,25 +47,25 @@ $(document).ready(function() {
                 const employeeRow = `
                 <tr class="employee-row" data-employee-id="${employee.id}">
                   <td class="shortcol">${index + 1}</td>
-                  <td class="midcol">${employee.name}</td>
+                  <td>${employee.name}</td>
                   <td class="midcol">${employee.phone}</td>
                   <td class="midcol">${formatDateForOutput(new Date(employee.dateOfBirth))}</td>
                   ${fullData ? '' : `<td class="midcol">${employee.isDriver ? 'Да' : 'Нет'}</td>`}
                   ${fullData ? `
-                    <td class="midcol">${employee.passport}</td>
+                    <td class="midcol">${employee.passport ? employee.passport.substring(0, 4) + ' ' + employee.passport.substring(4) : ''}</td>
                     <td class="midcol">${employee.inn}</td>
                     <td class="midcol">${employee.accountNumber}</td>
                     <td class="midcol">${employee.bik}</td>
                   ` : ''}
-                  <td class="midcol">
-                    <button class="btn btn-danger delete-employee-btn" data-employee-id="${employee.id}">⛌</button>
+                  <td class="btncol">
+                    <button class="btn delete-btn" data-employee-id="${employee.id}">⛌</button>
                   </td>
                 </tr>
               `;
                 employeesTableBody.append(employeeRow);
             });
 
-            $(`.delete-employee-btn`).off('click').on('click', function(event) {
+            $(`.delete-btn`).off('click').on('click', function(event) {
                 event.stopPropagation();
                 const employeeId = $(this).data('employee-id');
                 deleteEmployee(employeeId);
@@ -87,6 +87,10 @@ $(document).ready(function() {
                     alert('Сотрудник успешно удалён');
                     loadEmployees(false, 'employeesTable');
                     loadEmployees(true, 'dataTable');
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при удалении сотрудника';
+                    alert(errorMessage);
                 }
             });
         }
@@ -142,6 +146,10 @@ $(document).ready(function() {
         const employeeId = $('#employeeId').val();
         const url = employeeId ? `/api/employees/base/${employeeId}` : '/api/employees/base';
         const method = employeeId ? 'PUT' : 'POST';
+        
+        if (employeeId) {
+            employeeData.Id = employeeId;
+        }
 
         $.ajax({
             url: url,
@@ -154,8 +162,9 @@ $(document).ready(function() {
                 loadEmployees(true, 'dataTable');
                 alert(employeeId ? 'Сотрудник успешно обновлен' : 'Новый сотрудник успешно добавлен');
             },
-            error: function () {
-                alert('Ошибка при сохранении данных сотрудника');
+            error: function (xhr) {
+                const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при сохранении данных сотрудника';
+                alert(errorMessage);
             }
         });
     }
