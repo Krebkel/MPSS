@@ -92,6 +92,22 @@ $(document).ready(function() {
     }
 
     function loadProjects() {
+        $.getJSON('/api/counteragents/base', function(counteragents) {
+            const counteragentSelect = $('#projectCounteragent');
+            counteragentSelect.empty(); 
+            counteragents.forEach(counteragent => {
+                counteragentSelect.append(new Option(counteragent.name, counteragent.id));
+            });
+        });
+
+        $.getJSON('/api/employees/base', function(employees) {
+            const employeeSelect = $('#projectResponsibleEmployee');
+            employeeSelect.empty();
+            employees.forEach(employee => {
+                employeeSelect.append(new Option(employee.name, employee.id));
+            });
+        });
+
         $.getJSON('/api/projects/base', function(allProjects) {
             const today = new Date();
             const startDate = new Date(today);
@@ -112,19 +128,19 @@ $(document).ready(function() {
                 const projectRow = `
                 <tr class="project-row" data-project-id="${project.id}">
                     <td class="shortcol">${index + 1}</td>
-                    <td class="midcol">${project.name}</td>
+                    <td>${project.name}</td>
                     <td class="longcol">${project.address}</td>
                     <td class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</td>
                     <td class="midcol">${translateStatus(project.projectStatus)}</td>
-                    <td class="midcol">
-                        <button class="btn btn-danger delete-project-btn" data-project-id="${project.id}">⛌</button>
+                    <td class="btncol">
+                        <button class="btn delete-btn" data-project-id="${project.id}">⛌</button>
                     </td>
                 </tr>
             `;
                 projectsTableBody.append(projectRow);
             });
 
-            $('.delete-project-btn').on('click', function(event) {
+            $('.delete-btn').on('click', function(event) {
                 event.stopPropagation();
                 const projectId = $(this).data('project-id');
                 deleteProject(projectId);
@@ -155,6 +171,10 @@ $(document).ready(function() {
                 success: function() {
                     alert('Проект успешно удален');
                     loadProjects();
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при удалении проекта';
+                    alert(errorMessage);
                 }
             });
         }
@@ -220,14 +240,28 @@ $(document).ready(function() {
                 $('#projectAddress').val(data.address);
                 $('#projectStartDate').val(formatDateForInput(new Date(data.startDate)));
                 $('#projectDeadline').val(formatDateForInput(new Date(data.deadlineDate)));
-                $('#projectCounteragent').val(data.counteragent);
-                $('#projectResponsibleEmployee').val(data.responsibleEmployeeId);
+
+                if (data.counteragent) {
+                    $('#projectCounteragent').val(data.counteragent.id);
+                    $('#projectCounteragent option:selected').text(data.counteragent.name);
+                } else {
+                    $('#projectCounteragent').val('');
+                }
+
+                if (data.responsibleEmployee) {
+                    $('#projectResponsibleEmployee').val(data.responsibleEmployee.id);
+                    $('#projectResponsibleEmployee option:selected').text(data.responsibleEmployee.name);
+                } else {
+                    $('#projectResponsibleEmployee').val('');
+                }
+
                 $('#projectManagerShare').val(data.managerShare);
                 $('#projectStatus').val(data.projectStatus);
                 $('#projectModal').fadeIn();
             },
-            error: function(err) {
-                console.error('Ошибка при получении данных проекта:', err);
+            error: function (xhr) {
+                const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при сохранении данных проекта';
+                alert(errorMessage);
             }
         });
     }
@@ -253,7 +287,7 @@ $(document).ready(function() {
             startDate: $('#projectStartDate').val(),
             deadlineDate: $('#projectDeadline').val(),
             counteragent: $('#projectCounteragent').val() || null,
-            responsibleEmployeeId: $('#projectResponsibleEmployee').val(),
+            responsibleEmployee: $('#projectResponsibleEmployee').val(),
             managerShare: $('#projectManagerShare').val(),
             projectStatus: $('#projectStatus').val(),
         };
@@ -261,6 +295,10 @@ $(document).ready(function() {
         const projectId = $('#projectId').val();
         const url = projectId ? `/api/projects/base/${projectId}` : '/api/projects/base';
         const method = projectId ? 'PUT' : 'POST';
+
+        if (projectId) {
+            projectData.Id = projectId;
+        }
 
         $.ajax({
             url: url,

@@ -15,9 +15,10 @@ public class EmployeeBaseController : ControllerBase
     private readonly ILogger<EmployeeBaseController> _logger;
     private readonly IEmployeeService _employeeService;
 
-    public EmployeeBaseController(ILogger<EmployeeBaseController> logger)
+    public EmployeeBaseController(ILogger<EmployeeBaseController> logger, IEmployeeService employeeService)
     {
         _logger = logger;
+        _employeeService = employeeService;
     }
 
     [HttpPost]
@@ -40,7 +41,7 @@ public class EmployeeBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Employee))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEmployee([FromBody] UpdateEmployeeApiRequest request, CancellationToken ct)
@@ -48,11 +49,6 @@ public class EmployeeBaseController : ControllerBase
         try
         {
             var updatedEmployee = await _employeeService.UpdateEmployeeAsync(request.ToUpdateEmployeeRequest(), ct);
-            if (updatedEmployee == null)
-            {
-                _logger.LogWarning("Сотрудник с ID {Id} не найден", request.Id);
-                return NotFound($"Сотрудник с ID {request.Id} не найден");
-            }
 
             _logger.LogInformation("Сотрудник успешно обновлен: {@Name}", updatedEmployee.Name);
             return Ok(updatedEmployee);
@@ -108,6 +104,22 @@ public class EmployeeBaseController : ControllerBase
         {
             _logger.LogError(ex, "Ошибка при удалении сотрудника");
             return BadRequest($"Ошибка при удалении сотрудника: {ex.Message}");
+        }
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Employee>))]
+    public async Task<IActionResult> GetAllEmployees(CancellationToken ct)
+    {
+        try
+        {
+            var employees = await _employeeService.GetAllEmployeesAsync(ct);
+            return Ok(employees);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении списка сотрудников");
+            return BadRequest($"Ошибка при получении списка сотрудников: {ex.Message}");
         }
     }
 }

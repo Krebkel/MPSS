@@ -15,6 +15,8 @@ public interface IProductService
     Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteProductAsync(int id, CancellationToken cancellationToken);
+
+    Task<IEnumerable<Product>> GetAllProductsAsync(CancellationToken cancellationToken);
 }
 
 public class UpdateProductRequest

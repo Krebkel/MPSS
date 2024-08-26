@@ -55,7 +55,7 @@ internal class Repository<TEntity> : IRepository<TEntity> where TEntity : Databa
         await _dbContext.SaveChangesAsync(ct);
     }
 
-    public async Task<TEntity?> GetByIdAsync(int id, CancellationToken ct)
+    public async Task<TEntity?> GetByIdAsync(int? id, CancellationToken ct)
     {
         return await _dbContext.Set<TEntity>().FindAsync(id);
     }

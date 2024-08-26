@@ -2,7 +2,9 @@ using Contracts.EmployeeEntities;
 using Employees.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using Web.Extensions.EmployeeExtensions;
 using Web.Requests.EmployeeRequests;
 
@@ -15,9 +17,10 @@ public class EmployeeShiftBaseController : ControllerBase
     private readonly ILogger<EmployeeShiftBaseController> _logger;
     private readonly IEmployeeShiftService _employeeShiftService;
 
-    public EmployeeShiftBaseController(ILogger<EmployeeShiftBaseController> logger)
+    public EmployeeShiftBaseController(ILogger<EmployeeShiftBaseController> logger, IEmployeeShiftService employeeShiftService)
     {
         _logger = logger;
+        _employeeShiftService = employeeShiftService;
     }
 
     [HttpPost]
@@ -42,7 +45,7 @@ public class EmployeeShiftBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeShift))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEmployeeShift(
@@ -55,7 +58,7 @@ public class EmployeeShiftBaseController : ControllerBase
             await _employeeShiftService.UpdateEmployeeShiftAsync(updatedEmployeeShift, ct);
 
             _logger.LogInformation("Смена сотрудника {@EmployeeName} успешно обновлена: {@Date}", 
-                updatedEmployeeShift.Employee.Name, updatedEmployeeShift.Date);
+                updatedEmployeeShift.Employee, updatedEmployeeShift.Date);
             
             return Ok(updatedEmployeeShift);
         }
@@ -92,6 +95,7 @@ public class EmployeeShiftBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteEmployeeShift(int id, CancellationToken ct)
     {
         try
@@ -106,10 +110,63 @@ public class EmployeeShiftBaseController : ControllerBase
             _logger.LogInformation("Смена с ID {Id} успешно удалена", id);
             return Ok();
         }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgresEx && postgresEx.SqlState == "23503")
+        {
+            _logger.LogError(ex, "Ошибка при удалении смены из-за внешних ключей");
+            return BadRequest("Невозможно удалить смену, так как она связана с другими записями.");
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении смена");
             return BadRequest($"Ошибка при удалении смены: {ex.Message}");
+        }
+    }
+    
+    [HttpGet("byProject/{projectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EmployeeShift>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetEmployeeShiftsByProjectId(int projectId, CancellationToken ct)
+    {
+        try
+        {
+            var employeeShifts = 
+                await _employeeShiftService.GetEmployeeShiftsByProjectIdAsync(projectId, ct);
+            if (!employeeShifts.Any())
+            {
+                _logger.LogWarning("Проект с ID {ProjectId} не найден или нет смен на проекте", projectId);
+                return NotFound($"Проект с ID {projectId} не найден или нет смен на проекте");
+            }
+
+            return Ok(employeeShifts);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении смен по ID проекта");
+            return BadRequest($"Ошибка при получении смен по ID проекта: {ex.Message}");
+        }
+    }
+    
+    [HttpGet("byEmployee/{employeeId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EmployeeShift>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetEmployeeShiftsByEmployeeId(int employeeId, CancellationToken ct)
+    {
+        try
+        {
+            var employeeShifts = 
+                await _employeeShiftService.GetEmployeeShiftsByProjectIdAsync(employeeId, ct);
+            if (!employeeShifts.Any())
+            {
+                _logger.LogWarning("Сотрудник с ID {EmployeeId} не найден или нет смен на проекте", employeeId);
+                return NotFound($"Проект с ID {employeeId} не найден или нет смен на проекте");
+            }
+
+            return Ok(employeeShifts);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении смен по ID сотрудника");
+            return BadRequest($"Ошибка при получении смен по ID сотрудника: {ex.Message}");
         }
     }
 }

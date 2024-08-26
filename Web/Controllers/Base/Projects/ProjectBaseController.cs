@@ -15,9 +15,10 @@ public class ProjectBaseController : ControllerBase
     private readonly ILogger<ProjectBaseController> _logger;
     private readonly IProjectService _projectService;
 
-    public ProjectBaseController(ILogger<ProjectBaseController> logger)
+    public ProjectBaseController(ILogger<ProjectBaseController> logger, IProjectService projectService)
     {
         _logger = logger;
+        _projectService = projectService;
     }
 
     [HttpPost]
@@ -40,7 +41,7 @@ public class ProjectBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Project))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProject([FromBody] UpdateProjectApiRequest request, CancellationToken ct)
@@ -106,6 +107,22 @@ public class ProjectBaseController : ControllerBase
         {
             _logger.LogError(ex, "Ошибка при удалении проекта");
             return BadRequest($"Ошибка при удалении проекта: {ex.Message}");
+        }
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Project>))]
+    public async Task<IActionResult> GetAllProjects(CancellationToken ct)
+    {
+        try
+        {
+            var projects = await _projectService.GetAllProjectsAsync(ct);
+            return Ok(projects);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении списка проектов");
+            return BadRequest($"Ошибка при получении списка проектов: {ex.Message}");
         }
     }
 }

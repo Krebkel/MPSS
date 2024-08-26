@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace DataContracts;
 
 /// <summary>
@@ -8,5 +10,6 @@ public abstract class DatabaseEntity
     /// <summary>
     /// ID сущности
     /// </summary>
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 }

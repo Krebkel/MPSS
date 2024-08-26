@@ -1,4 +1,3 @@
-using Contracts;
 using Contracts.ProjectEntities;
 
 namespace Projects.Services;
@@ -15,17 +14,19 @@ public interface IProjectSuspensionService
     Task<ProjectSuspension?> GetProjectSuspensionByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteProjectSuspensionAsync(int id, CancellationToken cancellationToken);
+    
+    Task<IEnumerable<ProjectSuspension>> GetProjectSuspensionsByProjectIdAsync(int projectId, CancellationToken cancellationToken);
 }
 
 public class UpdateProjectSuspensionRequest
 {
     public required int Id { get; set; }
-    public required Project Project { get; set; }
+    public required int Project { get; set; }
     public required DateTimeOffset DateSuspended { get; set; }
 }
 
 public class CreateProjectSuspensionRequest
 {
-    public required Project Project { get; set; }
+    public required int Project { get; set; }
     public required DateTimeOffset DateSuspended { get; set; }
 }

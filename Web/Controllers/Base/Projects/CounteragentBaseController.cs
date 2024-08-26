@@ -1,7 +1,9 @@
 using Contracts.ProjectEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using Projects.Services;
 using Web.Extensions.ProjectExtensions;
 using Web.Requests.ProjectRequests;
@@ -15,9 +17,11 @@ public class CounteragentBaseController : ControllerBase
     private readonly ILogger<CounteragentBaseController> _logger;
     private readonly ICounteragentService _counteragentService;
 
-    public CounteragentBaseController(ILogger<CounteragentBaseController> logger)
+    public CounteragentBaseController(ILogger<CounteragentBaseController> logger, 
+        ICounteragentService counteragentService)
     {
         _logger = logger;
+        _counteragentService = counteragentService;
     }
 
     [HttpPost]
@@ -41,7 +45,7 @@ public class CounteragentBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Counteragent))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateCounteragent(
@@ -90,6 +94,7 @@ public class CounteragentBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteCounteragent(int id, CancellationToken ct)
     {
         try
@@ -104,10 +109,31 @@ public class CounteragentBaseController : ControllerBase
             _logger.LogInformation("Контрагент с ID {Id} успешно удален", id);
             return Ok();
         }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException postgresEx && postgresEx.SqlState == "23503")
+        {
+            _logger.LogError(ex, "Ошибка при удалении контрагента из-за внешних ключей");
+            return BadRequest("Невозможно удалить контрагента, так как он связан с другими записями.");
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении контрагента");
             return BadRequest($"Ошибка при удалении контрагента: {ex.Message}");
+        }
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Counteragent>))]
+    public async Task<IActionResult> GetAllCounteragents(CancellationToken ct)
+    {
+        try
+        {
+            var counteragents = await _counteragentService.GetAllCounteragentsAsync(ct);
+            return Ok(counteragents);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении списка контрагентов");
+            return BadRequest($"Ошибка при получении списка контрагентов: {ex.Message}");
         }
     }
 }

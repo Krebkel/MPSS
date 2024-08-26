@@ -18,7 +18,8 @@ public static class DependencyRegistrations
         });
         
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-
+        services.AddScoped(typeof(IValidator<>), typeof(Validator<>));
+        
         return services;
     }
 }

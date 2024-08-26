@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Contracts.ProductEntities;
+using Data;
 using DataContracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,52 +9,67 @@ namespace Products.Services;
 public class ProductComponentService : IProductComponentService
 {
     private readonly IRepository<ProductComponent> _productComponentRepository;
+    private readonly IRepository<Product> _productRepository;
     private readonly ILogger<ProductComponentService> _logger;
+    private readonly IValidator<Product> _productValidator;
+    private readonly IValidator<ProductComponent> _productComponentValidator;
+
 
     public ProductComponentService(
         IRepository<ProductComponent> productComponentRepository,
-        ILogger<ProductComponentService> logger)
+        IRepository<Product> productRepository,
+        ILogger<ProductComponentService> logger,
+        IValidator<Product> productValidator,
+        IValidator<ProductComponent> productComponentValidator)
     {
         _productComponentRepository = productComponentRepository;
+        _productRepository = productRepository;
         _logger = logger;
+        _productValidator = productValidator;
+        _productComponentValidator = productComponentValidator;
     }
 
-   public async Task<ProductComponent> CreateProductComponentAsync(
-       CreateProductComponentRequest request, 
-       CancellationToken cancellationToken)
+    public async Task<ProductComponent> CreateProductComponentAsync(CreateProductComponentRequest request, CancellationToken cancellationToken)
     {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var product = await _productValidator.ValidateAndGetEntityAsync(request.Product,
+            _productRepository, "Изделие", cancellationToken);
+
         var createdProductComponent = new ProductComponent
         {
-            Product = request.Product,
+            Product = product,
             Name = request.Name,
             Quantity = request.Quantity,
             Weight = request.Weight
         };
-        
-        _logger.LogInformation("Компонент изделия успешно добавлен: {@ProductComponent}", 
-            createdProductComponent);
+
+        await _productComponentRepository.AddAsync(createdProductComponent, cancellationToken);
+        _logger.LogInformation("Компонент изделия успешно добавлен: {@ProductComponent}", createdProductComponent);
+
         return createdProductComponent;
     }
     
-    public async Task<ProductComponent?> UpdateProductComponentAsync(
-        UpdateProductComponentRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ProductComponent> UpdateProductComponentAsync(UpdateProductComponentRequest request, CancellationToken cancellationToken)
     {
-        var productComponent = await _productComponentRepository
-            .GetAll()
-            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
-        
-        if (productComponent == null) return null;
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
 
-        productComponent.Id = request.Id;
+        var productComponent = await _productComponentValidator.ValidateAndGetEntityAsync(request.Id,
+            _productComponentRepository, "Компонент изделия", cancellationToken);
+        
+        var product = await _productValidator.ValidateAndGetEntityAsync(request.Product,
+            _productRepository, "Изделие", cancellationToken);
+
         productComponent.Name = request.Name;
-        productComponent.Product = request.Product;
+        productComponent.Product = product;
         productComponent.Quantity = request.Quantity;
         productComponent.Weight = request.Weight;
 
         await _productComponentRepository.UpdateAsync(productComponent, cancellationToken);
-
         _logger.LogInformation("Компонент изделия успешно обновлен: {@ProductComponent}", productComponent);
+
         return productComponent;
     }
     
@@ -75,5 +91,14 @@ public class ProductComponentService : IProductComponentService
         await _productComponentRepository.DeleteAsync(productComponent, cancellationToken);
         _logger.LogInformation("Компонент изделия с ID {Id} успешно удален", id);
         return true;
+    }
+    
+    public async Task<IEnumerable<ProductComponent>> GetProductComponentsByProductIdAsync(
+        int productId, CancellationToken cancellationToken)
+    {
+        return await _productComponentRepository
+            .GetAll()
+            .Where(es => es.Product.Id == productId)
+            .ToListAsync(cancellationToken);
     }
 }

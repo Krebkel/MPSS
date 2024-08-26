@@ -10,5 +10,5 @@ public interface IRepository<TEntity> where TEntity : DatabaseEntity
 
     public Task DeleteAsync(TEntity entity, CancellationToken ct);
     
-    public Task<TEntity?> GetByIdAsync(int id, CancellationToken ct);
+    public Task<TEntity?> GetByIdAsync(int? id, CancellationToken ct);
 }

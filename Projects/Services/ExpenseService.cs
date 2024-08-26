@@ -1,6 +1,6 @@
-using Contracts;
 using Microsoft.Extensions.Logging;
 using Contracts.ProjectEntities;
+using Data;
 using DataContracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,42 +9,64 @@ namespace Projects.Services;
 public class ExpenseService : IExpenseService
 {
     private readonly IRepository<Expense> _expenseRepository;
+    private readonly IRepository<Project> _projectRepository;
     private readonly ILogger<ExpenseService> _logger;
+    private readonly IValidator<Project> _projectValidator;
+    private readonly IValidator<Expense> _expenseValidator;
 
     public ExpenseService(
         IRepository<Expense> expenseRepository,
-        ILogger<ExpenseService> logger)
+        IRepository<Project> projectRepository,
+        ILogger<ExpenseService> logger,
+        IValidator<Project> projectValidator,
+        IValidator<Expense> expenseValidator)
     {
+        _projectRepository = projectRepository;
         _expenseRepository = expenseRepository;
         _logger = logger;
+        _projectValidator = projectValidator;
+        _expenseValidator = expenseValidator;
     }
+
 
     public async Task<Expense> CreateExpenseAsync(CreateExpenseRequest request, CancellationToken cancellationToken)
     {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var project = await _projectValidator.ValidateAndGetEntityAsync(
+            request.Project, _projectRepository, "Проект", cancellationToken);
+
+
         var createdExpense = new Expense
         {
-            Project = request.Project,
+            Project = project,
             Name = request.Name,
             Amount = request.Amount,
             Description = request.Description,
             Type = request.Type,
             IsPaidByCompany = request.IsPaidByCompany
         };
-        
+
+        await _expenseRepository.AddAsync(createdExpense, cancellationToken);
         _logger.LogInformation("Расход успешно добавлен: {@Expense}", createdExpense);
+
         return createdExpense;
     }
     
-    public async Task<Expense?> UpdateExpenseAsync(UpdateExpenseRequest request, CancellationToken cancellationToken)
+    public async Task<Expense> UpdateExpenseAsync(UpdateExpenseRequest request, CancellationToken cancellationToken)
     {
-        var expense = await _expenseRepository
-            .GetAll()
-            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
-        
-        if (expense == null) return null;
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
 
-        expense.Id = request.Id;
-        expense.Project = request.Project;
+        var expense = await _expenseValidator.ValidateAndGetEntityAsync(
+            request.Id, _expenseRepository, "Расход", cancellationToken);
+        
+        var project = await _projectValidator.ValidateAndGetEntityAsync(
+            request.Project, _projectRepository, "Проект", cancellationToken);
+
+
+        expense.Project = project;
         expense.Name = request.Name;
         expense.Amount = request.Amount;
         expense.Description = request.Description;
@@ -52,8 +74,8 @@ public class ExpenseService : IExpenseService
         expense.IsPaidByCompany = request.IsPaidByCompany;
 
         await _expenseRepository.UpdateAsync(expense, cancellationToken);
-
         _logger.LogInformation("Расход успешно обновлен: {@Expense}", expense);
+
         return expense;
     }
     
@@ -61,6 +83,7 @@ public class ExpenseService : IExpenseService
     {
         return await _expenseRepository
             .GetAll()
+            .Include(e => e.Project)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
@@ -75,5 +98,15 @@ public class ExpenseService : IExpenseService
         await _expenseRepository.DeleteAsync(expense, cancellationToken);
         _logger.LogInformation("Расход с ID {Id} успешно удален", id);
         return true;
+    }
+    
+    public async Task<IEnumerable<Expense>> GetExpensesByProjectIdAsync(
+        int projectId, CancellationToken cancellationToken)
+    {
+        return await _expenseRepository
+            .GetAll()
+            .Include(e => e.Project)
+            .Where(e => e.Project.Id == projectId)
+            .ToListAsync(cancellationToken);
     }
 }

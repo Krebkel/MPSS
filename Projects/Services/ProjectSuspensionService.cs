@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Contracts.ProjectEntities;
+using Data;
 using DataContracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,40 +12,60 @@ namespace Projects.Services;
 public class ProjectSuspensionService : IProjectSuspensionService
 {
     private readonly IRepository<ProjectSuspension> _projectSuspensionRepository;
+    private readonly IRepository<Project> _projectRepository;
+    private readonly IValidator<Project> _projectValidator;
+    private readonly IValidator<ProjectSuspension> _projectSuspensionValidator;
     private readonly ILogger<ProjectSuspensionService> _logger;
 
     public ProjectSuspensionService(
         IRepository<ProjectSuspension> projectSuspensionRepository,
-        ILogger<ProjectSuspensionService> logger)
+        IRepository<Project> projectRepository,
+        ILogger<ProjectSuspensionService> logger,
+        IValidator<ProjectSuspension> projectSuspensionValidator,
+        IValidator<Project> projectValidator)
     {
-        _projectSuspensionRepository = projectSuspensionRepository;
         _logger = logger;
+        _projectSuspensionRepository = projectSuspensionRepository;
+        _projectRepository = projectRepository;
+        _projectSuspensionValidator = projectSuspensionValidator;
+        _projectValidator = projectValidator;
     }
 
     public async Task<ProjectSuspension> CreateProjectSuspensionAsync(
         CreateProjectSuspensionRequest request, 
         CancellationToken cancellationToken)
     {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var project = await _projectValidator.ValidateAndGetEntityAsync(
+            request.Project, _projectRepository, "Проект", cancellationToken);
+        
         var createdProjectSuspension = new ProjectSuspension
         {
-            Project = request.Project,
-            DateSuspended = request.DateSuspended
+            Project = project,
+            DateSuspended = request.DateSuspended.ToUniversalTime()
         };
         
+        await _projectSuspensionRepository.AddAsync(createdProjectSuspension, cancellationToken);
+
         _logger.LogInformation("Приостановка проетка успешно добавлена: {@ProjectSuspension}", createdProjectSuspension);
         return createdProjectSuspension;
     }
     
-    public async Task<ProjectSuspension?> UpdateProjectSuspensionAsync(UpdateProjectSuspensionRequest request, CancellationToken cancellationToken)
+    public async Task<ProjectSuspension> UpdateProjectSuspensionAsync(UpdateProjectSuspensionRequest request, CancellationToken cancellationToken)
     {
-        var projectSuspension = await _projectSuspensionRepository
-            .GetAll()
-            .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var projectSuspension = await _projectSuspensionValidator.ValidateAndGetEntityAsync(
+            request.Id, _projectSuspensionRepository, "Приостановка проекта", cancellationToken);
         
-        if (projectSuspension == null) return null;
+        var project = await _projectValidator.ValidateAndGetEntityAsync(
+            request.Project, _projectRepository, "Проект", cancellationToken);
 
         projectSuspension.Id = request.Id;
-        projectSuspension.Project = request.Project;
+        projectSuspension.Project = project;
         projectSuspension.DateSuspended = request.DateSuspended;
 
         await _projectSuspensionRepository.UpdateAsync(projectSuspension, cancellationToken);
@@ -57,7 +78,8 @@ public class ProjectSuspensionService : IProjectSuspensionService
     {
         return await _projectSuspensionRepository
             .GetAll()
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            .Include(ps => ps.Project)
+            .FirstOrDefaultAsync(ps => ps.Id == id, cancellationToken);
     }
 
     public async Task<bool> DeleteProjectSuspensionAsync(int id, CancellationToken cancellationToken)
@@ -71,5 +93,15 @@ public class ProjectSuspensionService : IProjectSuspensionService
         await _projectSuspensionRepository.DeleteAsync(projectSuspension, cancellationToken);
         _logger.LogInformation("Приостановка проекта с ID {Id} успешно удалена", id);
         return true;
+    }
+    
+    public async Task<IEnumerable<ProjectSuspension>> GetProjectSuspensionsByProjectIdAsync(
+        int projectId, CancellationToken cancellationToken)
+    {
+        return await _projectSuspensionRepository
+            .GetAll()
+            .Include(ps => ps.Project)
+            .Where(ps => ps.Project.Id == projectId)
+            .ToListAsync(cancellationToken);
     }
 }

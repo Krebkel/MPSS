@@ -31,6 +31,6 @@ public static class CounteragentExtension
             OGRN = request.OGRN,
             AccountNumber = request.AccountNumber,
             BIK = request.BIK
-        };;
+        };
     }
 }

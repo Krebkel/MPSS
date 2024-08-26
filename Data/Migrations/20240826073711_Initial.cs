@@ -24,11 +24,11 @@ namespace Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Contact = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
-                    INN = table.Column<long>(type: "bigint", nullable: true),
-                    OGRN = table.Column<long>(type: "bigint", nullable: true),
-                    AccountNumber = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
-                    BIK = table.Column<long>(type: "bigint", nullable: true)
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    INN = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    OGRN = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
+                    AccountNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    BIK = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -45,11 +45,11 @@ namespace Data.Migrations
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     IsDriver = table.Column<bool>(type: "boolean", nullable: false),
-                    Passport = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
+                    Passport = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    INN = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
-                    AccountNumber = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
-                    BIK = table.Column<decimal>(type: "numeric(20,0)", nullable: true)
+                    INN = table.Column<string>(type: "character varying(12)", maxLength: 12, nullable: true),
+                    AccountNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    BIK = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: true)
                 },
                 constraints: table =>
                 {

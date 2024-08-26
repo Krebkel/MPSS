@@ -1,5 +1,4 @@
 using Contracts.EmployeeEntities;
-using Contracts.ProjectEntities;
 
 namespace Employees.Services;
 
@@ -9,19 +8,23 @@ namespace Employees.Services;
 public interface IEmployeeShiftService
 {
     Task<EmployeeShift> CreateEmployeeShiftAsync(CreateEmployeeShiftRequest employeeShift, CancellationToken cancellationToken);
-    
+
     Task<EmployeeShift> UpdateEmployeeShiftAsync(UpdateEmployeeShiftRequest employeeShift, CancellationToken cancellationToken);
     
     Task<EmployeeShift?> GetEmployeeShiftByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteEmployeeShiftAsync(int id, CancellationToken cancellationToken);
+
+    Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByProjectIdAsync(int projectId, CancellationToken cancellationToken);
+    
+    Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByEmployeeIdAsync(int employeeId, CancellationToken cancellationToken);
 }
 
 public class UpdateEmployeeShiftRequest
 {
     public required int Id { get; set; }
-    public required Project Project { get; set; }
-    public required Employee Employee { get; set; }
+    public required int Project { get; set; }
+    public required int Employee { get; set; }
     public required DateTimeOffset Date { get; set; }
     public DateTimeOffset? Arrival { get; set; }
     public DateTimeOffset? Departure { get; set; }
@@ -33,8 +36,8 @@ public class UpdateEmployeeShiftRequest
 
 public class CreateEmployeeShiftRequest
 {
-    public required Project Project { get; set; }
-    public required Employee Employee { get; set; }
+    public required int Project { get; set; }
+    public required int Employee { get; set; }
     public required DateTimeOffset Date { get; set; }
     public DateTimeOffset? Arrival { get; set; }
     public DateTimeOffset? Departure { get; set; }

@@ -12,12 +12,14 @@ public interface IExpenseService
     Task<Expense?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteExpenseAsync(int id, CancellationToken cancellationToken);
+    
+    Task<IEnumerable<Expense>> GetExpensesByProjectIdAsync(int projectId, CancellationToken cancellationToken);
 }
 
 public class UpdateExpenseRequest
 {
     public int Id { get; set; }
-    public Project Project { get; set; }
+    public int Project { get; set; }
     public string Name { get; set; }
     public double? Amount { get; set; }
     public string? Description { get; set; }
@@ -27,7 +29,7 @@ public class UpdateExpenseRequest
 
 public class CreateExpenseRequest
 {
-    public required Project Project { get; set; }
+    public required int Project { get; set; }
     public required string Name { get; set; }
     public required double Amount { get; set; }
     public string? Description { get; set; }

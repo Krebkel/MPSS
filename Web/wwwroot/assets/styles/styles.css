@@ -122,16 +122,22 @@ th {
     font-weight: bold;
 }
 
+.btncol {
+    width: 2rem;
+    justify-content: left;
+    align-items: flex-start;
+}
+
 .shortcol {
-    width: 0.5rem;
+    width: 2rem;
 }
 
 .midcol {
-    width: 4rem;
+    width: 10rem;
 }
 
 .longcol {
-    width: 8rem;
+    width: 20rem;
 }
 
 tr:nth-child(even) {
@@ -149,13 +155,15 @@ tr:hover {
     border-radius: 0.3rem;
     border: 0.087rem solid #faeedb;
     position: absolute;
-    margin-top: -0.0875rem;
-    margin-left: 1rem;
     cursor: pointer;
     padding: 0.5rem 1rem;
 }
+.btn-primary {
+    margin-top: -0.0875rem;
+    margin-left: 1rem;
+}
 
-.btn-primary:hover {
+.btn:hover {
     background-color: #faeedb;
 }
 
@@ -165,6 +173,11 @@ tr:hover {
 
 .btn-showall {
     margin-left: 4rem;
+}
+
+td .delete-btn {
+    position: relative;
+    justify-content: left
 }
 
 /* Модальные окна */
@@ -255,6 +268,7 @@ input[type="text"], input[type="date"], input[type="checkbox"], select {
     padding: 0;
 }
 
+#counteragentModal .modal-content,
 #projectModal .modal-content,
 #employeeModal .modal-content {
     width: 100%;
@@ -263,6 +277,7 @@ input[type="text"], input[type="date"], input[type="checkbox"], select {
     padding-bottom: 3.6rem;
 }
 
+#counteragentForm .form-group,
 #projectForm .form-group,
 #employeeForm .form-group {
     margin: 0.5rem;
@@ -270,14 +285,17 @@ input[type="text"], input[type="date"], input[type="checkbox"], select {
     margin-right: 1.5rem;
 }
 
+#counteragentForm label,
 #projectForm label,
 #employeeForm label {
     display: block;
     margin-bottom: 0.5rem;
 }
 
+#counteragentForm input,
 #projectForm input,
 #employeeForm input,
+#counteragentForm select,
 #projectForm select,
 #employeeForm select {
     width: 100%;
@@ -286,6 +304,7 @@ input[type="text"], input[type="date"], input[type="checkbox"], select {
     border-radius: 0.3rem;
 }
 
+#counteragentForm button[type="submit"],
 #projectForm button[type="submit"],
 #employeeForm button[type="submit"] {
     display: block;
