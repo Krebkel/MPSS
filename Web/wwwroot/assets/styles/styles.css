@@ -1,4 +1,15 @@
-/* Общие стили */
+/* Общее */
+@font-face {
+    font-family: 'Rosatom';
+    src: local("/assets/fonts/Rosatom-Bold.ttf");
+    font-weight: bold;
+}
+@font-face {
+    font-family: 'Rosatom';
+    src: local("/assets/fonts/Rosatom-Regular.ttf");
+    font-weight: normal;
+}
+
 body {
     font-family: 'Rosatom', sans-serif;
     background-color: #f4f5f7;
@@ -7,7 +18,7 @@ body {
 }
 
 main {
-    padding: 4.375rem 1.25rem 1.25rem 1.25rem;
+    padding: 4.375rem 1.25rem 1.25rem;
     width: 100%;
     height: 100vh;
     position: relative;
@@ -52,7 +63,7 @@ main {
     color: #1e1e2c;
 }
 
-/* Сайдбар */
+/* Боковая панель */
 .sidebar {
     background-color: #f4f5f7;
     padding: 1rem;
@@ -89,7 +100,7 @@ main {
     color: #1e1e2c;
 }
 
-/* Основной контент */
+/* Base ...d on me havin zero bi...  */
 .content {
     background-color: #f4f5f7;
     border-radius: 0.3rem;
@@ -122,30 +133,17 @@ th {
     font-weight: bold;
 }
 
-.btncol {
-    width: 2rem;
-    justify-content: left;
-    align-items: flex-start;
-}
+tr:nth-child(even) { background-color: #f9f9f9; }
+tr:hover { background-color: #f5f5f5; }
 
-.shortcol {
-    width: 2rem;
-}
+.btncol { width: 2rem; border-style: none; background-color: transparent}
+.shortcol { width: 2rem; white-space: nowrap;}
+.midcol { width: 10rem; white-space: nowrap;}
+.longcol { width: 20rem; white-space: nowrap;}
 
-.midcol {
-    width: 10rem;
-}
-
-.longcol {
-    width: 20rem;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f5f5f5;
+label {
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
 /* Кнопки */
@@ -154,30 +152,20 @@ tr:hover {
     font-family: 'Rosatom', sans-serif;
     border-radius: 0.3rem;
     border: 0.087rem solid #faeedb;
-    position: absolute;
     cursor: pointer;
     padding: 0.5rem 1rem;
 }
-.btn-primary {
-    margin-top: -0.0875rem;
-    margin-left: 1rem;
-}
 
-.btn:hover {
-    background-color: #faeedb;
-}
+.btn:hover { background-color: #faeedb; }
 
-.btn-add {
-    font-weight: bold;
-}
+.btn-primary { margin: -0.0875rem 0 0 1rem; }
+.btn-secondary { margin: 0.4875rem 0 0 7rem; }
+.btn-add { font-weight: bold; }
+.btn-showall { margin-left: 4rem; }
 
-.btn-showall {
-    margin-left: 4rem;
-}
-
-td .delete-btn {
-    position: relative;
-    justify-content: left
+button[type="submit"] {
+    display: block;
+    margin: 0.5rem auto 0;
 }
 
 /* Модальные окна */
@@ -190,16 +178,15 @@ td .delete-btn {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto;
-    padding: 2rem;
+    padding: 1rem 1rem 0.5rem;
     border: 1px solid #888;
-    width: 90%;
+    width: 100%;
     max-width: 35rem;
     border-radius: 0.3rem;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
@@ -211,53 +198,43 @@ td .delete-btn {
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
     color: black;
     text-decoration: none;
-    cursor: pointer;
 }
 
 /* Формы */
 .form-group {
-    margin-bottom: 1rem;
+    margin: 0.5rem 1.5rem 1rem 0.5rem;
     display: flex;
     flex-direction: column;
-}
-
-.form-group-checkbox label {
-    margin-right: 0.5rem;
-    white-space: nowrap;
 }
 
 .form-group-inline {
     display: flex;
     align-items: center;
+    margin-bottom: 1rem;
 }
 
 .form-group-inline label {
     margin-right: 1rem;
     margin-left: 0.5rem;
+    margin-bottom: -0.01rem;
     white-space: nowrap;
+    width: 12rem;
 }
 
-.form-group-inline input[type="date"] {
-    margin-bottom: 0.5rem;
-    margin-right: 2rem;
-}
-
-.form-group-inline input[type="checkbox"] {
-    margin-left: 0rem;
-    margin-bottom: 0.5rem;
-}
-
-
-input[type="text"], input[type="date"], input[type="checkbox"], select {
+input[type="text"], input[type="date"], input[type="checkbox"],
+input[type="number"], select {
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 0.3rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Индивидуальные элементы */
@@ -268,45 +245,7 @@ input[type="text"], input[type="date"], input[type="checkbox"], select {
     padding: 0;
 }
 
-#counteragentModal .modal-content,
-#projectModal .modal-content,
-#employeeModal .modal-content {
-    width: 100%;
-    max-width: 30rem;
-    padding: 1rem;
-    padding-bottom: 3.6rem;
-}
-
-#counteragentForm .form-group,
-#projectForm .form-group,
-#employeeForm .form-group {
-    margin: 0.5rem;
-    margin-bottom: 1rem;
-    margin-right: 1.5rem;
-}
-
-#counteragentForm label,
-#projectForm label,
-#employeeForm label {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-#counteragentForm input,
-#projectForm input,
-#employeeForm input,
-#counteragentForm select,
-#projectForm select,
-#employeeForm select {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 0.3rem;
-}
-
-#counteragentForm button[type="submit"],
-#projectForm button[type="submit"],
-#employeeForm button[type="submit"] {
-    display: block;
-    margin: 0.5rem auto 0;
-}
+/* Костыли (as if) */
+#projectStartDate {margin-left: 2.5rem;}
+#employeeDateOfBirth {margin-left: 1rem;}
+input[type="checkbox"]{margin-left: -6rem;}
