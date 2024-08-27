@@ -5,18 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Проекты - МПСС</title>
     <link rel="stylesheet" href="/assets/styles/styles.css">
-    <style>
-        @font-face {
-            font-family: 'Rosatom';
-            src: local("/assets/fonts/Rosatom-Bold.ttf");
-            font-weight: bold;
-        }
-        @font-face {
-            font-family: 'Rosatom';
-            src: local("/assets/fonts/Rosatom-Regular.ttf");
-            font-weight: normal;
-        }
-    </style>
 </head>
 <body>
 
@@ -27,9 +15,6 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="employees.html">Сотрудники</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="products.html">Изделия</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="counteragents.html">Контрагенты</a>
@@ -50,6 +35,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#employee-shifts">Смены</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products">Изделия</a>
                     </li>
                 </ul>
             </div>
@@ -84,7 +72,133 @@
                     </table>
                 </div>
             </div>
+            <div id="products" class="content-section" style="display: none;">
+                <div id="productTable">
+                    <h2 id="productsHeader">Изделия
+                        <button id="addProductBtn" class="btn btn-primary btn-add">+</button>
+                    </h2>
+                    <table id="productsTable" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="shortcol">№</th>
+                            <th>Название</th>
+                            <th class="midcol">Стоимость</th>
+                            <th class="midcol">Тип</th>
+                            <th class="btncol"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </main>
+    </div>
+</div>
+
+<div id="projectModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="modalTitle">Добавить новый проект</h3>
+        <form id="projectForm">
+            <input type="hidden" id="projectId" name="projectId">
+            <div class="form-group-inline">
+                <label for="projectName">Название:</label>
+                <input type="text" id="projectName" name="projectName" required>
+            </div>
+            <div class="form-group-inline">
+                <label for="projectAddress">Адрес:</label>
+                <input type="text" id="projectAddress" name="projectAddress" required>
+            </div>
+            <div class="form-group-inline">
+                <label for="projectStartDate">Дата начала:</label>
+                <input type="date" id="projectStartDate" name="projectStartDate" required>
+                
+                <label for="projectDeadline">Дедлайн:</label>
+                <input type="date" id="projectDeadline" name="projectDeadline" required>
+            </div>
+            <div class="form-group-inline">
+                <label for="projectCounteragent">Контрагент:</label>
+                <select id="projectCounteragent" name="projectCounteragent">
+                </select>
+            </div>
+            <div class="form-group-inline">
+                <label for="projectResponsibleEmployee">Ответственный:</label>
+                <select id="projectResponsibleEmployee" name="projectResponsibleEmployee" required>
+                </select>
+            </div>
+            <div class="form-group-inline">
+                <label for="projectManagerShare">З/п шефа, %:</label>
+                <input type="text" id="projectManagerShare" name="projectManagerShare" required step="0.01" min="0" max="100">
+            </div>
+            <div class="form-group-inline">
+                <label for="projectStatus">Статус:</label>
+                <select id="projectStatus" name="projectStatus" required>
+                    <option value="Active">Активен</option>
+                    <option value="Standby">Ожидание</option>
+                    <option value="Done">Завершен</option>
+                    <option value="Paid">Оплачен</option>
+                </select>
+            </div>
+            <h4>Изделия
+                <button type="button" id="addProjectProductBtn" class="btn btn-primary btn-add">+</button>
+            </h4>
+            <table id="projectProductsTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <th class="longcol">Изделие</th>
+                    <th class="shortcol">Кол-во</th>
+                    <th class="midcol">Доход</th>
+                    <th class="btncol"></th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="submit" id="modalSubmitButton" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="productModalTitle">Добавить новое изделие</h3>
+        <form id="productForm">
+            <input type="hidden" id="productId" name="productId">
+            <div class="form-group">
+                <label for="productName">Название:</label>
+                <input type="text" id="productName" name="productName" required>
+            </div>
+            <div class="form-group">
+                <label for="productCost">Стоимость:</label>
+                <input type="number" id="productCost" name="productCost" required step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="productType">Тип:</label>
+                <select id="productType" name="productType" required>
+                    <option value="Main">Основной</option>
+                    <option value="Extra">Доп. услуга</option>
+                    <option value="Other">Прочее</option>
+                </select>
+            </div>
+            <h4>Компоненты
+                <button type="button" id="addComponentBtn" class="btn btn-primary btn-add">+</button>
+            </h4>
+            <table id="componentsTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Название компонента</th>
+                    <th>Количество</th>
+                    <th>Вес</th>
+                    <th class="btncol"></th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="submit" id="productModalSubmitButton" class="btn btn-primary">Сохранить</button>
+        </form>
     </div>
 </div>
 
@@ -99,59 +213,10 @@
     </div>
 </div>
 
-<div id="projectModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3 id="modalTitle">Добавить новый проект</h3>
-        <form id="projectForm">
-            <input type="hidden" id="projectId" name="projectId">
-            <div class="form-group">
-                <label for="projectName">Название проекта:</label>
-                <input type="text" id="projectName" name="projectName" required>
-            </div>
-            <div class="form-group">
-                <label for="projectAddress">Адрес:</label>
-                <input type="text" id="projectAddress" name="projectAddress" required>
-            </div>
-            <div class="form-group">
-                <label for="projectStartDate">Дата начала:</label>
-                <input type="date" id="projectStartDate" name="projectStartDate" required>
-            </div>
-            <div class="form-group">
-                <label for="projectDeadline">Дедлайн:</label>
-                <input type="date" id="projectDeadline" name="projectDeadline" required>
-            </div>
-            <div class="form-group">
-                <label for="projectCounteragent">Контрагент:</label>
-                <select id="projectCounteragent" name="projectCounteragent" required>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="projectResponsibleEmployee">Ответственный:</label>
-                <select id="projectResponsibleEmployee" name="projectResponsibleEmployee" required>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="projectManagerShare">Процент руководителю:</label>
-                <input type="text" id="projectManagerShare" name="projectManagerShare">
-            </div>
-            <div class="form-group">
-                <label for="projectStatus">Статус:</label>
-                <select id="projectStatus" name="projectStatus" required>
-                    <option value="Active">Активен</option>
-                    <option value="Standby">Ожидание</option>
-                    <option value="Done">Завершен</option>
-                    <option value="Paid">Оплачен</option>
-                </select>
-            </div>
-            <button type="submit" id="modalSubmitButton" class="btn btn-primary">Сохранить</button>
-        </form>
-    </div>
-</div>
-
 <script src="/libs/jquery.js"></script>
 <script src="/libs/bootstrap.js"></script>
 <script src="/js/script.js"></script>
 <script src="/js/projects.js"></script>
+<script src="/js/products.js"></script>
 </body>
 </html>

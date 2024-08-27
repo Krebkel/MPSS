@@ -75,9 +75,6 @@
       <None Update="wwwroot\employees.html">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\products.html">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="wwwroot\projects.html">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

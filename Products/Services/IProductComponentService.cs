@@ -21,7 +21,7 @@ public class UpdateProductComponentRequest
     public required int Product { get; set; }
     public required string Name { get; set; }
     public int? Quantity { get; set; }
-    public float? Weight { get; set; }
+    public double? Weight { get; set; }
 }
 
 public class CreateProductComponentRequest
@@ -29,5 +29,5 @@ public class CreateProductComponentRequest
     public required int Product { get; set; }
     public required string Name { get; set; }
     public int? Quantity { get; set; }
-    public float? Weight { get; set; }
+    public double? Weight { get; set; }
 }

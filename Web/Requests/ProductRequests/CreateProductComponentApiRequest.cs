@@ -5,5 +5,5 @@ public class CreateProductComponentApiRequest
     public required int Product { get; set; }
     public required string Name { get; set; }
     public int? Quantity { get; set; }
-    public float? Weight { get; set; }
+    public double? Weight { get; set; }
 }

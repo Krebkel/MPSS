@@ -25,49 +25,61 @@ public class ProjectProductBaseController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
-    public async Task<IActionResult> AddProjectProduct(
-        [FromBody] CreateProjectProductApiRequest request, CancellationToken ct)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectProduct>))]
+    public async Task<IActionResult> AddProjectProducts(
+        [FromBody] IEnumerable<CreateProjectProductApiRequest> requests, CancellationToken ct)
     {
         try
         {
-            var addProjectProductRequest = request.ToCreateProjectProductRequest();
-            var createdProjectProduct = await _projectProductService
-                .CreateProjectProductAsync(addProjectProductRequest, ct);
-            
-            _logger.LogInformation("Изделие {@ProductName} успешно добавлено на проект {@ProjectName} ",
-                createdProjectProduct.Product.Name, createdProjectProduct.Project.Name);
+            var createdProjectProducts = new List<ProjectProduct>();
 
-            return Ok(createdProjectProduct);
+            foreach (var request in requests)
+            {
+                var addProjectProductRequest = request.ToCreateProjectProductRequest();
+                var createdProjectProduct = await _projectProductService
+                    .CreateProjectProductAsync(addProjectProductRequest, ct);
+                createdProjectProducts.Add(createdProjectProduct);
+            
+                _logger.LogInformation("Изделие {@ProductName} успешно добавлено на проект {@ProjectName} ",
+                    createdProjectProduct.Product.Name, createdProjectProduct.Project.Name);
+            }
+
+            return Ok(createdProjectProducts);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при добавлении изделия");
-            return BadRequest($"Ошибка при добавлении изделия {ex.Message}");
+            _logger.LogError(ex, "Ошибка при добавлении изделий на проект");
+            return BadRequest($"Ошибка при добавлении изделий на проект: {ex.Message}");
         }
     }
 
-    [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectProduct>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateProjectProduct(
-        [FromBody] UpdateProjectProductApiRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateProjectProducts(
+        [FromBody] IEnumerable<UpdateProjectProductApiRequest> requests, CancellationToken ct)
     {
         try
         {
-            var updatedProjectProduct = request.ToUpdateProjectProductRequest();
+            var updatedProjectProducts = new List<ProjectProduct>();
 
-            await _projectProductService.UpdateProjectProductAsync(updatedProjectProduct, ct);
+            foreach (var request in requests)
+            {
+                var updateProjectProductRequest = request.ToUpdateProjectProductRequest();
+                var updatedProjectProduct = await _projectProductService
+                    .UpdateProjectProductAsync(updateProjectProductRequest, ct);
+                updatedProjectProducts.Add(updatedProjectProduct);
 
-            _logger.LogInformation("Изделие {@ProductName} успешно обновлено на проекте {@ProjectName}",
-                request.Product, request.Project);
-            
-            return Ok(updatedProjectProduct);
+                _logger.LogInformation("Изделие {@ProductName} успешно обновлено на проекте {@ProjectName}",
+                    updatedProjectProduct.Product.Name, updatedProjectProduct.Project.Name);
+            }
+
+            return Ok(updatedProjectProducts);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении информации об изделии на проекте");
-            return BadRequest($"Ошибка при обновлении информации об изделии на проекте{ex.Message}");
+            _logger.LogError(ex, "Ошибка при обновлении информации об изделиях на проекте");
+            return BadRequest($"Ошибка при обновлении информации об изделиях на проекте: {ex.Message}");
         }
     }
     
@@ -133,10 +145,11 @@ public class ProjectProductBaseController : ControllerBase
         {
             var projectProducts = await _projectProductService
                 .GetProjectProductsByProjectIdAsync(projectId, ct);
-            if (!projectProducts.Any())
+        
+            if (projectProducts == null)
             {
-                _logger.LogWarning("Проект с ID {ProjectId} не найден или не содержит изделий", projectId);
-                return NotFound($"Проект с ID {projectId} не найден или не содержит изделий");
+                _logger.LogWarning("Проект с ID {ProjectId} не найден", projectId);
+                return NotFound($"Проект с ID {projectId} не найден");
             }
 
             return Ok(projectProducts);

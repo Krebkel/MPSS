@@ -25,5 +25,5 @@ public class ProductComponent : DatabaseEntity
     /// <summary>
     /// Вес одной детали для производства продукта
     /// </summary>
-    public float? Weight { get; set; }
+    public double? Weight { get; set; }
 }
