@@ -53,9 +53,9 @@ $(document).ready(function() {
                   ${fullData ? '' : `<td class="midcol">${employee.isDriver ? 'Да' : 'Нет'}</td>`}
                   ${fullData ? `
                     <td class="midcol">${employee.passport ? employee.passport.substring(0, 4) + ' ' + employee.passport.substring(4) : ''}</td>
-                    <td class="midcol">${employee.inn}</td>
-                    <td class="midcol">${employee.accountNumber}</td>
-                    <td class="midcol">${employee.bik}</td>
+                    <td class="midcol">${employee.inn ? employee.inn : ''}</td>
+                    <td class="midcol">${employee.accountNumber ? employee.accountNumber : ''}</td>
+                    <td class="midcol">${employee.bik ? employee.bik : ''}</td>
                   ` : ''}
                   <td class="btncol">
                     <button class="btn delete-btn" data-employee-id="${employee.id}">⛌</button>
@@ -105,11 +105,12 @@ $(document).ready(function() {
                 $('#employeeId').val(employeeId);
                 $('#employeeName').val(data.name);
                 $('#employeePhone').val(data.phone);
+                $('#employeePassport').val(data.passport ? data.passport.substring(0, 4) + ' ' + data.passport.substring(4) : '');
                 $('#employeeDateOfBirth').val(formatDateForInput(new Date(data.dateOfBirth)));
                 $('#employeeIsDriver').prop('checked', data.isDriver);
-                $('#employeeINN').val(data.inn);
-                $('#employeeAccountNumber').val(data.accountNumber);
-                $('#employeeBIK').val(data.bik);
+                $('#employeeINN').val(data.inn ? data.inn : '');
+                $('#employeeAccountNumber').val(data.accountNumber ? data.accountNumber : '');
+                $('#employeeBIK').val(data.bik ? data.bik : '');
                 $('#employeeModal').fadeIn();
             },
             error: function(err) {

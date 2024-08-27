@@ -100,12 +100,12 @@ $(document).ready(function() {
                 $('#modalTitle').text('Редактировать контрагента');
                 $('#counteragentId').val(counteragentId);
                 $('#counteragentName').val(data.name);
-                $('#counteragentContact').val(data.contact);
-                $('#counteragentPhone').val(data.phone);
-                $('#counteragentINN').val(data.inn);
-                $('#counteragentOGRN').val(data.ogrn);
-                $('#counteragentAccountNumber').val(data.accountNumber);
-                $('#counteragentBIK').val(data.bik);
+                $('#counteragentContact').val(data.contact ? data.contact : '');
+                $('#counteragentPhone').val(data.phone ? data.phone : '');
+                $('#counteragentINN').val(data.inn ? data.inn : '');
+                $('#counteragentOGRN').val(data.ogrn ? data.ogrn : '');
+                $('#counteragentAccountNumber').val(data.accountNumber ? data.accountNumber : '');
+                $('#counteragentBIK').val(data.bik ? data.bik : '');
                 $('#counteragentModal').fadeIn();
             },
             error: function(err) {

@@ -129,15 +129,14 @@ public class EmployeeShiftBaseController : ControllerBase
     {
         try
         {
-            var employeeShifts = 
-                await _employeeShiftService.GetEmployeeShiftsByProjectIdAsync(projectId, ct);
-            if (!employeeShifts.Any())
-            {
-                _logger.LogWarning("Проект с ID {ProjectId} не найден или нет смен на проекте", projectId);
-                return NotFound($"Проект с ID {projectId} не найден или нет смен на проекте");
-            }
-
+            var employeeShifts = await _employeeShiftService
+                .GetEmployeeShiftsByProjectIdAsync(projectId, ct);
             return Ok(employeeShifts);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex.Message);
+            return NotFound(ex.Message);
         }
         catch (Exception ex)
         {
@@ -153,15 +152,14 @@ public class EmployeeShiftBaseController : ControllerBase
     {
         try
         {
-            var employeeShifts = 
-                await _employeeShiftService.GetEmployeeShiftsByProjectIdAsync(employeeId, ct);
-            if (!employeeShifts.Any())
-            {
-                _logger.LogWarning("Сотрудник с ID {EmployeeId} не найден или нет смен на проекте", employeeId);
-                return NotFound($"Проект с ID {employeeId} не найден или нет смен на проекте");
-            }
-
+            var employeeShifts = await _employeeShiftService
+                .GetEmployeeShiftsByEmployeeIdAsync(employeeId, ct);
             return Ok(employeeShifts);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex.Message);
+            return NotFound(ex.Message);
         }
         catch (Exception ex)
         {

@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    
     function createGanttChart(projects) {
         const chartContainer = $('#ganttChart');
         chartContainer.empty();
@@ -152,17 +151,7 @@ $(document).ready(function() {
             });
         });
     }
-
-    function translateStatus(status) {
-        const statuses = {
-            'Active': 'Активен',
-            'Standby': 'Ожидание',
-            'Done': 'Завершен',
-            'Paid': 'Оплачен'
-        };
-        return statuses[status] || 'Неизвестный статус';
-    }
-
+    
     function deleteProject(projectId) {
         if (confirm('Вы уверены, что хотите удалить этот проект?')) {
             $.ajax({
@@ -229,55 +218,132 @@ $(document).ready(function() {
         });
     }
 
-    function openProjectModal(projectId) {
-        $.ajax({
-            url: `/api/projects/base/${projectId}`,
-            type: 'GET',
-            success: function(data) {
+    async function openProjectModal(projectId) {
+        const modal = $('#projectModal');
+        const form = $('#projectForm')[0];
+        form.reset();
+        $('#projectProductsTable tbody').empty();
+
+        try {
+            const availableProducts = await $.ajax({
+                url: `/api/products/base`,
+                type: 'GET',
+            });
+            
+            if (projectId) {
+                const projectData = await $.ajax({
+                    url: `/api/projects/base/${projectId}`,
+                    type: 'GET',
+                });
+
                 $('#modalTitle').text('Редактировать проект');
-                $('#projectId').val(data.id);
-                $('#projectName').val(data.name);
-                $('#projectAddress').val(data.address);
-                $('#projectStartDate').val(formatDateForInput(new Date(data.startDate)));
-                $('#projectDeadline').val(formatDateForInput(new Date(data.deadlineDate)));
+                $('#projectId').val(projectData.id);
+                $('#projectName').val(projectData.name);
+                $('#projectAddress').val(projectData.address);
+                $('#projectStartDate').val(formatDateForInput(new Date(projectData.startDate)));
+                $('#projectDeadline').val(formatDateForInput(new Date(projectData.deadlineDate)));
+                $('#projectCounteragent').val(projectData.counteragent ? projectData.counteragent.id : '');
+                $('#projectResponsibleEmployee').val(projectData.responsibleEmployee ? projectData.responsibleEmployee.id : '');
+                $('#projectManagerShare').val(projectData.managerShare);
+                $('#projectStatus').val(projectData.projectStatus);
+                
+                const projectProducts = await $.ajax({
+                    url: `/api/projectProducts/base/byProject/${projectId}`,
+                    type: 'GET',
+                });
 
-                if (data.counteragent) {
-                    $('#projectCounteragent').val(data.counteragent.id);
-                    $('#projectCounteragent option:selected').text(data.counteragent.name);
-                } else {
-                    $('#projectCounteragent').val('');
+                projectProducts.forEach(projectProduct => addProjectProductRow(projectProduct, availableProducts));
+            } else {
+                $('#modalTitle').text('Добавить новый проект');
+                $('#projectId').val('');
                 }
+            
+            $('#addProjectProductBtn').on('click', function() {
+                addProjectProductRow({}, availableProducts);
+            });
+            
+            modal.fadeIn();
+        } catch (error) {
+            alert('Ошибка при загрузке данных: ' + (error.responseText || error.statusText));
+        }
+    }
 
-                if (data.responsibleEmployee) {
-                    $('#projectResponsibleEmployee').val(data.responsibleEmployee.id);
-                    $('#projectResponsibleEmployee option:selected').text(data.responsibleEmployee.name);
-                } else {
-                    $('#projectResponsibleEmployee').val('');
-                }
 
-                $('#projectManagerShare').val(data.managerShare);
-                $('#projectStatus').val(data.projectStatus);
-                $('#projectModal').fadeIn();
+    function addProjectProductRow(projectProduct = {}, availableProducts = []) {
+        const productOptions = availableProducts.map(product =>
+            `<option value="${product.id}" ${product.id === (projectProduct.product ? projectProduct.product.id : '') ? 'selected' : ''}>${product.name}</option>`
+        ).join('');
+
+        const projectProductRow = `
+            <tr class="project-product-row" data-project-product-id="${projectProduct.id || ''}">
+                <td class="longcol">
+                    <select name="projectProduct[]">${productOptions}</select>
+                </td>
+                <td class="shortcol">
+                    <input type="number" name="projectQuantity[]" value="${projectProduct.quantity || ''}" required min="1" max="999999">
+                </td>
+                <td class="midcol">
+                    <input type="number" name="projectMarkup[]" value="${projectProduct.markup || ''}" required step="0.01" min="0" max="9999999999.99">
+                </td>
+                <td class="btncol"><button type="button" class="btn delete-btn">⛌</button></td>
+            </tr>
+        `;
+
+        $('#projectProductsTable tbody').append(projectProductRow);
+
+        $('.delete-btn').off('click').on('click', function() {
+            const projectProductId = $(this).closest('.project-product-row').data('project-product-id');
+            if (projectProductId) {
+                deleteProjectProduct(projectProductId);
+            }
+            $(this).closest('.project-product-row').remove();
+        });
+    }
+
+    function deleteProjectProduct(projectProductId) {
+        $.ajax({
+            url: `/api/projectProducts/base/${projectProductId}`,
+            method: 'DELETE',
+            success: function() {
+                alert('Изделие успешно удалено из проекта');
             },
-            error: function (xhr) {
-                const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при сохранении данных проекта';
-                alert(errorMessage);
+            error: function(xhr) {
+                alert('Ошибка при удалении изделия из проекта');
             }
         });
     }
     
-    function formatDateForInput(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); 
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
+    function saveProjectProducts(projectId) {
+        const projectProducts = [];
+        $('.project-product-row').each(function() {
+            const projectProduct = {
+                project: projectId,
+                product: $(this).find('select[name="projectProduct[]"]').val(),
+                quantity: parseInt($(this).find('input[name="projectQuantity[]"]').val()) || null,
+                markup: parseFloat($(this).find('input[name="projectMarkup[]"]').val()) || null
+            };
 
-    function formatDateForOutput(date) {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+            if ($(this).data('project-product-id')) {
+                projectProduct.id = $(this).data('project-product-id');
+            }
+
+            projectProducts.push(projectProduct);
+        });
+
+        $.ajax({
+            url: '/api/projectProducts/base',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(projectProducts),
+            success: function() {
+                $('#projectModal').hide();
+                loadProjects();
+                alert('Проект и изделия успешно сохранены');
+            },
+            error: function(xhr) {
+                alert('Ошибка при сохранении изделий проекта');
+            }
+        });
     }
     
     function submitProjectForm() {
@@ -296,16 +362,14 @@ $(document).ready(function() {
         const url = projectId ? `/api/projects/base/${projectId}` : '/api/projects/base';
         const method = projectId ? 'PUT' : 'POST';
 
-        if (projectId) {
-            projectData.Id = projectId;
-        }
-
         $.ajax({
             url: url,
             method: method,
             contentType: 'application/json',
             data: JSON.stringify(projectData),
-            success: function() {
+            success: function(response) {
+                const newProjectId = projectId || response.id;
+                saveProjectProducts(newProjectId);
                 $('#projectModal').hide();
                 loadProjects();
                 alert(projectId ? 'Проект успешно обновлен' : 'Проект успешно добавлен');
@@ -331,13 +395,37 @@ $(document).ready(function() {
         submitProjectForm();
     });
 
+    function formatDateForInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function formatDateForOutput(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
+
+    function translateStatus(status) {
+        const statuses = {
+            'Active': 'Активен',
+            'Standby': 'Ожидание',
+            'Done': 'Завершен',
+            'Paid': 'Оплачен'
+        };
+        return statuses[status] || 'Неизвестный статус';
+    }
+
     $('#addProjectBtn').on('click', function() {
         $('#modalTitle').text('Добавить новый проект');
         $('#projectForm')[0].reset();
         $('#projectId').val('');
         $('#projectStartDate').val(new Date().toISOString().split('T')[0]);
         $('#projectDeadline').val(new Date().toISOString().split('T')[0]);
-        $('#projectModal').fadeIn();
+        openProjectModal();
     });
     
     loadProjects();

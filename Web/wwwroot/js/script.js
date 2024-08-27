@@ -10,6 +10,7 @@ $(document).ready(function() {
         navLinks.removeClass('active');
         $(this).addClass('active');
     });
+    
 
     navLinks.first().trigger('click');
 });

@@ -5,18 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Контрагенты - МПСС</title>
     <link rel="stylesheet" href="/assets/styles/styles.css">
-    <style>
-        @font-face {
-            font-family: 'Rosatom';
-            src: local("/assets/fonts/Rosatom-Bold.ttf");
-            font-weight: bold;
-        }
-        @font-face {
-            font-family: 'Rosatom';
-            src: local("/assets/fonts/Rosatom-Regular.ttf");
-            font-weight: normal;
-        }
-    </style>
 </head>
 <body>
 <nav class="navbar">
@@ -26,9 +14,6 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="employees.html">Сотрудники</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="products.html">Изделия</a>
         </li>
         <li class="nav-item">
             <a class="nav-link active" href="counteragents.html">Контрагенты</a>
@@ -106,31 +91,31 @@
         <h3 id="modalTitle">Добавить нового контрагента</h3>
         <form id="counteragentForm">
             <input type="hidden" id="counteragentId" name="counteragentId">
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="counteragentName">Название:</label>
                 <input type="text" id="counteragentName" name="counteragentName" required>
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="counteragentContact">Контактное лицо:</label>
                 <input type="text" id="counteragentContact" name="counteragentContact" required>
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="counteragentPhone">Телефон:</label>
                 <input type="text" id="counteragentPhone" name="counteragentPhone" required>
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="counteragentINN">ИНН:</label>
                 <input type="text" id="counteragentINN" name="counteragentINN">
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="counteragentOGRN">ОГРН:</label>
                 <input type="text" id="counteragentOGRN" name="counteragentOGRN">
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="counteragentAccountNumber">Номер счёта:</label>
                 <input type="text" id="counteragentAccountNumber" name="counteragentAccountNumber">
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="counteragentBIK">БИК счёта:</label>
                 <input type="text" id="counteragentBIK" name="counteragentBIK">
             </div>

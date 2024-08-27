@@ -121,6 +121,15 @@ public class EmployeeShiftService : IEmployeeShiftService
     public async Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByProjectIdAsync(
         int projectId, CancellationToken cancellationToken)
     {
+        var projectExists = await _projectRepository.GetAll()
+            .AnyAsync(p => p.Id == projectId, cancellationToken);
+
+        if (!projectExists)
+        {
+            _logger.LogWarning("Проект с ID {ProjectId} не найден", projectId);
+            throw new KeyNotFoundException($"Проект с ID {projectId} не найден");
+        }
+
         return await _employeeShiftRepository
             .GetAll()
             .Where(pp => pp.Project.Id == projectId)
@@ -130,6 +139,15 @@ public class EmployeeShiftService : IEmployeeShiftService
     public async Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByEmployeeIdAsync(
         int employeeId, CancellationToken cancellationToken)
     {
+        var employeeExists = await _employeeRepository.GetAll()
+            .AnyAsync(e => e.Id == employeeId, cancellationToken);
+
+        if (!employeeExists)
+        {
+            _logger.LogWarning("Сотрудник с ID {EmployeeId} не найден", employeeId);
+            throw new KeyNotFoundException($"Сотрудник с ID {employeeId} не найден");
+        }
+
         return await _employeeShiftRepository
             .GetAll()
             .Where(es => es.Employee.Id == employeeId)

@@ -116,6 +116,15 @@ public class ProjectProductService : IProjectProductService
     public async Task<IEnumerable<ProjectProduct>> GetProjectProductsByProjectIdAsync(
         int projectId, CancellationToken cancellationToken)
     {
+        var projectExists = await _projectRepository.GetAll()
+            .AnyAsync(p => p.Id == projectId, cancellationToken);
+
+        if (!projectExists)
+        {
+            _logger.LogWarning("Проект с ID {ProjectId} не найден", projectId);
+            throw new KeyNotFoundException($"Проект с ID {projectId} не найден");
+        }
+
         return await _projectProductRepository
             .GetAll()
             .Where(pp => pp.Project.Id == projectId)

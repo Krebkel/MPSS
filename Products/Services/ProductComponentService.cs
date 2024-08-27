@@ -96,6 +96,15 @@ public class ProductComponentService : IProductComponentService
     public async Task<IEnumerable<ProductComponent>> GetProductComponentsByProductIdAsync(
         int productId, CancellationToken cancellationToken)
     {
+        var productExists = await _productRepository.GetAll()
+            .AnyAsync(p => p.Id == productId, cancellationToken);
+
+        if (!productExists)
+        {
+            _logger.LogWarning("Изделие с ID {ProductId} не найдено", productId);
+            throw new KeyNotFoundException($"Изделие с ID {productId} не найдено");
+        }
+
         return await _productComponentRepository
             .GetAll()
             .Where(es => es.Product.Id == productId)

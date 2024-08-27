@@ -23,49 +23,61 @@ public class ProductComponentBaseController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductComponent))]
-    public async Task<IActionResult> AddProductComponent(
-        [FromBody] CreateProductComponentApiRequest request, CancellationToken ct)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductComponent>))]
+    public async Task<IActionResult> AddProductComponents(
+        [FromBody] IEnumerable<CreateProductComponentApiRequest> requests, CancellationToken ct)
     {
         try
         {
-            var addProductComponentRequest = request.ToCreateProductComponentApiRequest();
-            var createdProductComponent = await _productComponentService
-                .CreateProductComponentAsync(addProductComponentRequest, ct);
-            
-            _logger.LogInformation("Компонент изделия {@ProductName} успешно добавлен: {@Name}",
-                createdProductComponent.Product, createdProductComponent.Name);
+            var createdProductComponents = new List<ProductComponent>();
 
-            return Ok(createdProductComponent);
+            foreach (var request in requests)
+            {
+                var addProductComponentRequest = request.ToCreateProductComponentApiRequest();
+                var createdProductComponent = await _productComponentService
+                    .CreateProductComponentAsync(addProductComponentRequest, ct);
+                createdProductComponents.Add(createdProductComponent);
+            
+                _logger.LogInformation("Компонент изделия {@ProductName} успешно добавлен: {@Name}",
+                    createdProductComponent.Product, createdProductComponent.Name);
+            }
+
+            return Ok(createdProductComponents);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при добавлении компонента изделия");
-            return BadRequest($"Ошибка при добавлении компонента изделия {ex.Message}");
+            _logger.LogError(ex, "Ошибка при добавлении компонентов изделия");
+            return BadRequest($"Ошибка при добавлении компонентов изделия: {ex.Message}");
         }
     }
 
-    [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductComponent))]
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductComponent>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateProductComponent(
-        [FromBody] UpdateProductComponentApiRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateProductComponents(
+        [FromBody] IEnumerable<UpdateProductComponentApiRequest> requests, CancellationToken ct)
     {
         try
         {
-            var updatedProductComponent = request.ToUpdateProductComponentApiRequest();
+            var updatedProductComponents = new List<ProductComponent>();
 
-            await _productComponentService.UpdateProductComponentAsync(updatedProductComponent, ct);
+            foreach (var request in requests)
+            {
+                var updateProductComponentRequest = request.ToUpdateProductComponentApiRequest();
+                var updatedProductComponent = await _productComponentService
+                    .UpdateProductComponentAsync(updateProductComponentRequest, ct);
+                updatedProductComponents.Add(updatedProductComponent);
 
-            _logger.LogInformation("Компонент изделия {@ProductName} успешно обновлен: {@Name}", 
-                request.Product, request.Name);
-            
-            return Ok(updatedProductComponent);
+                _logger.LogInformation("Компонент изделия {@ProductName} успешно обновлен: {@Name}", 
+                    updatedProductComponent.Product, updatedProductComponent.Name);
+            }
+
+            return Ok(updatedProductComponents);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении информации о компоненте изделия");
-            return BadRequest($"Ошибка при обновлении информации о компоненте изделия {ex.Message}");
+            _logger.LogError(ex, "Ошибка при обновлении информации о компонентах изделия");
+            return BadRequest($"Ошибка при обновлении информации о компонентах изделия: {ex.Message}");
         }
     }
     
@@ -123,15 +135,13 @@ public class ProductComponentBaseController : ControllerBase
     {
         try
         {
-            var productComponents = 
-                await _productComponentService.GetProductComponentsByProductIdAsync(productId, ct);
-            if (!productComponents.Any())
-            {
-                _logger.LogWarning("Изделие с ID {ProductId} не найдено или нет компонентов изделия", productId);
-                return NotFound($"Изделие с ID {productId} не найдено или нет компонентов изделия");
-            }
-
+            var productComponents = await _productComponentService.GetProductComponentsByProductIdAsync(productId, ct);
             return Ok(productComponents);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex.Message);
+            return NotFound(ex.Message);
         }
         catch (Exception ex)
         {
