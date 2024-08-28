@@ -11,13 +11,13 @@ public interface IEmployeeShiftService
 
     Task<EmployeeShift> UpdateEmployeeShiftAsync(UpdateEmployeeShiftRequest employeeShift, CancellationToken cancellationToken);
     
-    Task<EmployeeShift?> GetEmployeeShiftByIdAsync(int id, CancellationToken cancellationToken);
+    Task<object?> GetEmployeeShiftByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteEmployeeShiftAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByProjectIdAsync(int projectId, CancellationToken cancellationToken);
+    Task<IEnumerable<object>> GetEmployeeShiftsByProjectIdAsync(int projectId, CancellationToken cancellationToken);
     
-    Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByEmployeeIdAsync(int employeeId, CancellationToken cancellationToken);
+    Task<IEnumerable<object>> GetEmployeeShiftsByEmployeeIdAsync(int employeeId, CancellationToken cancellationToken);
 }
 
 public class UpdateEmployeeShiftRequest

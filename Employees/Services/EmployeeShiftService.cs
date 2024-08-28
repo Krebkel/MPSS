@@ -56,7 +56,6 @@ public class EmployeeShiftService : IEmployeeShiftService
             Date = request.Date.ToUniversalTime(),
             Arrival = request.Arrival?.ToUniversalTime(),
             Departure = request.Departure?.ToUniversalTime(),
-            HoursWorked = request.HoursWorked,
             TravelTime = request.TravelTime,
             ConsiderTravel = request.ConsiderTravel,
             ISN = request.ISN
@@ -87,7 +86,6 @@ public class EmployeeShiftService : IEmployeeShiftService
         employeeShift.Date = request.Date.ToUniversalTime();
         employeeShift.Arrival = request.Arrival?.ToUniversalTime();
         employeeShift.Departure = request.Departure?.ToUniversalTime();
-        employeeShift.HoursWorked = request.HoursWorked;
         employeeShift.TravelTime = request.TravelTime;
         employeeShift.ConsiderTravel = request.ConsiderTravel;
         employeeShift.ISN = request.ISN;
@@ -98,10 +96,24 @@ public class EmployeeShiftService : IEmployeeShiftService
         return employeeShift;
     }
     
-    public async Task<EmployeeShift?> GetEmployeeShiftByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<object?> GetEmployeeShiftByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _employeeShiftRepository
             .GetAll()
+            .Include(es => es.Project)
+            .Include(es => es.Employee)
+            .Select(es => new
+            {
+                Id = es.Id,
+                Project = es.Project.Id,
+                Employee = es.Employee.Id,
+                Date = es.Date,
+                Arrival = es.Arrival,
+                Departure = es.Departure,
+                TravelTime = es.TravelTime,
+                ConsiderTravel = es.ConsiderTravel,
+                ISN = es.ISN
+            })
             .FirstOrDefaultAsync(es => es.Id == id, cancellationToken);
     }
 
@@ -118,8 +130,9 @@ public class EmployeeShiftService : IEmployeeShiftService
         return true;
     }
     
-    public async Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByProjectIdAsync(
-        int projectId, CancellationToken cancellationToken)
+    public async Task<IEnumerable<object>> GetEmployeeShiftsByProjectIdAsync(
+        int projectId, 
+        CancellationToken cancellationToken)
     {
         var projectExists = await _projectRepository.GetAll()
             .AnyAsync(p => p.Id == projectId, cancellationToken);
@@ -132,11 +145,25 @@ public class EmployeeShiftService : IEmployeeShiftService
 
         return await _employeeShiftRepository
             .GetAll()
-            .Where(pp => pp.Project.Id == projectId)
+            .Include(es => es.Project)
+            .Include(es => es.Employee)
+            .Where(es => es.Project.Id == projectId)
+            .Select(es => new
+            {
+                Id = es.Id,
+                Project = es.Project.Id,
+                Employee = es.Employee.Id,
+                Date = es.Date,
+                Arrival = es.Arrival,
+                Departure = es.Departure,
+                TravelTime = es.TravelTime,
+                ConsiderTravel = es.ConsiderTravel,
+                ISN = es.ISN
+            })
             .ToListAsync(cancellationToken);
     }
     
-    public async Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByEmployeeIdAsync(
+    public async Task<IEnumerable<object>> GetEmployeeShiftsByEmployeeIdAsync(
         int employeeId, CancellationToken cancellationToken)
     {
         var employeeExists = await _employeeRepository.GetAll()
@@ -150,7 +177,21 @@ public class EmployeeShiftService : IEmployeeShiftService
 
         return await _employeeShiftRepository
             .GetAll()
+            .Include(es => es.Project)
+            .Include(es => es.Employee)
             .Where(es => es.Employee.Id == employeeId)
+            .Select(es => new
+            {
+                Id = es.Id,
+                Project = es.Project.Id,
+                Employee = es.Employee.Id,
+                Date = es.Date,
+                Arrival = es.Arrival,
+                Departure = es.Departure,
+                TravelTime = es.TravelTime,
+                ConsiderTravel = es.ConsiderTravel,
+                ISN = es.ISN
+            })
             .ToListAsync(cancellationToken);
     }
 }

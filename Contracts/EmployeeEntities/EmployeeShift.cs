@@ -34,11 +34,6 @@ public class EmployeeShift : DatabaseEntity
     public DateTimeOffset? Departure { get; set; }
 
     /// <summary>
-    /// Время проведенное на объекте
-    /// </summary>
-    public float? HoursWorked { get; set; }
-
-    /// <summary>
     /// Время в дороге
     /// </summary>
     public float? TravelTime { get; set; }

@@ -91,9 +91,6 @@ namespace Data.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
-                    b.Property<float?>("HoursWorked")
-                        .HasColumnType("float");
-
                     b.Property<int?>("ISN")
                         .HasColumnType("integer");
 
@@ -156,8 +153,8 @@ namespace Data.Migrations
                     b.Property<int?>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<float?>("Weight")
-                        .HasColumnType("real");
+                    b.Property<double?>("Weight")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 

@@ -57,7 +57,9 @@ $(document).ready(function() {
                     }
                 }
 
-                projectRow += `<td class="gantt-cell" data-project-id="${project.id}" data-date="${currentDate.toISOString()}" style="background-color: ${cellColor};"></td>`;
+                // Convert the date to local date string for data attribute
+                const localDateString = currentDate.toLocaleDateString('en-CA'); // 'en-CA' format yyyy-mm-dd
+                projectRow += `<td class="gantt-cell" data-project-id="${project.id}" data-date="${localDateString}" style="background-color: ${cellColor};"></td>`;
             }
             projectRow += '</tr>';
             bodyRows += projectRow;
@@ -168,56 +170,7 @@ $(document).ready(function() {
             });
         }
     }
-
-    function openShiftModal(projectId, date) {
-        const modal = $('#shiftModal');
-        const shiftList = $('#shiftList');
-        const addShiftForm = $('#addShiftForm');
-
-        shiftList.empty();
-        addShiftForm.empty();
-
-        $.getJSON(`/api/employeeShifts/logic/project/${projectId}/date/${date}`, function(shifts) {
-            if (shifts.length > 0) {
-                shifts.forEach((shift) => {
-                    shiftList.append(`<div>${shift.name}</div>`);
-                });
-            } else {
-                shiftList.append('<div>Смен нет</div>');
-            }
-
-            addShiftForm.html(`
-                <h4>Добавить смену</h4>
-                <input type="text" id="shiftName" placeholder="Название смены">
-                <button id="saveShiftBtn" class="btn btn-primary">Сохранить</button>
-            `);
-
-            $('#saveShiftBtn').on('click', function() {
-                const shiftName = $('#shiftName').val();
-                saveShift(projectId, date, shiftName);
-            });
-        });
-
-        modal.show();
-    }
-
-    function saveShift(projectId, date, shiftName) {
-        $.ajax({
-            url: '/api/employeeShifts/base',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                projectId: projectId,
-                date: date,
-                name: shiftName
-            }),
-            success: function() {
-                $('#shiftModal').hide();
-                alert('Смена успешно добавлена');
-            }
-        });
-    }
-
+    
     async function openProjectModal(projectId) {
         const modal = $('#projectModal');
         const form = $('#projectForm')[0];
@@ -268,7 +221,6 @@ $(document).ready(function() {
         }
     }
 
-
     function addProjectProductRow(projectProduct = {}, availableProducts = []) {
         const productOptions = availableProducts.map(product =>
             `<option value="${product.id}" ${product.id === (projectProduct.product ? projectProduct.product.id : '') ? 'selected' : ''}>${product.name}</option>`
@@ -307,7 +259,7 @@ $(document).ready(function() {
             success: function() {
                 alert('Изделие успешно удалено из проекта');
             },
-            error: function(xhr) {
+            error: function() {
                 alert('Ошибка при удалении изделия из проекта');
             }
         });
@@ -340,7 +292,7 @@ $(document).ready(function() {
                 loadProjects();
                 alert('Проект и изделия успешно сохранены');
             },
-            error: function(xhr) {
+            error: function() {
                 alert('Ошибка при сохранении изделий проекта');
             }
         });
@@ -374,21 +326,11 @@ $(document).ready(function() {
                 loadProjects();
                 alert(projectId ? 'Проект успешно обновлен' : 'Проект успешно добавлен');
             },
-            error: function(xhr) {
+            error: function() {
                 alert('Ошибка при сохранении проекта');
             }
         });
     }
-
-    $('.close').on('click', function() {
-        $(this).closest('.modal').fadeOut();
-    });
-
-    $(window).on('click', function(event) {
-        if ($(event.target).hasClass('modal')) {
-            $(event.target).fadeOut();
-        }
-    });
 
     $('#projectForm').on('submit', function(event) {
         event.preventDefault();
@@ -427,6 +369,273 @@ $(document).ready(function() {
         $('#projectDeadline').val(new Date().toISOString().split('T')[0]);
         openProjectModal();
     });
+
+// EmployeeShifts //
+
+    // Модальное окно для работы со сменами
+    function openShiftModal(projectId, date) {
+        currentProjectId = projectId;
+        currentDate = new Date(date);
+        $('#addShiftForm').hide();
+        $('#shiftForm')[0].reset();
+        $('#shiftForm').removeData('shiftId');
+        currentDate.setUTCHours(0, 0, 0, 0);
+
+        $('#shiftForm').attr('data-date', date);
+        $('#shiftDate').val(date);
+
+        $('#shiftModal').show();
+        loadExistingShifts(projectId, currentDate);
+        loadAvailableEmployees();
+        
+        toggleFutureShiftFields(currentDate);
+    }
+
+    // Получаем список смен по Id проекта и дате
+    function loadExistingShifts(projectId, date) {
+        const shiftsTableBody = $('#shiftsTable tbody');
+        shiftsTableBody.empty();
+
+        $.ajax({
+            url: `/api/employeeShifts/base/byProject/${projectId}`,
+            method: 'GET',
+            success: function(shifts) {
+                const shiftRows = [];
+                let currentIndex = 1;
+
+                const employeePromises = shifts.map((shift) => {
+                    const shiftDate = toLocal(new Date(shift.date));
+                    shiftDate.setHours(0, 0, 0, 0);
+
+                    if (shiftDate.toDateString() === date.toDateString()) {
+                        return $.getJSON(`/api/employees/base/${shift.employee}`)
+                            .then(employee => {
+                                const shiftRow = `
+                            <tr class="shift-row" data-shift-id="${shift.id}">
+                                <td class="shortcol">${currentIndex++}</td>
+                                <td>${employee.name}</td>
+                                <td class="btncol">
+                                    <button class="btn delete-btn" data-shift-id="${shift.id}">⛌</button>
+                                </td>
+                            </tr>`;
+                                shiftRows.push(shiftRow);
+                            });
+                    }
+                });
+
+                Promise.all(employeePromises).then(() => {
+                    shiftsTableBody.html(shiftRows.join(''));
+                });
+            },
+            error: function() {
+                alert('Ошибка при загрузке смен');
+            }
+        });
+    }
+
+    // Удаляем смену
+    function deleteEmployeeShift(employeeShiftId) {
+        $.ajax({
+            url: `/api/employeeShifts/base/${employeeShiftId}`,
+            method: 'DELETE',
+            success: function() {
+                alert('Смена успешно удалена из проекта');
+            },
+            error: function() {
+                alert('Ошибка при удалении смены из проекта');
+            }
+        });
+    }
+
+    // Получаем список всех сотрудников
+    function loadAvailableEmployees() {
+        $.ajax({
+            url: '/api/employees/base',
+            method: 'GET',
+            success: function(employees) {
+                const employeeSelect = $('#employeeSelect');
+                employeeSelect.empty();
+                employeeSelect.append($('<option>').val('').text('Выберите сотрудника'));
+
+                employees.forEach(employee => {
+                    employeeSelect.append($('<option>').val(employee.id).text(employee.name));
+                });
+            },
+            error: function() {
+                alert('Ошибка при загрузке списка сотрудников');
+            }
+        });
+    }
+
+    // Получаем данные смены для редактирования
+    function editShift(shiftId) {
+        $.ajax({
+            url: `/api/employeeShifts/base/${shiftId}`,
+            method: 'GET',
+            success: function(shift) {
+                const shiftDate = new Date(shift.date);
+
+                $('#addShiftForm').show();
+                $('#employeeSelect').val(shift.employee);
+                $('#shiftDate').val(formatDateForInput(shiftDate));
+                $('#hoursWorked').val(shift.hoursWorked);
+
+                toggleFutureShiftFields(shiftDate);
+
+                if (shift.arrival) {
+                    $('#arrivalTime').val(formatTimeForInput(new Date(shift.arrival)));
+                } else {
+                    $('#arrivalTime').val('');
+                }
+
+                if (shift.departure) {
+                    $('#departureTime').val(formatTimeForInput(new Date(shift.departure)));
+                } else {
+                    $('#departureTime').val('');
+                }
+
+                $('#travelTime').val(shift.travelTime);
+                $('#considerTravel').prop('checked', shift.considerTravel);
+                $('#isn').val(shift.isn);
+
+                $('#shiftForm').data('shiftId', shift.id);
+            },
+            error: function() {
+                alert('Ошибка при загрузке данных смены');
+            }
+        });
+    }
+
+    // Self-explanatory, нажимаем на плюс, появляется чистая форма создания смены на эту дату
+    $('#addShiftBtn').click(function() {
+        $('#addShiftForm').show();
+        $('#shiftForm')[0].reset();
+        $('#shiftForm').removeData('shiftId');
+
+        $('#arrivalTime').val('08:00');
+        $('#departureTime').val('20:00');
+        
+        const dateAttr = $('#shiftForm').attr('data-date');
+        if (dateAttr) {
+            const shiftDate = new Date(dateAttr);
+            $('#shiftDate').val(shiftDate.toISOString().split('T')[0]);
+        } else {
+            $('#shiftDate').val(formatDateForInput(new Date()));
+        }
+        
+        toggleFutureShiftFields(currentDate);
+    });
+
+    $('#shiftsTable').off('click', '.shift-row').on('click', '.shift-row', function() {
+        const shiftId = $(this).data('shift-id');
+        editShift(shiftId);
+    });
+
+    $('#shiftsTable').on('click', '.delete-btn', function(event) {
+        event.stopPropagation();
+        const shiftId = $(this).data('shift-id');
+        deleteEmployeeShift(shiftId);
+        $(this).closest('tr').remove();
+    });
+
+    // Вдруг мы решим на будущее смену добавить, тогда поля "когда приехал" и "когда свалил" не потребуются
+    $('#shiftDate').change(function() {
+        const selectedDate = new Date($(this).val());
+        toggleFutureShiftFields(selectedDate);
+    });
+
+    // Отминет создание, сворачиваемся
+    $('#cancelAddShift').click(function() {
+        $('#addShiftForm').hide();
+        $('#shiftForm')[0].reset().removeData('shiftId');
+    });
+
+    // Сохранение данных смены из формы
+    $('#shiftForm').submit(function(e) {
+        e.preventDefault();
+        
+        const shiftData = {
+            project: currentProjectId,
+            employee: $('#employeeSelect').val(),
+            date: toUTC(new Date($('#shiftDate').val())).toISOString(),
+            hoursWorked: parseFloat($('#hoursWorked').val()) || null,
+            arrival: combineDateTime($('#shiftDate').val(), $('#arrivalTime').val()),
+            departure: combineDateTime($('#shiftDate').val(), $('#departureTime').val()),
+            travelTime: parseFloat($('#travelTime').val()) || null,
+            considerTravel: $('#considerTravel').is(':checked'),
+            isn: parseInt($('#isn').val()) || null
+        };
+
+        const shiftId = $(this).data('shiftId');
+        const url = shiftId ? `/api/employeeShifts/base/${shiftId}` : '/api/employeeShifts/base';
+        const method = shiftId ? 'PUT' : 'POST';
+
+        // Если айдюк есть, то подставляем
+        if (shiftId) {
+            shiftData.id = shiftId;
+        }
+
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: 'application/json',
+            data: JSON.stringify(shiftData),
+            success: function() {
+                $('#addShiftForm').hide();
+                $('#shiftForm')[0].reset();
+                loadExistingShifts(currentProjectId, new Date($('#shiftDate').val()));
+                alert(shiftId ? 'Смена успешно обновлена' : 'Смена успешно добавлена');
+            },
+            error: function() {
+                alert('Ошибка при сохранении смены');
+            }
+        });
+    });
+
+    // Функция для сокрытия полей ввода для будущих смен
+    function toggleFutureShiftFields(date) {
+        const dateToCheck = toUTC(new Date(date));
+        const today = toUTC(new Date());
+        dateToCheck.setUTCHours(0, 0, 0, 0);
+        today.setUTCHours(0, 0, 0, 0);
+        const showFields = dateToCheck <= today;
+        $('#futureShiftFields').toggle(showFields);
+    }
+
+    // Функция для объединения даты и времени в UTC DateTimeOffset
+    function combineDateTime(date, time) {
+        if (!date || !time) return null;
+        const [year, month, day] = date.split('-');
+        const [hours, minutes] = time.split(':');
+        const localDateTime = new Date(year, month - 1, day, hours, minutes);
+        return toUTC(localDateTime).toISOString();
+    }
+
+    // Получаем смещение часового пояса клиента в минутах
+    const clientTimezoneOffset = new Date().getTimezoneOffset();
+
+    // Функция для преобразования локальной даты в UTC
+    function toUTC(localDate) {
+        return new Date(localDate.getTime() - clientTimezoneOffset * 60000);
+    }
+
+    // Функция для преобразования UTC в локальную дату
+    function toLocal(utcDate) {
+        return new Date(utcDate.getTime() + clientTimezoneOffset * 60000);
+    }
+
+    // Функция для форматирования даты в строку для input[type="date"]
+    function formatDateForInput(date) {
+        const localDate = toLocal(new Date(date));
+        return localDate.toISOString().split('T')[0];
+    }
+
+    // Функция для форматирования времени в строку для input[type="time"]
+    function formatTimeForInput(dateTimeOffset) {
+        if (!dateTimeOffset) return '';
+        const localDate = toLocal(new Date(dateTimeOffset));
+        return `${String(localDate.getHours()).padStart(2, '0')}:${String(localDate.getMinutes()).padStart(2, '0')}`;
+    }
     
     loadProjects();
 });

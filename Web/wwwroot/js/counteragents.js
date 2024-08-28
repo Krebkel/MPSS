@@ -109,7 +109,7 @@ $(document).ready(function() {
                 $('#counteragentModal').fadeIn();
             },
             error: function(err) {
-                console.error('Ошибка при получении данных контрагента:', err);
+                console.error();
             }
         });
     }
@@ -149,15 +149,6 @@ $(document).ready(function() {
             }
         });
     }
-
-    $('.close').on('click', function() {
-        $(this).closest('.modal').fadeOut();
-    });
-    $(window).on('click', function(event) {
-        if ($(event.target).hasClass('modal')) {
-            $(event.target).fadeOut();
-        }
-    });
 
     $('#counteragentForm').on('submit', function(event) {
         event.preventDefault();

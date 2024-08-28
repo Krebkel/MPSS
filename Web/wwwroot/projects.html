@@ -113,19 +113,17 @@
             <div class="form-group-inline">
                 <label for="projectStartDate">Дата начала:</label>
                 <input type="date" id="projectStartDate" name="projectStartDate" required>
-                
+
                 <label for="projectDeadline">Дедлайн:</label>
                 <input type="date" id="projectDeadline" name="projectDeadline" required>
             </div>
             <div class="form-group-inline">
                 <label for="projectCounteragent">Контрагент:</label>
-                <select id="projectCounteragent" name="projectCounteragent">
-                </select>
+                <select id="projectCounteragent" name="projectCounteragent"></select>
             </div>
             <div class="form-group-inline">
                 <label for="projectResponsibleEmployee">Ответственный:</label>
-                <select id="projectResponsibleEmployee" name="projectResponsibleEmployee" required>
-                </select>
+                <select id="projectResponsibleEmployee" name="projectResponsibleEmployee" required></select>
             </div>
             <div class="form-group-inline">
                 <label for="projectManagerShare">З/п шефа, %:</label>
@@ -202,13 +200,53 @@
     </div>
 </div>
 
-<div id="shiftModal" class="modal">
-    <div class="modal-content">
+<div id="shiftModal" class="modal" style="display: none;">
+    <div class="modal-content" style="padding-bottom: 1rem;" >
         <span class="close">&times;</span>
-        <h3>Управление сменами</h3>
-        <div id="shiftList">
+        <div id="existingShifts">
+            <h2 id="shiftsHeader" class="form-group-inline">Смены
+                <input type="date" id="shiftDate" style="margin: auto 3rem -0.2rem 19rem;" required>
+            </h2>
+            <table id="shiftsTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <th class="shortcol">№</th>
+                    <th>ФИО сотрудника</th>
+                    <th class="btncol"><button id="addShiftBtn" class="btn btn-primary btn-add" style="margin: 0;">+</button></th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
         <div id="addShiftForm">
+            <h4>Добавить новую смену</h4>
+            <form id="shiftForm">
+                <div class="form-group">
+                    <select id="employeeSelect" required>
+                        <option value="">Выберите сотрудника</option>
+                    </select>
+                </div>
+                <div id="futureShiftFields" style="display: none;">
+                    <div class="form-group-inline" >
+                        <label for="arrivalTime" style="margin-left: 0.6rem">Начало:</label>
+                        <input type="time" name="arrivalTime" id="arrivalTime" class="time-input" >
+
+                        <label for="departureTime">Конец:</label>
+                        <input type="time" name="departureTime" id="departureTime" class="time-input">
+                    </div>
+                    <div class="form-group-inline" style="margin-left: 0.6rem;">
+                        <input type="number" id="travelTime" step="0.1" min="0" placeholder="Время в пути в часах">
+                        <label for="considerTravel" style="margin-left: 2rem;"> Учитывать время в пути: </label>
+                        <input type="checkbox" name="considerTravel" id="considerTravel" style="margin-bottom: 0; margin-right:-6rem; margin-left:-8rem">
+                    </div>
+                    <div class="form-group-inline">
+                        <label for="isn">Индивидуальная стимулирующая надбавка:</label>
+                        <input type="number" id="isn" min="0" style="margin-left:8rem; width: 15%;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </form>
         </div>
     </div>
 </div>

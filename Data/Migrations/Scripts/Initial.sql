@@ -72,7 +72,7 @@ CREATE TABLE mpss."ProductComponents" (
                                           "ProductId" integer NOT NULL,
                                           "Name" character varying(100) NOT NULL,
                                           "Quantity" integer,
-                                          "Weight" real,
+                                          "Weight" double precision,
                                           CONSTRAINT "PK_ProductComponents" PRIMARY KEY ("Id"),
                                           CONSTRAINT "FK_ProductComponents_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES mpss."Products" ("Id") ON DELETE CASCADE
 );
@@ -84,7 +84,6 @@ CREATE TABLE mpss."EmployeeShifts" (
                                        "Date" timestamp with time zone NOT NULL,
                                        "Arrival" timestamp with time zone,
                                        "Departure" timestamp with time zone,
-                                       "HoursWorked" float,
                                        "TravelTime" float,
                                        "ConsiderTravel" boolean NOT NULL,
                                        "ISN" integer,
@@ -143,6 +142,6 @@ CREATE INDEX "IX_Projects_ResponsibleEmployeeId" ON mpss."Projects" ("Responsibl
 CREATE INDEX "IX_ProjectSuspensions_ProjectId" ON mpss."ProjectSuspensions" ("ProjectId");
 
 INSERT INTO mpss."__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20240826073711_Initial', '8.0.7');
+VALUES ('20240828163953_Initial', '8.0.7');
 
 COMMIT;

@@ -114,7 +114,7 @@ $(document).ready(function() {
                 $('#employeeModal').fadeIn();
             },
             error: function(err) {
-                console.error('Ошибка при получении данных сотрудника:', err);
+                console.error();
             }
         });
     }
@@ -169,15 +169,6 @@ $(document).ready(function() {
             }
         });
     }
-
-    $('.close').on('click', function() {
-        $(this).closest('.modal').fadeOut();
-    });
-    $(window).on('click', function(event) {
-        if ($(event.target).hasClass('modal')) {
-            $(event.target).fadeOut();
-        }
-    });
     
     $('#employeeForm').on('submit', function(event) {
         event.preventDefault();

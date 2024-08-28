@@ -18,7 +18,6 @@ internal class EmployeeShiftConfiguration : IEntityTypeConfiguration<EmployeeShi
         builder.Property(es => es.Date).IsRequired();
         builder.Property(es => es.Arrival).IsRequired(false);
         builder.Property(es => es.Departure).IsRequired(false);
-        builder.Property(es => es.HoursWorked).IsRequired(false).HasColumnType("float");
         builder.Property(es => es.TravelTime).IsRequired(false).HasColumnType("float");
         builder.Property(es => es.ConsiderTravel).IsRequired();
     }
