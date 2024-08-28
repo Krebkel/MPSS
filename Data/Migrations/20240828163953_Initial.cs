@@ -116,7 +116,7 @@ namespace Data.Migrations
                     ProductId = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: true),
-                    Weight = table.Column<float>(type: "real", nullable: true)
+                    Weight = table.Column<double>(type: "double precision", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -142,7 +142,6 @@ namespace Data.Migrations
                     Date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Arrival = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Departure = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    HoursWorked = table.Column<float>(type: "float", nullable: true),
                     TravelTime = table.Column<float>(type: "float", nullable: true),
                     ConsiderTravel = table.Column<bool>(type: "boolean", nullable: false),
                     ISN = table.Column<int>(type: "integer", nullable: true)

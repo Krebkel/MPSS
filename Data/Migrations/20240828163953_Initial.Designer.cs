@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240826073711_Initial")]
+    [Migration("20240828163953_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -94,9 +94,6 @@ namespace Data.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
-                    b.Property<float?>("HoursWorked")
-                        .HasColumnType("float");
-
                     b.Property<int?>("ISN")
                         .HasColumnType("integer");
 
@@ -159,8 +156,8 @@ namespace Data.Migrations
                     b.Property<int?>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<float?>("Weight")
-                        .HasColumnType("real");
+                    b.Property<double?>("Weight")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 

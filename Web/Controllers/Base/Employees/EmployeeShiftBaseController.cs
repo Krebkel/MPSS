@@ -123,7 +123,7 @@ public class EmployeeShiftBaseController : ControllerBase
     }
     
     [HttpGet("byProject/{projectId}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EmployeeShift>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEmployeeShiftsByProjectId(int projectId, CancellationToken ct)
     {
@@ -146,7 +146,7 @@ public class EmployeeShiftBaseController : ControllerBase
     }
     
     [HttpGet("byEmployee/{employeeId}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<EmployeeShift>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEmployeeShiftsByEmployeeId(int employeeId, CancellationToken ct)
     {

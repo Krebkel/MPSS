@@ -14,7 +14,6 @@ public static class EmployeeShiftExtension
             Date = request.Date,
             Arrival = request.Arrival,
             Departure = request.Departure,
-            HoursWorked = request.HoursWorked,
             TravelTime = request.TravelTime,
             ConsiderTravel = request.ConsiderTravel,
             ISN = request.ISN
@@ -31,7 +30,6 @@ public static class EmployeeShiftExtension
             Date = request.Date,
             Arrival = request.Arrival,
             Departure = request.Departure,
-            HoursWorked = request.HoursWorked,
             TravelTime = request.TravelTime,
             ConsiderTravel = request.ConsiderTravel,
             ISN = request.ISN

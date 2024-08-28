@@ -11,6 +11,15 @@ $(document).ready(function() {
         $(this).addClass('active');
     });
     
-
     navLinks.first().trigger('click');
+
+    $('.close').on('click', function() {
+        $(this).closest('.modal').fadeOut();
+    });
+
+    $(window).on('click', function(event) {
+        if ($(event.target).hasClass('modal')) {
+            $(event.target).fadeOut();
+        }
+    });
 });
