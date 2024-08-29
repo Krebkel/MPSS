@@ -106,7 +106,6 @@ public class ProjectService : IProjectService
                 "Контрагент",
                 cancellationToken);
         }
-
         
         project.Name = request.Name;
         project.Address = request.Address;
@@ -129,14 +128,27 @@ public class ProjectService : IProjectService
         return project;
     }
     
-    public async Task<Project?> GetProjectByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<object?> GetProjectByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _projectRepository
             .GetAll()
             .Include(p => p.Counteragent)
             .Include(p => p.ResponsibleEmployee)
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            .Select(p => new
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Address = p.Address,
+                DeadlineDate = p.DeadlineDate,
+                StartDate = p.StartDate,
+                Counteragent = p.Counteragent != null ? p.Counteragent.Id : (int?)null,
+                ResponsibleEmployee = p.ResponsibleEmployee.Id,
+                ProjectStatus = p.ProjectStatus,
+                ManagerShare = p.ManagerShare
+            })
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
+
 
     public async Task<bool> DeleteProjectAsync(int id, CancellationToken cancellationToken)
     {
@@ -151,12 +163,25 @@ public class ProjectService : IProjectService
         return true;
     }
     
-    public async Task<IEnumerable<Project>> GetAllProjectsAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<object>> GetAllProjectsAsync(CancellationToken cancellationToken)
     {
         return await _projectRepository
             .GetAll()
             .Include(p => p.Counteragent)
             .Include(p => p.ResponsibleEmployee)
+            .Select(p => new
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Address = p.Address,
+                DeadlineDate = p.DeadlineDate,
+                StartDate = p.StartDate,
+                Counteragent = p.Counteragent != null ? p.Counteragent.Id : (int?)null,
+                ResponsibleEmployee = p.ResponsibleEmployee.Id,
+                ProjectStatus = p.ProjectStatus,
+                ManagerShare = p.ManagerShare
+            })
             .ToListAsync(cancellationToken);
     }
+
 }

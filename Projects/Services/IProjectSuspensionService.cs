@@ -11,11 +11,11 @@ public interface IProjectSuspensionService
     
     Task<ProjectSuspension> UpdateProjectSuspensionAsync(UpdateProjectSuspensionRequest projectSuspension, CancellationToken cancellationToken);
     
-    Task<ProjectSuspension?> GetProjectSuspensionByIdAsync(int id, CancellationToken cancellationToken);
+    Task<object?> GetProjectSuspensionByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteProjectSuspensionAsync(int id, CancellationToken cancellationToken);
     
-    Task<IEnumerable<ProjectSuspension>> GetProjectSuspensionsByProjectIdAsync(int projectId, CancellationToken cancellationToken);
+    Task<IEnumerable<object>> GetProjectSuspensionsByProjectIdAsync(int projectId, CancellationToken cancellationToken);
 }
 
 public class UpdateProjectSuspensionRequest

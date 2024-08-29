@@ -79,11 +79,21 @@ public class ExpenseService : IExpenseService
         return expense;
     }
     
-    public async Task<Expense?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<object?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _expenseRepository
             .GetAll()
             .Include(e => e.Project)
+            .Select(e => new
+            {
+                Id = e.Id,
+                Project = e.Project.Id,
+                Name = e.Name,
+                Amount = e.Amount,
+                Description = e.Description,
+                Type = e.Type,
+                IsPaidByCompany = e.IsPaidByCompany
+            })
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
@@ -100,13 +110,23 @@ public class ExpenseService : IExpenseService
         return true;
     }
     
-    public async Task<IEnumerable<Expense>> GetExpensesByProjectIdAsync(
+    public async Task<IEnumerable<object>> GetExpensesByProjectIdAsync(
         int projectId, CancellationToken cancellationToken)
     {
         return await _expenseRepository
             .GetAll()
             .Include(e => e.Project)
             .Where(e => e.Project.Id == projectId)
+            .Select(e => new
+            {
+                Id = e.Id,
+                Project = e.Project.Id,
+                Name = e.Name,
+                Amount = e.Amount,
+                Description = e.Description,
+                Type = e.Type,
+                IsPaidByCompany = e.IsPaidByCompany
+            })
             .ToListAsync(cancellationToken);
     }
 }

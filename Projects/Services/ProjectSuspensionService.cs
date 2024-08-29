@@ -74,13 +74,20 @@ public class ProjectSuspensionService : IProjectSuspensionService
         return projectSuspension;
     }
     
-    public async Task<ProjectSuspension?> GetProjectSuspensionByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<object?> GetProjectSuspensionByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _projectSuspensionRepository
             .GetAll()
             .Include(ps => ps.Project)
+            .Select(ps => new
+            {
+                Id = ps.Id,
+                Project = ps.Project.Id,
+                DateSuspended = ps.DateSuspended
+            })
             .FirstOrDefaultAsync(ps => ps.Id == id, cancellationToken);
     }
+
 
     public async Task<bool> DeleteProjectSuspensionAsync(int id, CancellationToken cancellationToken)
     {
@@ -95,13 +102,20 @@ public class ProjectSuspensionService : IProjectSuspensionService
         return true;
     }
     
-    public async Task<IEnumerable<ProjectSuspension>> GetProjectSuspensionsByProjectIdAsync(
+    public async Task<IEnumerable<object>> GetProjectSuspensionsByProjectIdAsync(
         int projectId, CancellationToken cancellationToken)
     {
         return await _projectSuspensionRepository
             .GetAll()
             .Include(ps => ps.Project)
             .Where(ps => ps.Project.Id == projectId)
+            .Select(ps => new
+            {
+                Id = ps.Id,
+                Project = ps.Project.Id,
+                DateSuspended = ps.DateSuspended
+            })
             .ToListAsync(cancellationToken);
     }
+
 }

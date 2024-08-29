@@ -8,11 +8,11 @@ public interface IProductComponentService
     
     Task<ProductComponent> UpdateProductComponentAsync(UpdateProductComponentRequest productComponent, CancellationToken cancellationToken);
     
-    Task<ProductComponent?> GetProductComponentByIdAsync(int id, CancellationToken cancellationToken);
+    Task<object?> GetProductComponentByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteProductComponentAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<ProductComponent>> GetProductComponentsByProductIdAsync(int productId, CancellationToken cancellationToken);
+    Task<IEnumerable<object>> GetProductComponentsByProductIdAsync(int productId, CancellationToken cancellationToken);
 }
 
 public class UpdateProductComponentRequest
