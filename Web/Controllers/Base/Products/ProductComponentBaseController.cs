@@ -51,33 +51,26 @@ public class ProductComponentBaseController : ControllerBase
         }
     }
 
-    [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductComponent>))]
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductComponent))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProductComponents(
-        [FromBody] IEnumerable<UpdateProductComponentApiRequest> requests, CancellationToken ct)
+        [FromBody] UpdateProductComponentApiRequest request, CancellationToken ct)
     {
         try
         {
-            var updatedProductComponents = new List<ProductComponent>();
+            var updatedProductComponent = request.ToUpdateProductComponentApiRequest();
 
-            foreach (var request in requests)
-            {
-                var updateProductComponentRequest = request.ToUpdateProductComponentApiRequest();
-                var updatedProductComponent = await _productComponentService
-                    .UpdateProductComponentAsync(updateProductComponentRequest, ct);
-                updatedProductComponents.Add(updatedProductComponent);
+            await _productComponentService.UpdateProductComponentAsync(updatedProductComponent, ct);
 
-                _logger.LogInformation("Компонент изделия {@ProductName} успешно обновлен: {@Name}", 
-                    updatedProductComponent.Product, updatedProductComponent.Name);
-            }
-
-            return Ok(updatedProductComponents);
+            _logger.LogInformation("Компонент {@ProductComponenttName} успешно обновлен", request.Name);
+            
+            return Ok(updatedProductComponent);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении информации о компонентах изделия");
-            return BadRequest($"Ошибка при обновлении информации о компонентах изделия: {ex.Message}");
+            _logger.LogError(ex, "Ошибка при обновлении информации о компоненте");
+            return BadRequest($"Ошибка при обновлении информации о компоненте {ex.Message}");
         }
     }
     
