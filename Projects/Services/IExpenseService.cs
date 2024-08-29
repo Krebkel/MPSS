@@ -9,11 +9,11 @@ public interface IExpenseService
     
     Task<Expense> UpdateExpenseAsync(UpdateExpenseRequest expense, CancellationToken cancellationToken);
     
-    Task<Expense?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken);
+    Task<object?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteExpenseAsync(int id, CancellationToken cancellationToken);
     
-    Task<IEnumerable<Expense>> GetExpensesByProjectIdAsync(int projectId, CancellationToken cancellationToken);
+    Task<IEnumerable<object>> GetExpensesByProjectIdAsync(int projectId, CancellationToken cancellationToken);
 }
 
 public class UpdateExpenseRequest

@@ -73,12 +73,21 @@ public class ProductComponentService : IProductComponentService
         return productComponent;
     }
     
-    public async Task<ProductComponent?> GetProductComponentByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<object?> GetProductComponentByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _productComponentRepository
             .GetAll()
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            .Select(pc => new
+            {
+                Id = pc.Id,
+                Product = pc.Product.Id,
+                Name = pc.Name,
+                Quantity = pc.Quantity,
+                Weight = pc.Weight
+            })
+            .FirstOrDefaultAsync(pc => pc.Id == id, cancellationToken);
     }
+
 
     public async Task<bool> DeleteProductComponentAsync(int id, CancellationToken cancellationToken)
     {
@@ -93,7 +102,7 @@ public class ProductComponentService : IProductComponentService
         return true;
     }
     
-    public async Task<IEnumerable<ProductComponent>> GetProductComponentsByProductIdAsync(
+    public async Task<IEnumerable<object>> GetProductComponentsByProductIdAsync(
         int productId, CancellationToken cancellationToken)
     {
         var productExists = await _productRepository.GetAll()
@@ -107,7 +116,16 @@ public class ProductComponentService : IProductComponentService
 
         return await _productComponentRepository
             .GetAll()
-            .Where(es => es.Product.Id == productId)
+            .Where(pc => pc.Product.Id == productId)
+            .Select(pc => new
+            {
+                Id = pc.Id,
+                Product = pc.Product.Id,
+                Name = pc.Name,
+                Quantity = pc.Quantity,
+                Weight = pc.Weight
+            })
             .ToListAsync(cancellationToken);
     }
+
 }

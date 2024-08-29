@@ -10,11 +10,11 @@ public interface IProjectProductService
     Task<ProjectProduct> UpdateProjectProductAsync(UpdateProjectProductRequest projectProduct,
         CancellationToken cancellationToken);
     
-    Task<ProjectProduct?> GetProjectProductByIdAsync(int id, CancellationToken cancellationToken);
+    Task<object?> GetProjectProductByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteProjectProductAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<ProjectProduct>> GetProjectProductsByProjectIdAsync(int projectId,
+    Task<IEnumerable<object>> GetProjectProductsByProjectIdAsync(int projectId,
         CancellationToken cancellationToken);
 }
 

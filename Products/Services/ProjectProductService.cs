@@ -93,12 +93,21 @@ public class ProjectProductService : IProjectProductService
         return projectProduct;
     }
     
-    public async Task<ProjectProduct?> GetProjectProductByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<object?> GetProjectProductByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _projectProductRepository
             .GetAll()
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            .Select(pp => new
+            {
+                Id = pp.Id,
+                Project = pp.Project.Id,
+                Product = pp.Product.Id,
+                Quantity = pp.Quantity,
+                Markup = pp.Markup
+            })
+            .FirstOrDefaultAsync(pp => pp.Id == id, cancellationToken);
     }
+
 
     public async Task<bool> DeleteProjectProductAsync(int id, CancellationToken cancellationToken)
     {
@@ -113,7 +122,7 @@ public class ProjectProductService : IProjectProductService
         return true;
     }
     
-    public async Task<IEnumerable<ProjectProduct>> GetProjectProductsByProjectIdAsync(
+    public async Task<IEnumerable<object>> GetProjectProductsByProjectIdAsync(
         int projectId, CancellationToken cancellationToken)
     {
         var projectExists = await _projectRepository.GetAll()
@@ -128,6 +137,15 @@ public class ProjectProductService : IProjectProductService
         return await _projectProductRepository
             .GetAll()
             .Where(pp => pp.Project.Id == projectId)
+            .Select(pp => new
+            {
+                Id = pp.Id,
+                Project = pp.Project.Id,
+                Product = pp.Product.Id,
+                Quantity = pp.Quantity,
+                Markup = pp.Markup
+            })
             .ToListAsync(cancellationToken);
     }
+
 }

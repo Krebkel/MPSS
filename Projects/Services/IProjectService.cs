@@ -12,11 +12,11 @@ public interface IProjectService
     
     Task<Project> UpdateProjectAsync(UpdateProjectRequest project, CancellationToken cancellationToken);
     
-    Task<Project?> GetProjectByIdAsync(int id, CancellationToken cancellationToken);
+    Task<object?> GetProjectByIdAsync(int id, CancellationToken cancellationToken);
     
     Task<bool> DeleteProjectAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<Project>> GetAllProjectsAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<object>> GetAllProjectsAsync(CancellationToken cancellationToken);
 }
 
 public class UpdateProjectRequest
