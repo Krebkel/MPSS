@@ -37,16 +37,12 @@ $(document).ready(function() {
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                 const currentDate = new Date(d);
                 currentDate.setHours(0, 0, 0, 0);
-
                 const startDateNormalized = new Date(project.startDate);
                 startDateNormalized.setHours(0, 0, 0, 0);
-
                 const deadlineDateNormalized = new Date(project.deadlineDate);
                 deadlineDateNormalized.setHours(0, 0, 0, 0);
-
                 const isWithinPeriod = currentDate >= startDateNormalized && currentDate <= deadlineDateNormalized;
                 let cellColor = '';
-
                 if (isWithinPeriod) {
                     switch (project.projectStatus) {
                         case 'Active': cellColor = '#FABCB2'; break;
@@ -56,10 +52,10 @@ $(document).ready(function() {
                         default: cellColor = '';
                     }
                 }
-
-                // Convert the date to local date string for data attribute
-                const localDateString = currentDate.toLocaleDateString('en-CA'); // 'en-CA' format yyyy-mm-dd
-                projectRow += `<td class="gantt-cell" data-project-id="${project.id}" data-date="${localDateString}" style="background-color: ${cellColor};"></td>`;
+                const localDateString = currentDate.toLocaleDateString('en-CA');
+                projectRow += `<td class="gantt-cell" data-project-id="${project.id}" data-date="${localDateString}" style="background-color: ${cellColor};">
+                <span class="shift-count" style="color: #6F605D;"></span>
+            </td>`;
             }
             projectRow += '</tr>';
             bodyRows += projectRow;
@@ -75,12 +71,40 @@ $(document).ready(function() {
                 ${bodyRows}
             </tbody>
         </table>
-        `);
+    `);
 
         $('.gantt-cell').on('click', function() {
             const projectId = $(this).data('project-id');
             const date = $(this).data('date');
             openShiftModal(projectId, date);
+        });
+
+        updateAllShiftCounts();
+    }
+
+    function updateAllShiftCounts() {
+        $('.gantt-cell').each(function() {
+            const projectId = $(this).data('project-id');
+            const date = $(this).data('date');
+            updateShiftCount(projectId, date);
+        });
+    }
+
+    function updateShiftCount(projectId, date) {
+        $.ajax({
+            url: `/api/employeeShifts/base/byProject/${projectId}`,
+            method: 'GET',
+            success: function(shifts) {
+                const shiftCount = shifts.filter(shift => {
+                    const shiftDate = toLocal(new Date(shift.date));
+                    return shiftDate.toLocaleDateString('en-CA') === date;
+                }).length;
+
+                $(`.gantt-cell[data-project-id="${projectId}"][data-date="${date}"] .shift-count`).text(shiftCount > 0 ? shiftCount : '');
+            },
+            error: function() {
+                console.error('Error loading shifts for count update');
+            }
         });
     }
 
@@ -337,13 +361,6 @@ $(document).ready(function() {
         submitProjectForm();
     });
 
-    function formatDateForInput(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
     function formatDateForOutput(date) {
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -535,6 +552,7 @@ $(document).ready(function() {
         event.stopPropagation();
         const shiftId = $(this).data('shift-id');
         deleteEmployeeShift(shiftId);
+        updateAllShiftCounts();
         $(this).closest('tr').remove();
     });
 
@@ -553,7 +571,6 @@ $(document).ready(function() {
     // Сохранение данных смены из формы
     $('#shiftForm').submit(function(e) {
         e.preventDefault();
-        
         const shiftData = {
             project: currentProjectId,
             employee: $('#employeeSelect').val(),
@@ -570,7 +587,6 @@ $(document).ready(function() {
         const url = shiftId ? `/api/employeeShifts/base/${shiftId}` : '/api/employeeShifts/base';
         const method = shiftId ? 'PUT' : 'POST';
 
-        // Если айдюк есть, то подставляем
         if (shiftId) {
             shiftData.id = shiftId;
         }
@@ -584,6 +600,9 @@ $(document).ready(function() {
                 $('#addShiftForm').hide();
                 $('#shiftForm')[0].reset();
                 loadExistingShifts(currentProjectId, new Date($('#shiftDate').val()));
+
+                updateShiftCount(currentProjectId, $('#shiftDate').val());
+
                 alert(shiftId ? 'Смена успешно обновлена' : 'Смена успешно добавлена');
             },
             error: function() {
