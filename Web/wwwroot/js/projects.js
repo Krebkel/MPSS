@@ -79,14 +79,38 @@ $(document).ready(function() {
             openShiftModal(projectId, date);
         });
 
-        updateAllShiftCounts();
+        loadAllShifts(projects, startDate, endDate);
     }
 
-    function updateAllShiftCounts() {
+    function loadAllShifts(projects, startDate, endDate) {
+        const projectIds = projects.map(project => project.id);
+        $.ajax({
+            url: '/api/employeeShifts/base/byProjects',
+            method: 'GET',
+            data: {
+                projectIds: projectIds.join(','),
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString()
+            },
+            success: function(allShifts) {
+                updateAllShiftCounts(allShifts);
+            },
+            error: function() {
+                console.error('Error loading shifts');
+            }
+        });
+    }
+
+    function updateAllShiftCounts(allShifts) {
         $('.gantt-cell').each(function() {
             const projectId = $(this).data('project-id');
             const date = $(this).data('date');
-            updateShiftCount(projectId, date);
+            const shiftCount = allShifts.filter(shift =>
+                shift.projectId === projectId &&
+                toLocal(new Date(shift.date)).toLocaleDateString('en-CA') === date
+            ).length;
+
+            $(this).find('.shift-count').text(shiftCount > 0 ? shiftCount : '');
         });
     }
 
@@ -194,7 +218,7 @@ $(document).ready(function() {
             });
         }
     }
-    
+
     async function openProjectModal(projectId) {
         const modal = $('#projectModal');
         const form = $('#projectForm')[0];
@@ -206,7 +230,7 @@ $(document).ready(function() {
                 url: `/api/products/base`,
                 type: 'GET',
             });
-            
+
             if (projectId) {
                 const projectData = await $.ajax({
                     url: `/api/projects/base/${projectId}`,
@@ -217,13 +241,13 @@ $(document).ready(function() {
                 $('#projectId').val(projectData.id);
                 $('#projectName').val(projectData.name);
                 $('#projectAddress').val(projectData.address);
-                $('#projectStartDate').val(formatDateForInput(new Date(projectData.startDate)));
-                $('#projectDeadline').val(formatDateForInput(new Date(projectData.deadlineDate)));
-                $('#projectCounteragent').val(projectData.counteragent ? projectData.counteragent.id : '');
-                $('#projectResponsibleEmployee').val(projectData.responsibleEmployee ? projectData.responsibleEmployee.id : '');
+                $('#projectStartDate').val(toUTC(new Date(projectData.startDate)).toISOString().split('T')[0]);
+                $('#projectDeadline').val(toUTC(new Date(projectData.deadlineDate)).toISOString().split('T')[0]);
+                $('#projectCounteragent').val(projectData.counteragent);
+                $('#projectResponsibleEmployee').val(projectData.responsibleEmployee);
                 $('#projectManagerShare').val(projectData.managerShare);
                 $('#projectStatus').val(projectData.projectStatus);
-                
+
                 const projectProducts = await $.ajax({
                     url: `/api/projectProducts/base/byProject/${projectId}`,
                     type: 'GET',
@@ -233,12 +257,12 @@ $(document).ready(function() {
             } else {
                 $('#modalTitle').text('Добавить новый проект');
                 $('#projectId').val('');
-                }
-            
-            $('#addProjectProductBtn').on('click', function() {
+            }
+
+            $('#addProjectProductBtn').off('click').on('click', function() {
                 addProjectProductRow({}, availableProducts);
             });
-            
+
             modal.fadeIn();
         } catch (error) {
             alert('Ошибка при загрузке данных: ' + (error.responseText || error.statusText));
@@ -247,7 +271,7 @@ $(document).ready(function() {
 
     function addProjectProductRow(projectProduct = {}, availableProducts = []) {
         const productOptions = availableProducts.map(product =>
-            `<option value="${product.id}" ${product.id === (projectProduct.product ? projectProduct.product.id : '') ? 'selected' : ''}>${product.name}</option>`
+            `<option value="${product.id}" ${product.id === (projectProduct.product ? projectProduct.product : '') ? 'selected' : ''}>${product.name}</option>`
         ).join('');
 
         const projectProductRow = `
@@ -288,41 +312,52 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     function saveProjectProducts(projectId) {
-        const projectProducts = [];
-        $('.project-product-row').each(function() {
-            const projectProduct = {
+        const projectProducts = $('.project-product-row').map(function() {
+            const $this = $(this);
+            return {
+                id: $this.data('project-product-id') || null,
                 project: projectId,
-                product: $(this).find('select[name="projectProduct[]"]').val(),
-                quantity: parseInt($(this).find('input[name="projectQuantity[]"]').val()) || null,
-                markup: parseFloat($(this).find('input[name="projectMarkup[]"]').val()) || null
+                product: $this.find('select[name="projectProduct[]"]').val(),
+                quantity: parseInt($this.find('input[name="projectQuantity[]"]').val()) || null,
+                markup: parseFloat($this.find('input[name="projectMarkup[]"]').val()) || null
             };
+        }).get().filter(pp => pp.product);
 
-            if ($(this).data('project-product-id')) {
-                projectProduct.id = $(this).data('project-product-id');
-            }
+        const deletePromises = $('[data-deleted-project-product-id]')
+            .map((_, el) => $.ajax({
+                url: `/api/projectProducts/base/${$(el).data('deleted-project-product-id')}`,
+                method: 'DELETE'
+            })).get();
 
-            projectProducts.push(projectProduct);
-        });
-
-        $.ajax({
-            url: '/api/projectProducts/base',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(projectProducts),
-            success: function() {
+        Promise.all(deletePromises)
+            .then(() => Promise.all(projectProducts.map(pp => $.ajax({
+                url: pp.id ? `/api/projectProducts/base/${pp.id}` : '/api/projectProducts/base',
+                method: pp.id ? 'PUT' : 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(pp)
+            }))))
+            .then(() => {
                 $('#projectModal').hide();
                 loadProjects();
                 alert('Проект и изделия успешно сохранены');
-            },
-            error: function() {
-                alert('Ошибка при сохранении изделий проекта');
-            }
-        });
+            })
+            .catch(error => {
+                alert('Ошибка при сохранении или удалении изделий проекта');
+            });
     }
-    
+
     function submitProjectForm() {
+        const startDate = new Date($('#projectStartDate').val());
+        const deadlineDate = new Date($('#projectDeadline').val());
+
+        if (deadlineDate < startDate) {
+            alert('Дата окончания не может быть раньше даты начала проекта.');
+            return;
+        }
+        const projectId = $('#projectId').val();
+
         const projectData = {
             name: $('#projectName').val(),
             address: $('#projectAddress').val(),
@@ -334,7 +369,10 @@ $(document).ready(function() {
             projectStatus: $('#projectStatus').val(),
         };
 
-        const projectId = $('#projectId').val();
+        if (projectId) {
+            projectData.id = projectId;
+        };
+        
         const url = projectId ? `/api/projects/base/${projectId}` : '/api/projects/base';
         const method = projectId ? 'PUT' : 'POST';
 
@@ -347,7 +385,6 @@ $(document).ready(function() {
                 const newProjectId = projectId || response.id;
                 saveProjectProducts(newProjectId);
                 $('#projectModal').hide();
-                loadProjects();
                 alert(projectId ? 'Проект успешно обновлен' : 'Проект успешно добавлен');
             },
             error: function() {
