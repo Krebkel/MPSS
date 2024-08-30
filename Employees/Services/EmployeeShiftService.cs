@@ -194,4 +194,41 @@ public class EmployeeShiftService : IEmployeeShiftService
             })
             .ToListAsync(cancellationToken);
     }
+    
+    public async Task<IEnumerable<object>> GetEmployeeShiftsByProjectIdsAsync(List<int> projectIds, DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
+    {
+        var projectsExist = await _projectRepository.GetAll()
+            .Where(p => projectIds.Contains(p.Id))
+            .Select(p => p.Id)
+            .ToListAsync(cancellationToken);
+
+        var missingProjectIds = projectIds.Except(projectsExist).ToList();
+        if (missingProjectIds.Any())
+        {
+            _logger.LogWarning("Проекты с ID {MissingProjectIds} не найдены",
+                string.Join(", ", missingProjectIds));
+        }
+
+        return await _employeeShiftRepository
+            .GetAll()
+            .Include(es => es.Project)
+            .Include(es => es.Employee)
+            .Where(es => projectIds
+                .Contains(es.Project.Id) 
+                         && es.Date >= startDate.ToUniversalTime() 
+                         && es.Date <= endDate.ToUniversalTime())
+            .Select(es => new
+            {
+                Id = es.Id,
+                ProjectId = es.Project.Id,
+                EmployeeId = es.Employee.Id,
+                Date = es.Date,
+                Arrival = es.Arrival,
+                Departure = es.Departure,
+                TravelTime = es.TravelTime,
+                ConsiderTravel = es.ConsiderTravel,
+                ISN = es.ISN
+            })
+            .ToListAsync(cancellationToken);
+    }
 }

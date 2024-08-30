@@ -167,4 +167,31 @@ public class EmployeeShiftBaseController : ControllerBase
             return BadRequest($"Ошибка при получении смен по ID сотрудника: {ex.Message}");
         }
     }
+    
+    [HttpGet("byProjects")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetEmployeeShiftsByProjects(
+        [FromQuery] string projectIds, 
+        [FromQuery] DateTime startDate, 
+        [FromQuery]  DateTime endDate, CancellationToken ct)
+    {
+        try
+        {
+            var projectIdList = projectIds.Split(',').Select(int.Parse).ToList();
+            var employeeShifts = 
+                await _employeeShiftService.GetEmployeeShiftsByProjectIdsAsync(projectIdList, startDate, endDate, ct);
+            return Ok(employeeShifts);
+        }
+        catch (FormatException ex)
+        {
+            _logger.LogWarning(ex, "Неверный формат ID проектов");
+            return BadRequest("Неверный формат ID проектов");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении смен по проектам");
+            return BadRequest($"Ошибка при получении смен по проектам: {ex.Message}");
+        }
+    }
 }

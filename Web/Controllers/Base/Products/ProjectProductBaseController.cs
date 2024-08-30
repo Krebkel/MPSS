@@ -25,61 +25,49 @@ public class ProjectProductBaseController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectProduct>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
     public async Task<IActionResult> AddProjectProducts(
-        [FromBody] IEnumerable<CreateProjectProductApiRequest> requests, CancellationToken ct)
+        [FromBody] CreateProjectProductApiRequest request, CancellationToken ct)
     {
         try
         {
-            var createdProjectProducts = new List<ProjectProduct>();
-
-            foreach (var request in requests)
-            {
-                var addProjectProductRequest = request.ToCreateProjectProductRequest();
+            var addProjectProductRequest = request.ToCreateProjectProductRequest();
                 var createdProjectProduct = await _projectProductService
                     .CreateProjectProductAsync(addProjectProductRequest, ct);
-                createdProjectProducts.Add(createdProjectProduct);
             
                 _logger.LogInformation("Изделие {@ProductName} успешно добавлено на проект {@ProjectName} ",
                     createdProjectProduct.Product.Name, createdProjectProduct.Project.Name);
-            }
 
-            return Ok(createdProjectProducts);
+                return Ok(createdProjectProduct);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при добавлении изделий на проект");
-            return BadRequest($"Ошибка при добавлении изделий на проект: {ex.Message}");
+            _logger.LogError(ex, "Ошибка при добавлении изделия на проект");
+            return BadRequest($"Ошибка при добавлении изделияй на проект: {ex.Message}");
         }
     }
 
-    [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectProduct>))]
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateProjectProducts(
-        [FromBody] IEnumerable<UpdateProjectProductApiRequest> requests, CancellationToken ct)
+    public async Task<IActionResult> UpdateProjectProduct(
+        [FromBody] UpdateProjectProductApiRequest request, CancellationToken ct)
     {
         try
         {
-            var updatedProjectProducts = new List<ProjectProduct>();
+            var updateProjectProductRequest = request.ToUpdateProjectProductRequest();
+            var updatedProjectProduct = await _projectProductService
+                .UpdateProjectProductAsync(updateProjectProductRequest, ct);
 
-            foreach (var request in requests)
-            {
-                var updateProjectProductRequest = request.ToUpdateProjectProductRequest();
-                var updatedProjectProduct = await _projectProductService
-                    .UpdateProjectProductAsync(updateProjectProductRequest, ct);
-                updatedProjectProducts.Add(updatedProjectProduct);
+            _logger.LogInformation("Изделие {@ProductName} успешно обновлено на проекте {@ProjectName}",
+                updatedProjectProduct.Product.Name, updatedProjectProduct.Project.Name);
 
-                _logger.LogInformation("Изделие {@ProductName} успешно обновлено на проекте {@ProjectName}",
-                    updatedProjectProduct.Product.Name, updatedProjectProduct.Project.Name);
-            }
-
-            return Ok(updatedProjectProducts);
+            return Ok(updatedProjectProduct);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении информации об изделиях на проекте");
-            return BadRequest($"Ошибка при обновлении информации об изделиях на проекте: {ex.Message}");
+            _logger.LogError(ex, "Ошибка при обновлении информации об изделии на проекте");
+            return BadRequest($"Ошибка при обновлении информации об изделии на проекте: {ex.Message}");
         }
     }
     

@@ -18,6 +18,10 @@ public interface IEmployeeShiftService
     Task<IEnumerable<object>> GetEmployeeShiftsByProjectIdAsync(int projectId, CancellationToken cancellationToken);
     
     Task<IEnumerable<object>> GetEmployeeShiftsByEmployeeIdAsync(int employeeId, CancellationToken cancellationToken);
+
+    Task<IEnumerable<object>> GetEmployeeShiftsByProjectIdsAsync(List<int> projectIds, DateTime startDate,
+        DateTime endDate, CancellationToken cancellationToken);
+
 }
 
 public class UpdateEmployeeShiftRequest
