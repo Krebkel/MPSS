@@ -45,7 +45,7 @@ let ShiftManagement = (function () {
                                 <td class="shortcol">${currentIndex++}</td>
                                 <td>${employee.name}</td>
                                 <td class="btncol">
-                                    <button class="btn delete-btn" data-shift-id="${shift.id}">⛌</button>
+                                    <button name="deleteShiftBtn" class="btn delete-btn" data-shift-id="${shift.id}">⛌</button>
                                 </td>
                             </tr>`;
                                 shiftRows.push(shiftRow);

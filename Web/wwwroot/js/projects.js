@@ -162,7 +162,6 @@ let ProjectManagement = (function () {
             $.getJSON('/api/employees/base'),
             $.getJSON('/api/projects/base')
         ]).then(([counteragents, employees, allProjects]) => {
-
             fillSelect('#projectCounteragent', counteragents);
             fillSelect('#projectResponsibleEmployee', employees);
 
@@ -175,15 +174,6 @@ let ProjectManagement = (function () {
 
             displayProjects(projectsToShow, showActual);
             module.createGanttChart(projectsToShow);
-
-            $('#projectsTable').on('click', '.delete-btn', function(event) {
-                event.stopPropagation();
-                module.deleteProject($(this).data('project-id'));
-            });
-
-            $('#projectsTable').on('click', '.project-row', function() {
-                module.openProjectModal($(this).data('project-id'));
-            });
         });
     };
 
@@ -225,11 +215,23 @@ let ProjectManagement = (function () {
                     <td class="longcol">${project.address}</td>
                     <td class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</td>
                     <td class="midcol" style="background-color: ${cellColor};">${translateStatus(project.projectStatus)}</td>
-                    <td class="btncol"
-                        <button class="btn delete-btn" data-project-id="${project.id}">⛌</button>
+                    <td class="btncol">
+                        <button name="deleteProjectBtn" class="btn delete-btn" data-project-id="${project.id}">⛌</button>
                     </td>
                 </tr>
             `);
+        });
+
+        $('#projectsTable').off('click', '.delete-btn');
+        $('#projectsTable').off('click', '.project-row');
+
+        $('#projectsTable').on('click', '.delete-btn', function(event) {
+            event.stopPropagation();
+            module.deleteProject($(this).data('project-id'));
+        });
+
+        $('#projectsTable').on('click', '.project-row', function() {
+            module.openProjectModal($(this).data('project-id'));
         });
     }
 
@@ -258,15 +260,24 @@ let ProjectManagement = (function () {
 
         try {
             const availableProducts = await $.ajax({
-                url: `/api/products/base`,
+                url: '/api/products/base',
                 type: 'GET',
             });
 
+            let projectData = null;
+            let projectProducts = [];
+
             if (projectId) {
-                const projectData = await $.ajax({
-                    url: `/api/projects/base/${projectId}`,
-                    type: 'GET',
-                });
+                [projectData, projectProducts] = await Promise.all([
+                    $.ajax({
+                        url: `/api/projects/base/${projectId}`,
+                        type: 'GET',
+                    }),
+                    $.ajax({
+                        url: `/api/projectProducts/base/byProject/${projectId}`,
+                        type: 'GET',
+                    })
+                ]);
 
                 $('#modalTitle').text('Редактировать проект');
                 $('#projectId').val(projectData.id);
@@ -279,19 +290,14 @@ let ProjectManagement = (function () {
                 $('#projectManagerShare').val(projectData.managerShare);
                 $('#projectStatus').val(projectData.projectStatus);
 
-                const projectProducts = await $.ajax({
-                    url: `/api/projectProducts/base/byProject/${projectId}`,
-                    type: 'GET',
-                });
-
                 projectProducts.forEach(projectProduct => module.addProjectProductRow(projectProduct, availableProducts));
             } else {
                 $('#modalTitle').text('Добавить новый проект');
                 $('#projectId').val('');
-                
+
                 const startDate = new Date();
                 const deadlineDate = new Date(today.setDate(today.getDate() + 7));
-                
+
                 $('#projectStartDate').val(toUTC(new Date(startDate)).toISOString().split('T')[0]);
                 $('#projectDeadline').val(toUTC(new Date(deadlineDate)).toISOString().split('T')[0]);
             }
@@ -332,26 +338,26 @@ let ProjectManagement = (function () {
             return null;
         }
     };
-    
+
     module.addProjectProductRow = async function (projectProduct = {}, availableProducts = []) {
         const productOptions = availableProducts.map(product =>
             `<option value="${product.id}" ${product.id === (projectProduct.product ? projectProduct.product : '') ? 'selected' : ''}>${product.name}</option>`
         ).join('');
 
         const row = $(`
-            <tr class="project-product-row" data-project-product-id="${projectProduct.id || ''}">
-                <td class="longcol">
-                    <select name="projectProduct[]">${productOptions}</select>
-                </td>
-                <td class="shortcol">
-                    <input type="number" name="projectQuantity[]" value="${projectProduct.quantity || ''}" required min="1" max="999999">
-                </td>
-                <td class="midcol">
-                    <input type="number" name="projectMarkup[]" value="${projectProduct.markup || ''}" required step="0.01" min="0" max="9999999999.99">
-                </td>
-                <td class="btncol"><button type="button" class="btn delete-btn">⛌</button></td>
-            </tr>
-        `);
+        <tr class="project-product-row" data-project-product-id="${projectProduct.id || ''}">
+            <td class="longcol">
+                <select name="projectProduct[]">${productOptions}</select>
+            </td>
+            <td class="shortcol">
+                <input type="number" name="projectQuantity[]" value="${projectProduct.quantity || ''}" required min="1" max="999999">
+            </td>
+            <td class="midcol">
+                <input type="number" name="projectMarkup[]" value="${projectProduct.markup || ''}" required step="0.01" min="0" max="9999999999.99">
+            </td>
+            <td class="btncol"><button type="button" class="btn delete-btn">⛌</button></td>
+        </tr>
+    `);
 
         $('#projectProductsTable tbody').append(row);
 
@@ -395,38 +401,38 @@ let ProjectManagement = (function () {
     };
 
     module.saveProjectProducts = function (projectId) {
-        const projectProducts = $('.project-product-row').map(function () {
-            const $this = $(this);
-            return {
-                id: $this.data('project-product-id') || null,
-                project: projectId,
-                product: $this.find('select[name="projectProduct[]"]').val(),
-                quantity: parseInt($this.find('input[name="projectQuantity[]"]').val()) || null,
-                markup: parseFloat($this.find('input[name="projectMarkup[]"]').val()) || null
-            };
-        }).get().filter(pp => pp.product);
+        return new Promise((resolve, reject) => {
+            const projectProducts = $('.project-product-row').map(function () {
+                const $this = $(this);
+                return {
+                    id: $this.data('project-product-id') || null,
+                    project: projectId,
+                    product: $this.find('select[name="projectProduct[]"]').val(),
+                    quantity: parseInt($this.find('input[name="projectQuantity[]"]').val()) || null,
+                    markup: parseFloat($this.find('input[name="projectMarkup[]"]').val()) || null
+                };
+            }).get().filter(pp => pp.product);
 
-        const deletePromises = $('[data-deleted-project-product-id]')
-            .map((_, el) => $.ajax({
-                url: `/api/projectProducts/base/${$(el).data('deleted-project-product-id')}`,
-                method: 'DELETE'
-            })).get();
+            const deletePromises = $('[data-deleted-project-product-id]')
+                .map((_, el) => $.ajax({
+                    url: `/api/projectProducts/base/${$(el).data('deleted-project-product-id')}`,
+                    method: 'DELETE'
+                })).get();
 
-        Promise.all(deletePromises)
-            .then(() => Promise.all(projectProducts.map(pp => $.ajax({
-                url: pp.id ? `/api/projectProducts/base/${pp.id}` : '/api/projectProducts/base',
-                method: pp.id ? 'PUT' : 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(pp)
-            }))))
-            .then(() => {
-                $('#projectModal').hide();
-                module.loadProjects();
-                alert('Проект и изделия успешно сохранены');
-            })
-            .catch(error => {
-                alert('Ошибка при сохранении или удалении изделий проекта');
-            });
+            Promise.all(deletePromises)
+                .then(() => Promise.all(projectProducts.map(pp => $.ajax({
+                    url: pp.id ? `/api/projectProducts/base/${pp.id}` : '/api/projectProducts/base',
+                    method: pp.id ? 'PUT' : 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(pp)
+                }))))
+                .then(() => {
+                    resolve();
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
     };
 
     module.submitProjectForm = function () {
@@ -464,25 +470,31 @@ let ProjectManagement = (function () {
             data: JSON.stringify(projectData),
             success: function (response) {
                 const newProjectId = projectId || response.id;
-                module.saveProjectProducts(newProjectId);
-                $('#projectModal').hide();
-                alert(projectId ? 'Проект успешно обновлен' : 'Проект успешно добавлен');
-                module.loadProjects(true);
+                module.saveProjectProducts(newProjectId)
+                    .then(() => {
+                        $('#projectModal').hide();
+                        alert(projectId ? 'Проект успешно обновлен' : 'Проект успешно добавлен');
+                        module.loadProjects(true);
+                    })
+                    .catch(error => {
+                        alert('Ошибка при сохранении изделий проекта: ' + error);
+                    });
             },
             error: function () {
-                alert('Ошибка при сохранении проекта');
+                alert('Пасхалка, проект не сохранен просто потому что.');
             }
         });
     };
 
+    // Обновленная функция init
     module.init = function () {
         $(document).ready(function () {
-            $('#projectForm').on('submit', function (event) {
+            $('#projectForm').off('submit').on('submit', function (event) {
                 event.preventDefault();
                 module.submitProjectForm();
             });
 
-            $('#addProjectBtn').on('click', function () {
+            $('#addProjectBtn').off('click').on('click', function () {
                 $('#modalTitle').text('Добавить новый проект');
                 $('#projectForm')[0].reset();
                 $('#projectId').val('');
@@ -491,13 +503,13 @@ let ProjectManagement = (function () {
                 module.openProjectModal();
             });
 
-            $('#showAllProjectsBtn').on('click', function () {
+            $('#showAllProjectsBtn').off('click').on('click', function () {
                 module.loadProjects(false);
                 $('#showAllProjectsBtn').hide();
                 $('#hideProjectsBtn').show();
             });
 
-            $('#hideProjectsBtn').on('click', function () {
+            $('#hideProjectsBtn').off('click').on('click', function () {
                 module.loadProjects(true);
             });
 
