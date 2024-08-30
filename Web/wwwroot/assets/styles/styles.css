@@ -165,7 +165,9 @@ label {
 .btn-primary { margin: -0.0875rem 0 0 1rem; }
 .btn-secondary { margin: 0.4875rem 0 0 7rem; }
 .btn-add { font-weight: bold; }
-.btn-showall { margin-left: 4rem; }
+.btn-show-all-projects { margin-left: 0;}
+.btn-hide-projects { margin-left: 0; }
+
 
 button[type="submit"] {
     display: block;

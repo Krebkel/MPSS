@@ -5,11 +5,18 @@ let ProjectManagement = (function () {
     module.createGanttChart = function (projects) {
         const chartContainer = $('#ganttChart');
         chartContainer.empty();
+        const today = new Date();
+
         const startDate = new Date();
         startDate.setDate(today.getDate() - 3);
         const endDate = new Date();
         endDate.setDate(today.getDate() + 30);
 
+        const filteredProjects = projects.filter(project => {
+            const deadlineDate = new Date(project.deadlineDate);
+            return deadlineDate >= startDate && deadlineDate <= endDate;
+        });
+        
         let monthRow = '<tr><th rowspan="2">Проект</th>';
         let currentMonth = startDate.getMonth();
         let monthSpan = 0;
@@ -34,7 +41,7 @@ let ProjectManagement = (function () {
         dayRow += '</tr>';
 
         let bodyRows = '';
-        projects.forEach((project) => {
+        filteredProjects.forEach((project) => {
             let projectRow = `<tr><td>${project.name}</td>`;
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                 const currentDate = new Date(d);
@@ -143,67 +150,88 @@ let ProjectManagement = (function () {
         });
     };
 
-    module.loadProjects = function () {
-        $.getJSON('/api/counteragents/base', function (counteragents) {
-            const counteragentSelect = $('#projectCounteragent');
-            counteragentSelect.empty();
-            counteragents.forEach(counteragent => {
-                counteragentSelect.append(new Option(counteragent.name, counteragent.id));
+    module.loadProjects = function (showActual = true) {
+        const today = new Date();
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - 3);
+        const endDate = new Date(today);
+        endDate.setDate(today.getDate() + 30);
+
+        Promise.all([
+            $.getJSON('/api/counteragents/base'),
+            $.getJSON('/api/employees/base'),
+            $.getJSON('/api/projects/base')
+        ]).then(([counteragents, employees, allProjects]) => {
+
+            fillSelect('#projectCounteragent', counteragents);
+            fillSelect('#projectResponsibleEmployee', employees);
+
+            const projectsToShow = showActual
+                ? allProjects.filter(project => {
+                    const deadlineDate = new Date(project.deadlineDate);
+                    return deadlineDate >= startDate && deadlineDate <= endDate;
+                })
+                : allProjects;
+
+            displayProjects(projectsToShow, showActual);
+            module.createGanttChart(projectsToShow);
+
+            $('#projectsTable').on('click', '.delete-btn', function(event) {
+                event.stopPropagation();
+                module.deleteProject($(this).data('project-id'));
+            });
+
+            $('#projectsTable').on('click', '.project-row', function() {
+                module.openProjectModal($(this).data('project-id'));
             });
         });
+    };
 
-        $.getJSON('/api/employees/base', function (employees) {
-            const employeeSelect = $('#projectResponsibleEmployee');
-            employeeSelect.empty();
-            employees.forEach(employee => {
-                employeeSelect.append(new Option(employee.name, employee.id));
-            });
-        });
+    function fillSelect(selector, items) {
+        const select = $(selector);
+        select.empty();
+        items.forEach(item => select.append(new Option(item.name, item.id)));
+    }
 
-        $.getJSON('/api/projects/base', function (allProjects) {
-            const today = new Date();
-            const startDate = new Date(today);
-            startDate.setDate(today.getDate() - 3);
-            const endDate = new Date(today);
-            endDate.setDate(today.getDate() + 30);
+    function displayProjects(projects, showActual) {
+        const projectsTableBody = $('#projectsTable tbody');
+        projectsTableBody.empty();
 
-            const filteredProjects = allProjects.filter(project => {
-                const deadlineDate = new Date(project.deadlineDate);
-                return deadlineDate >= startDate && deadlineDate <= endDate;
-            });
-
-            module.createGanttChart(filteredProjects);
-            const projectsTableBody = $('#projectsTable tbody');
-            projectsTableBody.empty();
-
-            filteredProjects.forEach((project, index) => {
-                const projectRow = `
+        $('#hideProjectsBtn').toggle(!showActual);
+        $('#showAllProjectsBtn').toggle(showActual);
+        
+        projects.forEach((project, index) => {
+            let cellColor = '';
+            switch (project.projectStatus) {
+                case 'Active':
+                    cellColor = '#FDE9E5';
+                    break;
+                case 'Standby':
+                    cellColor = '#F3F1F0';
+                    break;
+                case 'Done':
+                    cellColor = '#ECF7F1';
+                    break;
+                case 'Paid':
+                    cellColor = '#E7F0FC';
+                    break;
+                default:
+                    cellColor = '';
+            }
+            projectsTableBody.append(`
                 <tr class="project-row" data-project-id="${project.id}">
                     <td class="shortcol">${index + 1}</td>
                     <td>${project.name}</td>
                     <td class="longcol">${project.address}</td>
                     <td class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</td>
-                    <td class="midcol">${translateStatus(project.projectStatus)}</td>
-                    <td class="btncol">
+                    <td class="midcol" style="background-color: ${cellColor};">${translateStatus(project.projectStatus)}</td>
+                    <td class="btncol"
                         <button class="btn delete-btn" data-project-id="${project.id}">⛌</button>
                     </td>
                 </tr>
-            `;
-                projectsTableBody.append(projectRow);
-            });
-
-            $('.delete-btn').on('click', function (event) {
-                event.stopPropagation();
-                const projectId = $(this).data('project-id');
-                module.deleteProject(projectId);
-            });
-
-            $('.project-row').on('click', function () {
-                const projectId = $(this).data('project-id');
-                module.openProjectModal(projectId);
-            });
+            `);
         });
-    };
+    }
 
     module.deleteProject = function (projectId) {
         if (confirm('Вы уверены, что хотите удалить этот проект?')) {
@@ -395,6 +423,7 @@ let ProjectManagement = (function () {
                 module.saveProjectProducts(newProjectId);
                 $('#projectModal').hide();
                 alert(projectId ? 'Проект успешно обновлен' : 'Проект успешно добавлен');
+                module.loadProjects(true);
             },
             error: function () {
                 alert('Ошибка при сохранении проекта');
@@ -418,7 +447,17 @@ let ProjectManagement = (function () {
                 module.openProjectModal();
             });
 
-            module.loadProjects();
+            $('#showAllProjectsBtn').on('click', function () {
+                module.loadProjects(false);
+                $('#showAllProjectsBtn').hide();
+                $('#hideProjectsBtn').show();
+            });
+
+            $('#hideProjectsBtn').on('click', function () {
+                module.loadProjects(true);
+            });
+
+            module.loadProjects(true);
         });
     };
 
