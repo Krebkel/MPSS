@@ -12,14 +12,14 @@ $(document).ready(function() {
                     <td class="shortcol">${product.cost}</td>
                     <td class="shortcol">${translateProductType(product.type)}</td>
                     <td class="btncol">
-                        <button class="btn delete-btn" data-product-id="${product.id}">⛌</button>
+                        <button name="deleteProductBtn" class="btn delete-btn" data-product-id="${product.id}">⛌</button>
                     </td>
                 </tr>
             `;
                 productsTableBody.append(productRow);
             });
 
-            $('.delete-btn').on('click', function(event) {
+            $('#productsTable').on('click', '.delete-btn', function(event) {
                 event.stopPropagation();
                 const productId = $(this).data('product-id');
                 deleteProduct(productId);

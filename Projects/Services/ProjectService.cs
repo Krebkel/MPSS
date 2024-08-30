@@ -165,7 +165,7 @@ public class ProjectService : IProjectService
     
     public async Task<IEnumerable<object>> GetAllProjectsAsync(CancellationToken cancellationToken)
     {
-        return await _projectRepository
+        var projects = await _projectRepository
             .GetAll()
             .Include(p => p.Counteragent)
             .Include(p => p.ResponsibleEmployee)
@@ -182,6 +182,11 @@ public class ProjectService : IProjectService
                 ManagerShare = p.ManagerShare
             })
             .ToListAsync(cancellationToken);
+
+        return projects
+            .OrderByDescending(p => p.DeadlineDate)
+            .ThenBy(p => p.ProjectStatus)
+            .ThenBy(p => p.Name);
     }
 
 }

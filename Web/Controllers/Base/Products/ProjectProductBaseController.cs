@@ -148,4 +148,25 @@ public class ProjectProductBaseController : ControllerBase
             return BadRequest($"Ошибка при получении изделий по ID проекта: {ex.Message}");
         }
     }
+    
+    [HttpGet("recent/{productId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetRecentProjectProductsByProductId(
+        int productId, 
+        [FromQuery] int limit = 5, 
+        CancellationToken ct = default)
+    {
+        try
+        {
+            var recentProjectProducts = await _projectProductService
+                .GetRecentProjectProductsByProductIdAsync(productId, limit, ct);
+            return Ok(recentProjectProducts);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении последних проектных изделий для изделия с ID {ProductId}", productId);
+            return BadRequest($"Ошибка при получении последних проектных изделий: {ex.Message}");
+        }
+    }
 }

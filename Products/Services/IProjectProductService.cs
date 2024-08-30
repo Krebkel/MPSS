@@ -16,6 +16,9 @@ public interface IProjectProductService
 
     Task<IEnumerable<object>> GetProjectProductsByProjectIdAsync(int projectId,
         CancellationToken cancellationToken);
+
+    Task<IEnumerable<object>> GetRecentProjectProductsByProductIdAsync(int productId, int limit,
+        CancellationToken cancellationToken);
 }
 
 public class UpdateProjectProductRequest
