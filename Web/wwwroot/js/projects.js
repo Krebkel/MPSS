@@ -1,10 +1,10 @@
 let ProjectManagement = (function () {
     const module = {};
+    const today = new Date();
 
     module.createGanttChart = function (projects) {
         const chartContainer = $('#ganttChart');
         chartContainer.empty();
-        const today = new Date();
         const startDate = new Date();
         startDate.setDate(today.getDate() - 3);
         const endDate = new Date();
@@ -260,6 +260,12 @@ let ProjectManagement = (function () {
             } else {
                 $('#modalTitle').text('Добавить новый проект');
                 $('#projectId').val('');
+                
+                const startDate = new Date();
+                const deadlineDate = new Date(today.setDate(today.getDate() + 7));
+                
+                $('#projectStartDate').val(toUTC(new Date(startDate)).toISOString().split('T')[0]);
+                $('#projectDeadline').val(toUTC(new Date(deadlineDate)).toISOString().split('T')[0]);
             }
 
             $('#addProjectProductBtn').off('click').on('click', function () {
