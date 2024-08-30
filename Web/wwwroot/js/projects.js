@@ -305,13 +305,40 @@ let ProjectManagement = (function () {
             alert('Ошибка при загрузке данных: ' + (error.responseText || error.statusText));
         }
     };
+    
+    module.getMostFrequentMarkup = async function(productId) {
+        try {
+            const response = await $.ajax({
+                url: `/api/projectProducts/base/recent/${productId}?limit=5`,
+                method: 'GET'
+            });
 
-    module.addProjectProductRow = function (projectProduct = {}, availableProducts = []) {
+            if (response.length === 0) {
+                return null;
+            }
+
+            const markupCounts = response.reduce((acc, pp) => {
+                acc[pp.markup] = (acc[pp.markup] || 0) + 1;
+                return acc;
+            }, {});
+
+            const mostFrequentMarkup = Object.keys(markupCounts).reduce((a, b) =>
+                markupCounts[a] > markupCounts[b] ? a : b
+            );
+
+            return parseFloat(mostFrequentMarkup);
+        } catch (error) {
+            console.error('Ошибка получения недавних проектных изделий:', error);
+            return null;
+        }
+    };
+    
+    module.addProjectProductRow = async function (projectProduct = {}, availableProducts = []) {
         const productOptions = availableProducts.map(product =>
             `<option value="${product.id}" ${product.id === (projectProduct.product ? projectProduct.product : '') ? 'selected' : ''}>${product.name}</option>`
         ).join('');
 
-        const projectProductRow = `
+        const row = $(`
             <tr class="project-product-row" data-project-product-id="${projectProduct.id || ''}">
                 <td class="longcol">
                     <select name="projectProduct[]">${productOptions}</select>
@@ -324,17 +351,34 @@ let ProjectManagement = (function () {
                 </td>
                 <td class="btncol"><button type="button" class="btn delete-btn">⛌</button></td>
             </tr>
-        `;
+        `);
 
-        $('#projectProductsTable tbody').append(projectProductRow);
+        $('#projectProductsTable tbody').append(row);
 
-        $('.delete-btn').off('click').on('click', function () {
-            const projectProductId = $(this).closest('.project-product-row').data('project-product-id');
+        const productSelect = row.find('select[name="projectProduct[]"]');
+        const markupInput = row.find('input[name="projectMarkup[]"]');
+
+        productSelect.on('change', async function() {
+            const selectedProductId = $(this).val();
+            if (selectedProductId) {
+                const mostFrequentMarkup = await module.getMostFrequentMarkup(selectedProductId);
+                if (mostFrequentMarkup !== null) {
+                    markupInput.val(mostFrequentMarkup.toFixed(2));
+                }
+            }
+        });
+
+        row.find('.delete-btn').on('click', function () {
+            const projectProductId = row.data('project-product-id');
             if (projectProductId) {
                 module.deleteProjectProduct(projectProductId);
             }
-            $(this).closest('.project-product-row').remove();
+            row.remove();
         });
+
+        if (!projectProduct.id) {
+            productSelect.trigger('change');
+        }
     };
 
     module.deleteProjectProduct = function (projectProductId) {

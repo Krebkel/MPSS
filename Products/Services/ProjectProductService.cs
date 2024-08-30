@@ -148,4 +148,33 @@ public class ProjectProductService : IProjectProductService
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<object>> GetRecentProjectProductsByProductIdAsync(
+        int productId,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _projectProductRepository
+                .GetAll()
+                .Where(pp => pp.Product.Id == productId)
+                .OrderByDescending(pp => pp.Id)
+                .Take(limit)
+                .Select(pp => new
+                {
+                    Id = pp.Id,
+                    Project = pp.Project.Id,
+                    Product = pp.Product.Id,
+                    Quantity = pp.Quantity,
+                    Markup = pp.Markup
+                })
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении последних ProjectProducts для Product с ID {ProductId}",
+                productId);
+            throw;
+        }
+    }
 }
