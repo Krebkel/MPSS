@@ -155,6 +155,15 @@ public class ProjectProductService : IProjectProductService
     {
         try
         {
+            var productExists = await _productRepository.GetAll()
+                .AnyAsync(p => p.Id == productId, cancellationToken);
+
+            if (!productExists)
+            {
+                _logger.LogWarning("Изделие с ID {ProductId} не найдено", productId);
+                throw new KeyNotFoundException($"Изделие с ID {productId} не найдено");
+            }
+            
             return await _projectProductRepository
                 .GetAll()
                 .Where(pp => pp.Product.Id == productId)

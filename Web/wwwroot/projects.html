@@ -37,6 +37,9 @@
                         <a class="nav-link" href="#employee-shifts">Смены</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#expenses">Расходы</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#products">Изделия</a>
                     </li>
                 </ul>
@@ -72,6 +75,10 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div id="expenses" class="content-section" style="display: none;">
+                <h2>Расходы по проектам</h2>
+                <div id="expensesContainer"></div>
             </div>
             <div id="products" class="content-section" style="display: none;">
                 <div id="productTable">
@@ -159,55 +166,13 @@
     </div>
 </div>
 
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3 id="productModalTitle">Добавить новое изделие</h3>
-        <form id="productForm">
-            <input type="hidden" id="productId" name="productId">
-            <div class="form-group">
-                <label for="productName">Название:</label>
-                <input type="text" id="productName" name="productName" required>
-            </div>
-            <div class="form-group">
-                <label for="productCost">Стоимость:</label>
-                <input type="number" id="productCost" name="productCost" required step="0.01">
-            </div>
-            <div class="form-group">
-                <label for="productType">Тип:</label>
-                <select id="productType" name="productType" required>
-                    <option value="Main">Основной</option>
-                    <option value="Extra">Доп. услуга</option>
-                    <option value="Other">Прочее</option>
-                </select>
-            </div>
-            <h4>Компоненты
-                <button type="button" id="addComponentBtn" class="btn btn-primary btn-add">+</button>
-            </h4>
-            <table id="componentsTable" class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Название компонента</th>
-                    <th>Количество</th>
-                    <th>Вес</th>
-                    <th class="btncol"></th>
-                </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <button type="submit" id="productModalSubmitButton" class="btn btn-primary">Сохранить</button>
-        </form>
-    </div>
-</div>
-
 <div id="shiftModal" class="modal" style="display: none;">
     <div class="modal-content" style="padding-bottom: 1rem;" >
         <span class="close">&times;</span>
         <div id="existingShifts">
-            <h2 id="shiftsHeader" class="form-group-inline">Смены
+            <h3 id="shiftsHeader" class="form-group-inline">Смены
                 <input type="date" id="shiftDate" style="margin: auto 3rem -0.2rem 19rem;" required>
-            </h2>
+            </h3>
             <table id="shiftsTable" class="table table-striped">
                 <thead>
                 <tr>
@@ -252,11 +217,90 @@
     </div>
 </div>
 
+<div id="expenseModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="expenseHeader">Добавить новый расход</h3>
+        <form id="expenseForm">
+            <input type="hidden" id="expenseId" name="expenseId">
+            <input type="hidden" id="expenseProjectId" name="expenseProjectId">
+            <div class="form-group">
+                <label for="expenseName">Статья:</label>
+                <input type="text" id="expenseName" name="expenseName" required>
+            </div>
+            <div class="form-group">
+                <label for="expenseAmount">Сумма:</label>
+                <input type="number" id="expenseAmount" name="expenseAmount" required step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label for="expenseIsPaidByCompany">Оплачено компанией:</label>
+                <input type="checkbox" id="expenseIsPaidByCompany" name="expenseIsPaidByCompany">
+            </div>
+            <div class="form-group">
+                <label for="expenseType">Тип:</label>
+                <select id="expenseType" name="expenseType" required>
+                    <option value="Travel">Транспорт</option>
+                    <option value="Wares">Товары</option>
+                    <option value="Other">Прочее</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="expenseDescription">Комментарий:</label>
+                <textarea id="expenseDescription" name="expenseDescription"></textarea>
+            </div>
+            <button type="submit" id="expenseModalSubmitButton" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="productModalTitle">Добавить новое изделие</h3>
+        <form id="productForm">
+            <input type="hidden" id="productId" name="productId">
+            <div class="form-group">
+                <label for="productName">Название:</label>
+                <input type="text" id="productName" name="productName" required>
+            </div>
+            <div class="form-group">
+                <label for="productCost">Стоимость:</label>
+                <input type="number" id="productCost" name="productCost" required step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="productType">Тип:</label>
+                <select id="productType" name="productType" required>
+                    <option value="Main">Основной</option>
+                    <option value="Extra">Доп. услуга</option>
+                    <option value="Other">Прочее</option>
+                </select>
+            </div>
+            <h4>Компоненты
+                <button type="button" id="addComponentBtn" class="btn btn-primary btn-add">+</button>
+            </h4>
+            <table id="componentsTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Название компонента</th>
+                    <th>Количество</th>
+                    <th>Вес</th>
+                    <th class="btncol"></th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="submit" id="productModalSubmitButton" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+
 <script src="/libs/jquery.js"></script>
 <script src="/libs/bootstrap.js"></script>
 <script src="/js/script.js"></script>
 <script src="/js/projects.js"></script>
 <script src="/js/products.js"></script>
 <script src="/js/shifts.js"></script>
+<script src="/js/expenses.js"></script>
 </body>
 </html>
