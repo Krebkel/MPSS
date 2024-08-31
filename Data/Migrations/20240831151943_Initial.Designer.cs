@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240828163953_Initial")]
+    [Migration("20240831151943_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -298,6 +298,9 @@ namespace Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Note")
                         .HasColumnType("text");
 
                     b.Property<string>("ProjectStatus")

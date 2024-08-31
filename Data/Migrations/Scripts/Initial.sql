@@ -61,6 +61,7 @@ CREATE TABLE mpss."Projects" (
                                  "CounteragentId" integer,
                                  "ResponsibleEmployeeId" integer NOT NULL,
                                  "ManagerShare" real NOT NULL,
+                                 "Note" text,
                                  "ProjectStatus" text NOT NULL,
                                  CONSTRAINT "PK_Projects" PRIMARY KEY ("Id"),
                                  CONSTRAINT "FK_Projects_Counteragents_CounteragentId" FOREIGN KEY ("CounteragentId") REFERENCES mpss."Counteragents" ("Id"),
@@ -142,6 +143,6 @@ CREATE INDEX "IX_Projects_ResponsibleEmployeeId" ON mpss."Projects" ("Responsibl
 CREATE INDEX "IX_ProjectSuspensions_ProjectId" ON mpss."ProjectSuspensions" ("ProjectId");
 
 INSERT INTO mpss."__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20240828163953_Initial', '8.0.7');
+VALUES ('20240831151943_Initial', '8.0.7');
 
 COMMIT;

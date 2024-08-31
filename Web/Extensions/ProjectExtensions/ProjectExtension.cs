@@ -16,6 +16,7 @@ public static class ProjectExtension
             Counteragent = request.Counteragent,
             ResponsibleEmployee = request.ResponsibleEmployee,
             ProjectStatus = request.ProjectStatus,
+            Note = request.Note,
             ManagerShare = request.ManagerShare
         };
     }
@@ -32,6 +33,7 @@ public static class ProjectExtension
             Counteragent = request.Counteragent,
             ResponsibleEmployee = request.ResponsibleEmployee,
             ProjectStatus = request.ProjectStatus,
+            Note = request.Note,
             ManagerShare = request.ManagerShare
         };
     }

@@ -135,7 +135,7 @@
             </div>
             <div class="form-group-inline">
                 <label for="projectManagerShare">З/п шефа, %:</label>
-                <input type="text" id="projectManagerShare" name="projectManagerShare" required step="0.01" min="0" max="100">
+                <input type="number" id="projectManagerShare" name="projectManagerShare" required step="0.01" min="0" max="100">
             </div>
             <div class="form-group-inline">
                 <label for="projectStatus">Статус:</label>
@@ -145,6 +145,8 @@
                     <option value="Done">Завершен</option>
                     <option value="Paid">Оплачен</option>
                 </select>
+                <label for="projectNote">Примечание:</label>
+                <input type="text" id="projectNote" name="projectNote">
             </div>
             <h4>Изделия
                 <button type="button" id="addProjectProductBtn" class="btn btn-primary btn-add">+</button>

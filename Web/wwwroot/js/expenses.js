@@ -36,9 +36,9 @@ let ExpenseManagement = (function () {
                             <th class="expense-header shortcol">№</th>
                             <th class="expense-header">Наименование</th>
                             <th class="expense-header midcol">Сумма</th>
-                            <th class="expense-header shortcol">Оплачено</th>
-                            <th class="expense-header">Комментарий</th>
                             <th class="expense-header shortcol">Тип</th>
+                            <th class="expense-header">Комментарий</th>
+                            <th class="expense-header shortcol">Оплачено</th>
                             <th class="btncol"></th>
                         </tr>
                     </tbody>
@@ -85,9 +85,9 @@ let ExpenseManagement = (function () {
                     <td class="expense-data">${index + 1}</td>
                     <td class="expense-data">${expense.name}</td>
                     <td class="expense-data">${expense.amount}</td>
-                    <td class="expense-data">${expense.isPaidByCompany ? 'Да' : 'Нет'}</td>
-                    <td class="expense-data">${expense.description || ''}</td>
                     <td class="expense-data">${translateExpenseType(expense.type)}</td>
+                    <td class="expense-data">${expense.description || ''}</td>
+                    <td class="expense-data">${expense.isPaidByCompany ? 'Да' : 'Нет'}</td>
                     <td class="btncol expensebtns">
                         <button class="btn delete-btn" data-expense-id="${expense.id}">⛌</button>
                     </td>
