@@ -172,8 +172,8 @@ let ShiftManagement = (function () {
                 event.stopPropagation();
                 const shiftId = $(this).data('shift-id');
                 module.deleteEmployeeShift(shiftId);
-                module.updateAllShiftCounts();
-                $(this).closest('tr').remove();
+                ProjectManagement.updateAllShiftCounts();
+                $(this).closest('td').remove();
             });
 
             $('#shiftDate').change(function () {
@@ -218,7 +218,7 @@ let ShiftManagement = (function () {
                         $('#shiftForm')[0].reset();
                         module.loadExistingShifts(currentProjectId, new Date($('#shiftDate').val()));
 
-                        module.updateShiftCount(currentProjectId, $('#shiftDate').val());
+                        ProjectManagement.updateShiftCount(currentProjectId, $('#shiftDate').val());
 
                         alert(shiftId ? 'Смена успешно обновлена' : 'Смена успешно добавлена');
                     },

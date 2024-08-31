@@ -107,14 +107,16 @@ let ProjectManagement = (function () {
             method: 'GET',
             data: {
                 projectIds: projectIds.join(','),
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString()
+                startDate: new Date(startDate.setHours(0,0,0,0)).toISOString(),
+                endDate: new Date(endDate.setHours(0,0,0,0)).toISOString()
             },
             success: function (allShifts) {
-                module.updateAllShiftCounts(allShifts);
+                if (allShifts.length > 0) {
+                    module.updateAllShiftCounts(allShifts);
+                }
             },
             error: function () {
-                console.error('Error loading shifts');
+                alert('Ошибка прогрузки смен');
             }
         });
     };
@@ -145,7 +147,7 @@ let ProjectManagement = (function () {
                 $(`.gantt-cell[data-project-id="${projectId}"][data-date="${date}"] .shift-count`).text(shiftCount > 0 ? shiftCount : '');
             },
             error: function () {
-                console.error('Error loading shifts for count update');
+                alert('Ошибка прогрузки смен для обновления диаграммы Ганта');
             }
         });
     };
