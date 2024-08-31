@@ -113,20 +113,37 @@ public class ExpenseService : IExpenseService
     public async Task<IEnumerable<object>> GetExpensesByProjectIdAsync(
         int projectId, CancellationToken cancellationToken)
     {
-        return await _expenseRepository
-            .GetAll()
-            .Include(e => e.Project)
-            .Where(e => e.Project.Id == projectId)
-            .Select(e => new
+        try {
+            var projectExists = await _projectRepository.GetAll()
+                .AnyAsync(p => p.Id == projectId, cancellationToken);
+
+            if (!projectExists)
             {
-                Id = e.Id,
-                Project = e.Project.Id,
-                Name = e.Name,
-                Amount = e.Amount,
-                Description = e.Description,
-                Type = e.Type,
-                IsPaidByCompany = e.IsPaidByCompany
-            })
-            .ToListAsync(cancellationToken);
+                _logger.LogWarning("Проект с ID {ProjectId} не найден", projectId);
+                throw new KeyNotFoundException($"Проект с ID {projectId} не найден");
+            }
+            
+            return await _expenseRepository
+                .GetAll()
+                .Include(e => e.Project)
+                .Where(e => e.Project.Id == projectId)
+                .Select(e => new
+                {
+                    Id = e.Id,
+                    Project = e.Project.Id,
+                    Name = e.Name,
+                    Amount = e.Amount,
+                    Description = e.Description,
+                    Type = e.Type,
+                    IsPaidByCompany = e.IsPaidByCompany
+                })
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении расходов для проекта с ID {ProjectId}",
+                projectId);
+            throw;
+        }
     }
 }

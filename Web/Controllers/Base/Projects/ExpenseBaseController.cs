@@ -121,7 +121,7 @@ public class ExpenseBaseController : ControllerBase
     }
     
     [HttpGet("byProject/{projectId}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Expense>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetExpensesByProjectId(int projectId, CancellationToken ct)
     {
@@ -129,11 +129,6 @@ public class ExpenseBaseController : ControllerBase
         {
             var expenses = 
                 await _expenseService.GetExpensesByProjectIdAsync(projectId, ct);
-            if (!expenses.Any())
-            {
-                _logger.LogWarning("Проекта с ID {ProjectId} не найдено или нет статей расхода", projectId);
-                return NotFound($"Проекта с ID {projectId} не найдено или нет статей расхода");
-            }
 
             return Ok(expenses);
         }

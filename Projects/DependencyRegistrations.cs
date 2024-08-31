@@ -9,6 +9,7 @@ public static class DependencyRegistrations
     {
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<ICounteragentService, CounteragentService>();
+        services.AddScoped<IExpenseService, ExpenseService>();
 
         return services;
     }

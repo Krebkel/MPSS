@@ -61,6 +61,14 @@ function translateStatus(status) {
     return statuses[status] || 'Неизвестный статус';
 }
 
+function translateExpenseType(status) {
+    const statuses = {
+        'Travel': 'Транспорт',
+        'Wares': 'Товары',
+        'Other': 'Прочее',
+    };
+    return statuses[status] || 'Неизвестный статус';
+}
 
 $(document).ready(function() {
     const contentSections = $('.content-section');
