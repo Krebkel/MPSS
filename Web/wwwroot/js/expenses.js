@@ -25,21 +25,21 @@ let ExpenseManagement = (function () {
                         <tr class="project-header">
                             <th class="shortcol">${index + 1}</th>
                             <th colspan="4">${project.name}</th>
-                            <th class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</th>
+                            <th class="shortcol">${formatDateForOutput(new Date(project.deadlineDate))}</th>
                             <th class="btncol">
-                                <button class="btn btn-primary btn-add addExpenseBtn" data-project-id="${project.id}">+</button>
+                                <button class="btn btn-add addExpenseBtn" data-project-id="${project.id}">+</button>
                             </th>
                         </tr>
                     </thead>
-                    <tbody style="display: none;">
+                    <tbody  style="display: none;">
                         <tr>
-                            <th>№</th>
-                            <th>Статья</th>
-                            <th>Сумма</th>
-                            <th>Оплачено</th>
-                            <th>Комментарий</th>
-                            <th>Тип</th>
-                            <th></th>
+                            <th class="expense-header shortcol">№</th>
+                            <th class="expense-header">Наименование</th>
+                            <th class="expense-header midcol">Сумма</th>
+                            <th class="expense-header shortcol">Оплачено</th>
+                            <th class="expense-header">Комментарий</th>
+                            <th class="expense-header shortcol">Тип</th>
+                            <th class="btncol"></th>
                         </tr>
                     </tbody>
                 </table>
@@ -82,13 +82,13 @@ let ExpenseManagement = (function () {
         expenses.forEach((expense, index) => {
             const expenseRow = $(`
                 <tr data-expense-id="${expense.id}">
-                    <td>${index + 1}</td>
-                    <td>${expense.name}</td>
-                    <td>${expense.amount}</td>
-                    <td>${expense.isPaidByCompany ? 'Да' : 'Нет'}</td>
-                    <td>${expense.description || ''}</td>
-                    <td>${translateExpenseType(expense.type)}</td>
-                    <td class="btncol">
+                    <td class="expense-data">${index + 1}</td>
+                    <td class="expense-data">${expense.name}</td>
+                    <td class="expense-data">${expense.amount}</td>
+                    <td class="expense-data">${expense.isPaidByCompany ? 'Да' : 'Нет'}</td>
+                    <td class="expense-data">${expense.description || ''}</td>
+                    <td class="expense-data">${translateExpenseType(expense.type)}</td>
+                    <td class="btncol expensebtns">
                         <button class="btn delete-btn" data-expense-id="${expense.id}">⛌</button>
                     </td>
                 </tr>

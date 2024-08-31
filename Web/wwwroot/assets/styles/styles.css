@@ -140,7 +140,16 @@ th {
 
 tr:nth-child(even) { background-color: #f9f9f9; }
 
-.btncol { width: 2rem; border-style: none; background-color: transparent}
+.expense-header {
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.expense-data {
+    font-size: 0.85rem;
+}
+
+.btncol { width: 2rem; border-style: none; background-color: transparent;}
 .shortcol { width: 2rem; white-space: nowrap;}
 .midcol { width: 10rem; white-space: nowrap;}
 .longcol { width: 20rem; white-space: nowrap;}
