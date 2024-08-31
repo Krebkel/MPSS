@@ -21,6 +21,7 @@ internal class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .WithMany()
             .IsRequired();        
         builder.Property(p => p.ManagerShare).IsRequired();
+        builder.Property(p => p.Note).IsRequired(false);
         builder.Property(p => p.ProjectStatus)
             .IsRequired()
             .HasConversion(

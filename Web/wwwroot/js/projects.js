@@ -101,24 +101,26 @@ let ProjectManagement = (function () {
     };
 
     module.loadAllShifts = function (projects, startDate, endDate) {
-        const projectIds = projects.map(project => project.id);
-        $.ajax({
-            url: '/api/employeeShifts/base/byProjects',
-            method: 'GET',
-            data: {
-                projectIds: projectIds.join(','),
-                startDate: new Date(startDate.setHours(0,0,0,0)).toISOString(),
-                endDate: new Date(endDate.setHours(0,0,0,0)).toISOString()
-            },
-            success: function (allShifts) {
-                if (allShifts.length > 0) {
-                    module.updateAllShiftCounts(allShifts);
+        if (projects) {
+            const projectIds = projects.map(project => project.id);
+            $.ajax({
+                url: '/api/employeeShifts/base/byProjects',
+                method: 'GET',
+                data: {
+                    projectIds: projectIds.join(','),
+                    startDate: new Date(startDate.setHours(0, 0, 0, 0)).toISOString(),
+                    endDate: new Date(endDate.setHours(0, 0, 0, 0)).toISOString()
+                },
+                success: function (allShifts) {
+                    if (allShifts.length > 0) {
+                        module.updateAllShiftCounts(allShifts);
+                    }
+                },
+                error: function () {
+                    alert('Ошибка прогрузки смен');
                 }
-            },
-            error: function () {
-                alert('Ошибка прогрузки смен');
-            }
-        });
+            });
+        }
     };
 
     module.updateAllShiftCounts = function (allShifts) {
@@ -289,6 +291,7 @@ let ProjectManagement = (function () {
                 $('#projectDeadline').val(toUTC(new Date(projectData.deadlineDate)).toISOString().split('T')[0]);
                 $('#projectCounteragent').val(projectData.counteragent);
                 $('#projectResponsibleEmployee').val(projectData.responsibleEmployee);
+                $('#projectNote').val(projectData.note);
                 $('#projectManagerShare').val(projectData.managerShare);
                 $('#projectStatus').val(projectData.projectStatus);
 
@@ -454,6 +457,7 @@ let ProjectManagement = (function () {
             deadlineDate: $('#projectDeadline').val(),
             counteragent: $('#projectCounteragent').val() || null,
             responsibleEmployee: $('#projectResponsibleEmployee').val(),
+            note: $('#projectNote').val(),
             managerShare: $('#projectManagerShare').val(),
             projectStatus: $('#projectStatus').val(),
         };
@@ -502,6 +506,7 @@ let ProjectManagement = (function () {
                 $('#projectId').val('');
                 $('#projectStartDate').val(new Date().toISOString().split('T')[0]);
                 $('#projectDeadline').val(new Date().toISOString().split('T')[0]);
+                $('#projectNote').val('');
                 module.openProjectModal();
             });
 

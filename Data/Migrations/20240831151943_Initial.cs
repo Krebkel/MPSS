@@ -86,6 +86,7 @@ namespace Data.Migrations
                     CounteragentId = table.Column<int>(type: "integer", nullable: true),
                     ResponsibleEmployeeId = table.Column<int>(type: "integer", nullable: false),
                     ManagerShare = table.Column<float>(type: "real", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true),
                     ProjectStatus = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>

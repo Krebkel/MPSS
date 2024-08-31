@@ -42,6 +42,11 @@ public class Project : DatabaseEntity
     /// Процент, который получает руководитель от прибыли
     /// </summary>
     public float ManagerShare { get; set; }
+    
+    /// <summary>
+    /// Примечание
+    /// </summary>
+    public string? Note { get; set; }
 
     /// <summary>
     /// Статус проекта

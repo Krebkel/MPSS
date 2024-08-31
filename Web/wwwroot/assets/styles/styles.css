@@ -268,3 +268,5 @@ input[type="number"], input[type="time"], select {
 #projectStartDate {margin-left: 2.5rem;}
 #employeeDateOfBirth {margin-left: 1rem;}
 input[type="checkbox"]{margin-left: -6rem;}
+#projectNote {padding-right: 0rem;}
+#projectStatus {margin-left: 5.2rem}

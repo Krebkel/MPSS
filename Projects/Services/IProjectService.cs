@@ -28,6 +28,7 @@ public class UpdateProjectRequest
     public required DateTimeOffset StartDate { get; set; }
     public int? Counteragent { get; set; }
     public required int ResponsibleEmployee { get; set; }
+    public string? Note { get; set; }
     public required ProjectStatus ProjectStatus { get; set; }
     public required float ManagerShare { get; set; }
 }
@@ -40,6 +41,7 @@ public class CreateProjectRequest
     public required DateTimeOffset StartDate { get; set; }
     public int? Counteragent { get; set; }
     public required int ResponsibleEmployee { get; set; }
+    public string? Note { get; set; }
     public required ProjectStatus ProjectStatus { get; set; }
     public required float ManagerShare { get; set; }
 }
