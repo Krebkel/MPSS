@@ -14,7 +14,6 @@ $(document).ready(function() {
         }
     });
 
-    // Маска для ввода ИНН
     $('#employeeINN').mask('999999999999', {
         clearIfNotMatch: true,
         onComplete: function(value) {
@@ -22,7 +21,6 @@ $(document).ready(function() {
         }
     });
 
-    // Маска для ввода номера счета
     $('#employeeAccountNumber').mask('99999999999999999999', {
         clearIfNotMatch: true,
         onComplete: function(value) {
@@ -30,7 +28,6 @@ $(document).ready(function() {
         }
     });
 
-    // Маска для ввода БИК
     $('#employeeBIK').mask('999999999', {
         clearIfNotMatch: true,
         onComplete: function(value) {

@@ -67,9 +67,7 @@ let ShiftManagement = (function () {
         $.ajax({
             url: `/api/employeeShifts/base/${employeeShiftId}`,
             method: 'DELETE',
-            success: function () {
-                alert('Смена успешно удалена из проекта');
-            },
+            success: function () {},
             error: function () {
                 alert('Ошибка при удалении смены из проекта');
             }
@@ -219,9 +217,7 @@ let ShiftManagement = (function () {
                         module.loadExistingShifts(currentProjectId, new Date($('#shiftDate').val()));
 
                         ProjectManagement.updateShiftCount(currentProjectId, $('#shiftDate').val());
-
-                        alert(shiftId ? 'Смена успешно обновлена' : 'Смена успешно добавлена');
-                    },
+                        },
                     error: function () {
                         alert('Ошибка при сохранении смены');
                     }

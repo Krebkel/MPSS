@@ -107,8 +107,7 @@ public class ProjectProductService : IProjectProductService
             })
             .FirstOrDefaultAsync(pp => pp.Id == id, cancellationToken);
     }
-
-
+    
     public async Task<bool> DeleteProjectProductAsync(int id, CancellationToken cancellationToken)
     {
         var projectProduct = await _projectProductRepository

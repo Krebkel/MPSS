@@ -6,6 +6,9 @@ using Microsoft.Extensions.Options;
 
 namespace Tests.Projects;
 
+/// <summary>
+/// Набор тестов для класса <see cref="ProjectRepository"/>. НЕ АКТУАЛЕН
+/// </summary>
 [TestFixture]
 public class ProjectTests
 {

@@ -94,6 +94,4 @@ $(document).ready(function() {
             $(event.target).fadeOut();
         }
     });
-    
-    ExpenseManagement.l
 });

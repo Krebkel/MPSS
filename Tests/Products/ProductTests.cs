@@ -5,6 +5,9 @@ using Microsoft.Extensions.Options;
 
 namespace Tests.Products;
 
+/// <summary>
+/// Набор тестов для класса <see cref="ProductRepository"/>. НЕ АКТУАЛЕН
+/// </summary>
 [TestFixture]
 public class ProductTests
 {
