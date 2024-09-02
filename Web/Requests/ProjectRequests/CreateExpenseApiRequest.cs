@@ -1,4 +1,5 @@
 using Contracts;
+using Contracts.EmployeeEntities;
 
 namespace Web.Requests.ProjectRequests;
 
@@ -9,5 +10,6 @@ public class CreateExpenseApiRequest
     public required double Amount { get; set; }
     public string? Description { get; set; }
     public required ExpenseType Type { get; set; }
+    public int? Employee { get; set; }
     public required bool IsPaidByCompany { get; set; }
 }

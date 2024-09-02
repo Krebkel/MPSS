@@ -65,6 +65,7 @@ function translateExpenseType(status) {
     const statuses = {
         'Travel': 'Транспорт',
         'Wares': 'Товары',
+        'Personal': 'Личные',
         'Other': 'Прочее',
     };
     return statuses[status] || 'Неизвестный статус';

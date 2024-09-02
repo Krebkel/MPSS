@@ -100,8 +100,10 @@ CREATE TABLE mpss."Expenses" (
                                  "Amount" numeric(18,2),
                                  "Description" character varying(500),
                                  "Type" text NOT NULL,
+                                 "EmployeeId" integer,
                                  "IsPaidByCompany" boolean NOT NULL,
                                  CONSTRAINT "PK_Expenses" PRIMARY KEY ("Id"),
+                                 CONSTRAINT "FK_Expenses_Employees_EmployeeId" FOREIGN KEY ("EmployeeId") REFERENCES mpss."Employees" ("Id"),
                                  CONSTRAINT "FK_Expenses_Projects_ProjectId" FOREIGN KEY ("ProjectId") REFERENCES mpss."Projects" ("Id") ON DELETE CASCADE
 );
 
@@ -128,6 +130,8 @@ CREATE INDEX "IX_EmployeeShifts_EmployeeId" ON mpss."EmployeeShifts" ("EmployeeI
 
 CREATE INDEX "IX_EmployeeShifts_ProjectId" ON mpss."EmployeeShifts" ("ProjectId");
 
+CREATE INDEX "IX_Expenses_EmployeeId" ON mpss."Expenses" ("EmployeeId");
+
 CREATE INDEX "IX_Expenses_ProjectId" ON mpss."Expenses" ("ProjectId");
 
 CREATE INDEX "IX_ProductComponents_ProductId" ON mpss."ProductComponents" ("ProductId");
@@ -143,6 +147,6 @@ CREATE INDEX "IX_Projects_ResponsibleEmployeeId" ON mpss."Projects" ("Responsibl
 CREATE INDEX "IX_ProjectSuspensions_ProjectId" ON mpss."ProjectSuspensions" ("ProjectId");
 
 INSERT INTO mpss."__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20240831151943_Initial', '8.0.7');
+VALUES ('20240902083531_Initial', '8.0.7');
 
 COMMIT;

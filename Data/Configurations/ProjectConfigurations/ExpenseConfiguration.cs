@@ -21,5 +21,9 @@ internal class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
                 et => et.ToString(),
                 s => (ExpenseType)Enum.Parse(typeof(ExpenseType), s)
             );
+        builder.Property(e => e.IsPaidByCompany).IsRequired();
+        builder.HasOne(e => e.Employee)
+            .WithMany()
+            .IsRequired(false);
     }
 }
