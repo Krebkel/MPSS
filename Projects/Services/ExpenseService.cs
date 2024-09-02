@@ -75,9 +75,13 @@ public class ExpenseService : IExpenseService
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        var expense = await _expenseValidator.ValidateAndGetEntityAsync(
-            request.Id, _expenseRepository, "Расход", cancellationToken);
-
+        var expense = await _expenseRepository
+            .GetAll()
+            .Include(e => e.Employee)
+            .Include(e => e.Project)
+            .Where(e => e.Id == request.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        
         var project = await _projectValidator.ValidateAndGetEntityAsync(
             request.Project, _projectRepository, "Проект", cancellationToken);
 
@@ -87,7 +91,7 @@ public class ExpenseService : IExpenseService
             employee = await _employeeValidator.ValidateAndGetEntityAsync(
                 request.Employee.Value,
                 _employeeRepository,
-                "Контрагент",
+                "Сотрудник",
                 cancellationToken);
         }
 
