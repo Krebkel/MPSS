@@ -81,7 +81,6 @@ $(document).ready(function() {
                 url: `/api/employees/base/${employeeId}`,
                 method: 'DELETE',
                 success: function() {
-                    alert('Сотрудник успешно удалён');
                     loadEmployees(false, 'employeesTable');
                     loadEmployees(true, 'dataTable');
                 },
@@ -158,7 +157,6 @@ $(document).ready(function() {
                 $('#employeeModal').hide();
                 loadEmployees(false, 'employeesTable');
                 loadEmployees(true, 'dataTable');
-                alert(employeeId ? 'Сотрудник успешно обновлен' : 'Новый сотрудник успешно добавлен');
             },
             error: function (xhr) {
                 const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при сохранении данных сотрудника';

@@ -102,23 +102,26 @@ let ProjectManagement = (function () {
     module.loadAllShifts = function (projects, startDate, endDate) {
         if (projects) {
             const projectIds = projects.map(project => project.id);
-            $.ajax({
-                url: '/api/employeeShifts/base/byProjects',
-                method: 'GET',
-                data: {
-                    projectIds: projectIds.join(','),
-                    startDate: new Date(startDate.setHours(0, 0, 0, 0)).toISOString(),
-                    endDate: new Date(endDate.setHours(0, 0, 0, 0)).toISOString()
-                },
-                success: function (allShifts) {
-                    if (allShifts.length > 0) {
-                        module.updateAllShiftCounts(allShifts);
+            if (projectIds.length > 0) 
+            {
+                $.ajax({
+                    url: '/api/employeeShifts/base/byProjects',
+                    method: 'GET',
+                    data: {
+                        projectIds: projectIds.join(','),
+                        startDate: new Date(startDate.setHours(0, 0, 0, 0)).toISOString(),
+                        endDate: new Date(endDate.setHours(0, 0, 0, 0)).toISOString()
+                    },
+                    success: function (allShifts) {
+                        if (allShifts.length > 0) {
+                            module.updateAllShiftCounts(allShifts);
+                        }
+                    },
+                    error: function () {
+                        alert('Ошибка прогрузки смен');
                     }
-                },
-                error: function () {
-                    alert('Ошибка прогрузки смен');
-                }
-            });
+                });
+            }
         }
     };
 

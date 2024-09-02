@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Contracts.ProductEntities;
 using Contracts.ProjectEntities;
-using Data;
 using DataContracts;
 using Microsoft.EntityFrameworkCore;
 

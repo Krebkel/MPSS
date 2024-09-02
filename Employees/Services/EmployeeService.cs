@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Contracts.EmployeeEntities;
-using Data;
 using DataContracts;
 using Microsoft.EntityFrameworkCore;
 

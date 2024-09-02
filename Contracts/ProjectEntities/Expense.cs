@@ -34,7 +34,7 @@ public class Expense : DatabaseEntity
     public ExpenseType Type { get; set; }
     
     /// <summary>
-    /// Сотрудник, если личный расход
+    /// Сотрудник
     /// </summary>
     public Employee? Employee { get; set; }
     

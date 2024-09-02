@@ -47,7 +47,6 @@ $(document).ready(function() {
                 url: `/api/products/base/${productId}`,
                 method: 'DELETE',
                 success: function() {
-                    alert('Изделие успешно удалено');
                     loadProducts();
                 },
                 error: function(xhr) {
@@ -200,7 +199,6 @@ $(document).ready(function() {
             .then(() => {
                 $('#productModal').hide();
                 loadProducts();
-                alert('Изделие и компоненты успешно сохранены');
             })
             .catch(error => {
                 console.error('Error:', error);

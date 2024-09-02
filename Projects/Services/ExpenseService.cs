@@ -77,15 +77,15 @@ public class ExpenseService : IExpenseService
 
         var expense = await _expenseValidator.ValidateAndGetEntityAsync(
             request.Id, _expenseRepository, "Расход", cancellationToken);
-        
+
         var project = await _projectValidator.ValidateAndGetEntityAsync(
             request.Project, _projectRepository, "Проект", cancellationToken);
-        
+
         Employee? employee = null;
         if (request.Employee.HasValue)
         {
             employee = await _employeeValidator.ValidateAndGetEntityAsync(
-                request.Employee,
+                request.Employee.Value,
                 _employeeRepository,
                 "Контрагент",
                 cancellationToken);
@@ -96,15 +96,15 @@ public class ExpenseService : IExpenseService
         expense.Amount = request.Amount;
         expense.Description = request.Description;
         expense.Type = request.Type;
-        expense.Employee = employee;
+        expense.Employee = employee;  
         expense.IsPaidByCompany = request.IsPaidByCompany;
-
+        
         await _expenseRepository.UpdateAsync(expense, cancellationToken);
         _logger.LogInformation("Расход успешно обновлен: {@Expense}", expense);
 
         return expense;
     }
-    
+
     public async Task<object?> GetExpenseByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _expenseRepository

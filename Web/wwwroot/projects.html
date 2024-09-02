@@ -226,25 +226,29 @@
         <form id="expenseForm">
             <input type="hidden" id="expenseId" name="expenseId">
             <input type="hidden" id="expenseProjectId" name="expenseProjectId">
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="expenseName">Статья:</label>
                 <input type="text" id="expenseName" name="expenseName" required>
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="expenseAmount">Сумма:</label>
                 <input type="number" id="expenseAmount" name="expenseAmount" required step="0.01" min="0">
-            </div>
-            <div class="form-group">
-                <label for="expenseIsPaidByCompany">Оплачено компанией:</label>
+           
+                <label for="expenseIsPaidByCompany">Компенсация:</label>
                 <input type="checkbox" id="expenseIsPaidByCompany" name="expenseIsPaidByCompany">
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="expenseType">Тип:</label>
                 <select id="expenseType" name="expenseType" required>
                     <option value="Travel">Транспорт</option>
                     <option value="Wares">Товары</option>
                     <option value="Other">Прочее</option>
                 </select>
+                
+                <label for="expenseEmployee">Оплатил:</label>
+                <select id="expenseEmployee" name="expenseEmployee">
+                    <option value="">Выберите сотрудника</option>
+                </select>            
             </div>
             <div class="form-group">
                 <label for="expenseDescription">Комментарий:</label>

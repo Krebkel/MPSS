@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace DataContracts;
 
 public interface IRepository<TEntity> where TEntity : DatabaseEntity
