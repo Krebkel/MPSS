@@ -82,6 +82,7 @@ let ShiftManagement = (function () {
                 const shiftDate = new Date(shift.date);
 
                 $('#addShiftForm').show();
+                $('#expenseHeader').text('Редактировать смену');
                 $('#employeeSelect').val(shift.employee);
                 $('#shiftDate').val(formatDateForInput(shiftDate));
                 $('#hoursWorked').val(shift.hoursWorked);

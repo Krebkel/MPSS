@@ -230,9 +230,11 @@ public class ProjectService : IProjectService
         double managerShare = totalMarkup * project.ManagerShare / 100;
         double remainingAmount = totalMarkup - managerShare;
 
-        // Вычет неоплаченных расходов
-        double unpaidExpenses = expenses.Where(e => !e.IsPaidByCompany).Sum(e => e.Amount ?? 0);
-        remainingAmount -= unpaidExpenses;
+        // Вычет неоплаченных расходов без сотрудника
+        double unpaidExpensesWithoutEmployee = expenses
+            .Where(e => !e.IsPaidByCompany && e.Employee == null)
+            .Sum(e => e.Amount ?? 0);
+        remainingAmount -= unpaidExpensesWithoutEmployee;
 
         // Расчет базовой ставки и общего количества часов
         const double baseHourlyRate = 300;
@@ -269,6 +271,11 @@ public class ProjectService : IProjectService
             double baseWage = ed.TotalHours * adjustedHourlyRate;
             double bonus = totalISN > 0 ? (remainingAmount * ed.TotalISN / totalISN) : 0;
             
+            // Расчет компенсации для сотрудника
+            double compensation = expenses
+                .Where(e => e.IsPaidByCompany && e.Employee?.Id == ed.Employee.Id)
+                .Sum(e => e.Amount ?? 0);
+            
             return new
             {
                 EmployeeName = ed.Employee.Name,
@@ -276,6 +283,7 @@ public class ProjectService : IProjectService
                 TotalISN = ed.TotalISN,
                 BaseWage = baseWage,
                 Bonus = bonus,
+                Compensation = compensation,
                 TotalWage = baseWage + bonus
             };
         }).ToList();
