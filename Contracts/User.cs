@@ -17,4 +17,9 @@ public class User : DatabaseEntity
     /// Пароль TODO на хеш
     /// </summary>
     public required string Password { get; set; }
+    
+    /// <summary>
+    /// Роль пользователя
+    /// </summary>
+    public required UserRole Role { get; set; }
 }

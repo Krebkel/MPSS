@@ -1,5 +1,6 @@
 using Contracts.EmployeeEntities;
 using Employees.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ namespace Web.Controllers.Base.Employees;
 
 [ApiController]
 [Route("api/employees/base")]
+[Authorize]
 public class EmployeeBaseController : ControllerBase
 {
     private readonly ILogger<EmployeeBaseController> _logger;
@@ -23,6 +25,7 @@ public class EmployeeBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Employee))]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddEmployee([FromBody] CreateEmployeeApiRequest request, CancellationToken ct)
     {
         try
@@ -44,6 +47,7 @@ public class EmployeeBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Employee))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateEmployee([FromBody] UpdateEmployeeApiRequest request, CancellationToken ct)
     {
         try
@@ -63,6 +67,7 @@ public class EmployeeBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Employee))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator,Trusted")]
     public async Task<IActionResult> GetEmployee(int id, CancellationToken ct)
     {
         try
@@ -86,6 +91,7 @@ public class EmployeeBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteEmployee(int id, CancellationToken ct)
     {
         try
@@ -109,6 +115,7 @@ public class EmployeeBaseController : ControllerBase
     
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Employee>))]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetAllEmployees(CancellationToken ct)
     {
         try

@@ -1,4 +1,5 @@
 using Contracts.ProductEntities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ namespace Web.Controllers.Base.Products;
 
 [ApiController]
 [Route("api/productComponents/base")]
+[Authorize]
 public class ProductComponentBaseController : ControllerBase
 {
     private readonly ILogger<ProductComponentBaseController> _logger;
@@ -24,6 +26,7 @@ public class ProductComponentBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductComponent>))]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddProductComponents(
         [FromBody] IEnumerable<CreateProductComponentApiRequest> requests, CancellationToken ct)
     {
@@ -54,6 +57,7 @@ public class ProductComponentBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductComponent))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateProductComponents(
         [FromBody] UpdateProductComponentApiRequest request, CancellationToken ct)
     {
@@ -77,6 +81,7 @@ public class ProductComponentBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProductComponent(int id, CancellationToken ct)
     {
         try
@@ -100,6 +105,7 @@ public class ProductComponentBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteProductComponent(int id, CancellationToken ct)
     {
         try
@@ -124,6 +130,7 @@ public class ProductComponentBaseController : ControllerBase
     [HttpGet("byProduct/{productId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductComponent>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProductComponentsByProductId(int productId, CancellationToken ct)
     {
         try

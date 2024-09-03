@@ -13,5 +13,11 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(es => es.Employee)
             .WithMany()
             .IsRequired();
+        builder.Property(u => u.Role)
+            .IsRequired()
+            .HasConversion(
+                ur => ur.ToString(),
+                s => (UserRole)Enum.Parse(typeof(UserRole), s)
+            );
     }
 }

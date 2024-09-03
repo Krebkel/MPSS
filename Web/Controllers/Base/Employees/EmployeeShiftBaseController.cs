@@ -1,5 +1,6 @@
 using Contracts.EmployeeEntities;
 using Employees.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace Web.Controllers.Base.Employees;
 
 [ApiController]
 [Route("api/employeeShifts/base")]
+[Authorize]
 public class EmployeeShiftBaseController : ControllerBase
 {
     private readonly ILogger<EmployeeShiftBaseController> _logger;
@@ -25,6 +27,7 @@ public class EmployeeShiftBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeShift))]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddEmployeeShift(
         [FromBody] CreateEmployeeShiftApiRequest request, CancellationToken ct)
     {
@@ -48,6 +51,7 @@ public class EmployeeShiftBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeShift))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateEmployeeShift(
         [FromBody] UpdateEmployeeShiftApiRequest request, CancellationToken ct)
     {
@@ -72,6 +76,7 @@ public class EmployeeShiftBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeShift))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetEmployeeShift(int id, CancellationToken ct)
     {
         try
@@ -96,6 +101,7 @@ public class EmployeeShiftBaseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteEmployeeShift(int id, CancellationToken ct)
     {
         try
@@ -125,6 +131,7 @@ public class EmployeeShiftBaseController : ControllerBase
     [HttpGet("byProject/{projectId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetEmployeeShiftsByProjectId(int projectId, CancellationToken ct)
     {
         try

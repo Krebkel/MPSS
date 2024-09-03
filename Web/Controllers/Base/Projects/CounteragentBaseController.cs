@@ -1,4 +1,5 @@
 using Contracts.ProjectEntities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace Web.Controllers.Base.Projects;
 
 [ApiController]
 [Route("api/counteragents/base")]
+[Authorize]
 public class CounteragentBaseController : ControllerBase
 {
     private readonly ILogger<CounteragentBaseController> _logger;
@@ -26,6 +28,7 @@ public class CounteragentBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Counteragent))]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddCounteragent(
         [FromBody] CreateCounteragentApiRequest request, CancellationToken ct)
     {
@@ -48,6 +51,7 @@ public class CounteragentBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Counteragent))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateCounteragent(
         [FromBody] UpdateCounteragentApiRequest request, CancellationToken ct)
     {
@@ -71,6 +75,7 @@ public class CounteragentBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Counteragent))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetCounteragent(int id, CancellationToken ct)
     {
         try
@@ -95,6 +100,7 @@ public class CounteragentBaseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteCounteragent(int id, CancellationToken ct)
     {
         try
@@ -123,6 +129,7 @@ public class CounteragentBaseController : ControllerBase
     
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Counteragent>))]
+    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetAllCounteragents(CancellationToken ct)
     {
         try

@@ -13,6 +13,7 @@ using Products;
 using Projects;
 using Data;
 using Employees;
+using Web.Extensions;
 using Web.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -122,5 +123,7 @@ app.UseDefaultFiles()
            };
        }
    }); 
+
+app.UseAuthorizationErrorHandling();
 
 app.Run();

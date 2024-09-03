@@ -16,7 +16,6 @@ namespace Web.Controllers.Tokens;
 public class TokenController : ControllerBase
 {
     private readonly IUserService _users;
-    
     private readonly JwtTokenOptions _options;
 
     public TokenController(IOptions<JwtTokenOptions> options, IUserService users)
@@ -29,7 +28,6 @@ public class TokenController : ControllerBase
     public async Task<IActionResult> Post(UserCredentialsRequest request, CancellationToken ct)
     {
         var user = await _users.FindUser(request.Phone, ct);
-
         if (user == null) return BadRequest("Пользователь не найден");
         if (user.Password != request.Password) return BadRequest("Неправильный пароль");
         
@@ -39,7 +37,8 @@ public class TokenController : ControllerBase
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
             new Claim("DisplayName", $"{user.Employee.Name}"),
-            new Claim("Phone", user.Employee.Phone)
+            new Claim("Phone", user.Employee.Phone),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
