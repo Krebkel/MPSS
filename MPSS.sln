@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataContracts", "DataContracts\DataContracts.csproj", "{D3D7A28B-EF3F-4B76-832E-8E76F5082940}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Users", "Users\Users.csproj", "{20529058-B3F8-458B-B1A8-37233935405E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{D3D7A28B-EF3F-4B76-832E-8E76F5082940}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3D7A28B-EF3F-4B76-832E-8E76F5082940}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3D7A28B-EF3F-4B76-832E-8E76F5082940}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20529058-B3F8-458B-B1A8-37233935405E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20529058-B3F8-458B-B1A8-37233935405E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20529058-B3F8-458B-B1A8-37233935405E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20529058-B3F8-458B-B1A8-37233935405E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

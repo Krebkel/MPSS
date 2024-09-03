@@ -1,59 +1,114 @@
-﻿using System.Text.Json.Serialization;
-using Data;
-using Employees;
+﻿using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Users;
 using Products;
 using Projects;
+using Data;
+using Employees;
+using Web.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавление контроллеров
-builder.Services.AddControllers()
+var allowedOrigings = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
+builder.Services
+    .AddCors(options => options
+        .AddPolicy("CorsPolicy", policyBuilder => policyBuilder
+            .WithOrigins(allowedOrigings)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()))
+    .AddControllers()
     .AddJsonOptions(opts =>
     {
         opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-// Добавление Swagger для документации API
-builder.Services.AddEndpointsApiExplorer()
-                .AddSwaggerGen();
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen(setup =>
+    {
+        var jwtSecurityScheme = new OpenApiSecurityScheme
+        {
+            BearerFormat = "JWT",
+            Name = "JWT Authentication",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = JwtBearerDefaults.AuthenticationScheme,
+            Description = "Вставь сюда JWT-токен",
+        
+            Reference = new OpenApiReference
+            {
+                Id = JwtBearerDefaults.AuthenticationScheme,
+                Type = ReferenceType.SecurityScheme
+            }
+        };
+        
+        setup.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+        
+        setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            { jwtSecurityScheme, Array.Empty<string>() }
+        });
+    });
 
-// Конфигурация параметров базы данных
-builder.Services.Configure<DataOptions>(builder.Configuration.GetSection("Postgres"));
+builder.Services
+    .Configure<DataOptions>(builder.Configuration.GetSection("Postgres"))
+    .Configure<JwtTokenOptions>(builder.Configuration.GetSection("Jwt"));
 
-// Добавление сервисов для работы с базой данных
 builder.Services.AddPostgresData()
+    .AddUsers()
     .AddPostgresProducts()
     .AddPostgresEmployees()
-    .AddPostgresProjects();
+    .AddPostgresProjects()
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
 
-// Добавление проверки здоровья приложения
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// Настройка маршрутизации
 app.UseRouting();
 
-// Настройка конечных точек маршрутизации
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHealthChecks("/health");
 });
 
-// Подключение Swagger UI
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+// if (app.Environment.IsDevelopment()) 
+app.UseSwagger().UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
     c.RoutePrefix = "swagger"; 
 });
 
-// Настройка статических файлов
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors("CorsPolicy");
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseHealthChecks("/healthcheck");
+app.MapControllers();
 app.UseDefaultFiles()
    .UseStaticFiles(new StaticFileOptions
    {
