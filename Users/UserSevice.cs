@@ -1,3 +1,4 @@
+using Contracts;
 using DataContracts;
 using Employees.Services;
 using Microsoft.EntityFrameworkCore;

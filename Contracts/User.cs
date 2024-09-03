@@ -1,7 +1,7 @@
 using Contracts.EmployeeEntities;
 using DataContracts;
 
-namespace Users;
+namespace Contracts;
 
 /// <summary>
 /// Пользователь сервиса

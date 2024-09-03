@@ -30,7 +30,7 @@ public class Employee : DatabaseEntity
     /// <summary>
     /// Дата рождения сотрудника
     /// </summary>
-    public DateTimeOffset DateOfBirth { get; set; }
+    public DateTimeOffset? DateOfBirth { get; set; }
 
     /// <summary>
     /// ИНН сотрудника

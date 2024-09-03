@@ -6,7 +6,7 @@ public class CreateEmployeeApiRequest
     public required string Phone { get; set; }
     public bool IsDriver { get; set; }
     public string? Passport { get; set; }
-    public DateTimeOffset DateOfBirth { get; set; }
+    public DateTimeOffset? DateOfBirth { get; set; }
     public string? INN { get; set; }
     public string? AccountNumber { get; set; }
     public string? BIK { get; set; }

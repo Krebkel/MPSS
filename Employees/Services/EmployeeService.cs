@@ -34,7 +34,7 @@ public class EmployeeService : IEmployeeService
             Phone = request.Phone,
             IsDriver = request.IsDriver,
             Passport = request.Passport,
-            DateOfBirth = request.DateOfBirth.ToUniversalTime(),
+            DateOfBirth = request.DateOfBirth?.ToUniversalTime(),
             INN = request.INN,
             AccountNumber = request.AccountNumber,
             BIK = request.BIK
@@ -57,7 +57,7 @@ public class EmployeeService : IEmployeeService
         employee.Phone = request.Phone;
         employee.IsDriver = request.IsDriver;
         employee.Passport = request.Passport;
-        employee.DateOfBirth = request.DateOfBirth.ToUniversalTime();
+        employee.DateOfBirth = request.DateOfBirth?.ToUniversalTime();
         employee.INN = request.INN;
         employee.AccountNumber = request.AccountNumber;
         employee.BIK = request.BIK;

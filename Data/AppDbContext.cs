@@ -1,4 +1,5 @@
 using System.Reflection;
+using Contracts;
 using Contracts.EmployeeEntities;
 using Contracts.ProductEntities;
 using Contracts.ProjectEntities;
@@ -20,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<Project> Projects { get; set; } = null!;
     public DbSet<ProjectProduct> ProjectProducts { get; set; } = null!;
     public DbSet<ProjectSuspension> ProjectSuspensions { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
 
     public AppDbContext(DbContextOptions<AppDbContext> options, IOptions<DataOptions> dataOptions) : base(options)
     {
