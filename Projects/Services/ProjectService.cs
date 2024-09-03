@@ -253,38 +253,38 @@ public class ProjectService : IProjectService
             remainingAmount -= totalBaseWages;
         }
 
-        // Расчет бонусов на основе ИСН
+        // Расчет среднего ИСН и бонусов
         var employeeData = employeeShifts
             .GroupBy(es => es.Employee)
             .Select(g => new
             {
                 Employee = g.Key,
                 TotalHours = g.Sum(es => CalculateHoursWorked(es)),
-                TotalISN = g.Sum(es => es.ISN ?? 0)
+                AverageISN = g.Average(es => es.ISN ?? 0)
             })
             .ToList();
 
-        int totalISN = employeeData.Sum(ed => ed.TotalISN);
-        
+        double totalAverageISN = employeeData.Sum(ed => ed.AverageISN);
+
         var results = employeeData.Select(ed =>
         {
             double baseWage = ed.TotalHours * adjustedHourlyRate;
-            double bonus = totalISN > 0 ? (remainingAmount * ed.TotalISN / totalISN) : 0;
-            
+            double bonus = totalAverageISN > 0 ? (remainingAmount * ed.AverageISN / totalAverageISN) : 0;
+
             // Расчет компенсации для сотрудника
             double compensation = expenses
                 .Where(e => e.IsPaidByCompany && e.Employee?.Id == ed.Employee.Id)
                 .Sum(e => e.Amount ?? 0);
-            
+
             return new
             {
                 EmployeeName = ed.Employee.Name,
                 TotalHours = ed.TotalHours,
-                TotalISN = ed.TotalISN,
+                AverageISN = ed.AverageISN,
                 BaseWage = baseWage,
                 Bonus = bonus,
                 Compensation = compensation,
-                TotalWage = baseWage + bonus
+                TotalWage = baseWage + bonus + compensation
             };
         }).ToList();
 
@@ -294,11 +294,11 @@ public class ProjectService : IProjectService
             .Select(g => new
             {
                 Date = g.Key,
-                Shifts = g.Select(es => new 
-                { 
-                    EmployeeName = es.Employee.Name, 
-                    Hours = CalculateHoursWorked(es), 
-                    ISN = es.ISN ?? 0 
+                Shifts = g.Select(es => new
+                {
+                    EmployeeName = es.Employee.Name,
+                    Hours = CalculateHoursWorked(es),
+                    ISN = es.ISN ?? 0
                 }).ToList()
             })
             .ToList();

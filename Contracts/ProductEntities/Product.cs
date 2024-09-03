@@ -3,22 +3,22 @@ using DataContracts;
 namespace Contracts.ProductEntities;
 
 /// <summary>
-/// Производимое изделие
+/// Производимый вид работ
 /// </summary>
 public class Product : DatabaseEntity
 {
     /// <summary>
-    /// Наименование изделия
+    /// Наименование работы
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// Стоимость единицы в рублях
+    /// Стоимость единицы работы в рублях
     /// </summary>
     public double Cost { get; set; }
     
     /// <summary>
-    /// Вид изделия
+    /// Вид работы
     /// </summary>
     public ProductType Type { get; set; }
 }

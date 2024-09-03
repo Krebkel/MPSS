@@ -3,27 +3,27 @@ using DataContracts;
 namespace Contracts.ProductEntities;
 
 /// <summary>
-/// Детали производимого продукта
+/// Компоненты производимой работы
 /// </summary>
 public class ProductComponent : DatabaseEntity
 {
     /// <summary>
-    /// ID производимого продукта
+    /// ID производимой работы
     /// </summary>
     public Product Product { get; set; }
 
     /// <summary>
-    /// Наименование производимого продукта
+    /// Наименование производимой работы
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// Количество деталей для производства продукта в штуках
+    /// Количество компонентов для выполнения работы
     /// </summary>
     public int? Quantity { get; set; }
 
     /// <summary>
-    /// Вес одной детали для производства продукта
+    /// Вес одного компонента для выполнения работы
     /// </summary>
     public double? Weight { get; set; }
 }

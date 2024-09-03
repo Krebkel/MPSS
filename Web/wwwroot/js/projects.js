@@ -340,11 +340,9 @@ let ProjectManagement = (function () {
         $.ajax({
             url: `/api/projectProducts/base/${projectProductId}`,
             method: 'DELETE',
-            success: function () {
-                alert('Изделие успешно удалено из проекта');
-            },
+            success: function () {},
             error: function () {
-                alert('Ошибка при удалении изделия из проекта');
+                alert('Ошибка при удалении работы из проекта');
             }
         });
     };

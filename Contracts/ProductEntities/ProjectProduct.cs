@@ -4,7 +4,7 @@ using DataContracts;
 namespace Contracts.ProductEntities;
 
 /// <summary>
-/// Производимая единица (Секция стеллажа, ящик, etc.) на проекте
+/// Производимая единица работы (Секция стеллажа, ящик, разгрузка etc.) на проекте
 /// </summary>
 public class ProjectProduct : DatabaseEntity
 {
@@ -14,17 +14,17 @@ public class ProjectProduct : DatabaseEntity
     public Project Project { get; set; }
 
     /// <summary>
-    /// Производимая единица
+    /// Производимая работа
     /// </summary>
     public Product Product { get; set; }
 
     /// <summary>
-    /// Количество единиц в штуках
+    /// Количество единиц работы
     /// </summary>
     public int Quantity { get; set; }
 
     /// <summary>
-    /// Наценка на одну единицу в рублях
+    /// Наценка на одну единицу работы в рублях
     /// </summary>
     public double Markup { get; set; }
 }

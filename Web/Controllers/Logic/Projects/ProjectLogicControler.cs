@@ -32,7 +32,7 @@ public class ProjectLogicController : ControllerBase
     {
         try
         {
-                var result = await _projectService.CalculateProjectWagesAsync(id, ct);
+            var result = await _projectService.CalculateProjectWagesAsync(id, ct);
             return Ok(result);
         }
         catch (KeyNotFoundException ex)
