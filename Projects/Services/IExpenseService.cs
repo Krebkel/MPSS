@@ -24,6 +24,7 @@ public class UpdateExpenseRequest
     public double? Amount { get; set; }
     public string? Description { get; set; }
     public ExpenseType Type { get; set; }
+    public int? Employee { get; set; }
     public bool IsPaidByCompany { get; set; }
 }
 
@@ -34,5 +35,6 @@ public class CreateExpenseRequest
     public required double Amount { get; set; }
     public string? Description { get; set; }
     public required ExpenseType Type { get; set; }
+    public int? Employee { get; set; }
     public required bool IsPaidByCompany { get; set; }
 }

@@ -21,7 +21,10 @@ public class Validator<TEntity> : IValidator<TEntity> where TEntity : DatabaseEn
 
     public async Task<TEntity> ValidateAndGetEntityAsync(int? id, IRepository<TEntity> repository, string entityName, CancellationToken cancellationToken)
     {
-        var entity = await repository.GetByIdAsync(id, cancellationToken);
+        if (!id.HasValue)
+            throw new ArgumentNullException(nameof(id), $"ID для сущности \"{entityName}\" не может быть пустым.");
+    
+        var entity = await repository.GetByIdAsync(id.Value, cancellationToken);
         if (entity == null)
             throw new ApplicationException($"Сущность \"{entityName}\" с ID {id} не найдена.");
         return entity;

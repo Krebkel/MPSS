@@ -1,12 +1,12 @@
 namespace Contracts;
 
 /// <summary>
-/// Вид изделия
+/// Вид работы
 /// </summary>
 public enum ProductType
 {
     /// <summary>
-    /// Основное изделие
+    /// Основная
     /// </summary>
     Main,
     

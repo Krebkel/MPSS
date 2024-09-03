@@ -8,6 +8,9 @@ using Microsoft.Extensions.Options;
 
 namespace Tests;
 
+/// <summary>
+/// Набор тестов для основной бизнес-логики. НЕ АКТУАЛЕН
+/// </summary>
 [TestFixture]
 public class ProductionTests
 {

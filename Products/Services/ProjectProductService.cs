@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Contracts.ProductEntities;
 using Contracts.ProjectEntities;
-using Data;
 using DataContracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -107,8 +106,7 @@ public class ProjectProductService : IProjectProductService
             })
             .FirstOrDefaultAsync(pp => pp.Id == id, cancellationToken);
     }
-
-
+    
     public async Task<bool> DeleteProjectProductAsync(int id, CancellationToken cancellationToken)
     {
         var projectProduct = await _projectProductRepository

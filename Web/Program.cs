@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Data;
-using DataContracts;
 using Employees;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

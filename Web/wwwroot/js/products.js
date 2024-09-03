@@ -42,20 +42,17 @@ $(document).ready(function() {
     }
 
     function deleteProduct(productId) {
-        if (confirm('Вы уверены, что хотите удалить это изделие?')) {
-            $.ajax({
-                url: `/api/products/base/${productId}`,
-                method: 'DELETE',
-                success: function() {
-                    alert('Изделие успешно удалено');
-                    loadProducts();
-                },
-                error: function(xhr) {
-                    const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при удалении изделия';
-                    alert(errorMessage);
-                }
-            });
-        }
+        $.ajax({
+            url: `/api/products/base/${productId}`,
+            method: 'DELETE',
+            success: function() {
+                loadProducts();
+            },
+            error: function(xhr) {
+                const errorMessage = xhr.responseText ? xhr.responseText : 'Ошибка при удалении работы';
+                alert(errorMessage);
+            }
+        });
     }
 
     function openProductModal(productId) {
@@ -69,7 +66,7 @@ $(document).ready(function() {
                 url: `/api/products/base/${productId}`,
                 type: 'GET',
                 success: function(data) {
-                    $('#productModalTitle').text('Редактировать изделие');
+                    $('#productModalTitle').text('Редактировать работу');
                     $('#productId').val(data.id);
                     $('#productName').val(data.name);
                     $('#productCost').val(data.cost);
@@ -83,18 +80,18 @@ $(document).ready(function() {
                             components.forEach(component => addComponentRow(component));
                         },
                         error: function(xhr) {
-                            alert('Ошибка при загрузке компонентов изделия');
+                            alert('Ошибка при загрузке компонентов работы');
                         }
                     });
 
                     modal.fadeIn();
                 },
                 error: function(xhr) {
-                    alert('Ошибка при загрузке данных изделия');
+                    alert('Ошибка при загрузке данных работы');
                 }
             });
         } else {
-            $('#productModalTitle').text('Добавить новое изделие');
+            $('#productModalTitle').text('Добавить новую работу');
             $('#productId').val('');
             modal.fadeIn();
         }
@@ -165,7 +162,7 @@ $(document).ready(function() {
                 saveProductComponents(newProductId);
             },
             error: function(xhr) {
-                alert('Ошибка при сохранении изделия');
+                alert('Ошибка при сохранении работы');
             }
         });
     });
@@ -200,11 +197,10 @@ $(document).ready(function() {
             .then(() => {
                 $('#productModal').hide();
                 loadProducts();
-                alert('Изделие и компоненты успешно сохранены');
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Ошибка при сохранении или удалении компонентов изделия');
+                alert('Ошибка при сохранении или удалении компонентов работы');
             });
     }
 

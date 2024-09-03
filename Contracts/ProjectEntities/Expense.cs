@@ -1,3 +1,4 @@
+using Contracts.EmployeeEntities;
 using DataContracts;
 
 namespace Contracts.ProjectEntities;
@@ -31,6 +32,11 @@ public class Expense : DatabaseEntity
     /// Тип расхода
     /// </summary>
     public ExpenseType Type { get; set; }
+    
+    /// <summary>
+    /// Сотрудник
+    /// </summary>
+    public Employee? Employee { get; set; }
     
     /// <summary>
     /// Оплачено ли заказчиком

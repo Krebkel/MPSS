@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240831151943_Initial")]
+    [Migration("20240902083531_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -254,6 +254,9 @@ namespace Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsPaidByCompany")
                         .HasColumnType("boolean");
 
@@ -269,6 +272,8 @@ namespace Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("ProjectId");
 
@@ -394,11 +399,17 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Contracts.ProjectEntities.Expense", b =>
                 {
+                    b.HasOne("Contracts.EmployeeEntities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
                     b.HasOne("Contracts.ProjectEntities.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Project");
                 });

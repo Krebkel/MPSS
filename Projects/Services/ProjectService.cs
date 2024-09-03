@@ -1,4 +1,5 @@
 using Contracts.EmployeeEntities;
+using Contracts.ProductEntities;
 using Microsoft.Extensions.Logging;
 using Contracts.ProjectEntities;
 using DataContracts;
@@ -14,6 +15,9 @@ public class ProjectService : IProjectService
     private readonly IRepository<Project> _projectRepository;
     private readonly IRepository<Counteragent> _counteragentRepository;
     private readonly IRepository<Employee> _employeeRepository;
+    private readonly IRepository<EmployeeShift> _employeeShiftRepository;
+    private readonly IRepository<Expense> _expenseRepository;
+    private readonly IRepository<ProjectProduct> _projectProductRepository;
     private readonly ILogger<ProjectService> _logger;
     private readonly IValidator<Employee> _employeeValidator;
     private readonly IValidator<Counteragent> _counteragentValidator;
@@ -24,14 +28,20 @@ public class ProjectService : IProjectService
         IRepository<Project> projectRepository,
         IRepository<Counteragent> counteragentRepository,
         IRepository<Employee> employeeRepository,
+        IRepository<EmployeeShift> employeeShiftRepository,
+        IRepository<Expense> expenseRepository,
+        IRepository<ProjectProduct> projectProductRepository,
         IValidator<Project> projectValidator,
         IValidator<Counteragent> counteragentValidator,
         IValidator<Employee> employeeValidator)
     {
         _logger = logger;
         _projectRepository = projectRepository;
+        _projectProductRepository = projectProductRepository;
         _counteragentRepository = counteragentRepository;
         _employeeRepository = employeeRepository;
+        _employeeShiftRepository = employeeShiftRepository;
+        _expenseRepository = expenseRepository;
         _projectValidator = projectValidator;
         _counteragentValidator = counteragentValidator;
         _employeeValidator = employeeValidator;
@@ -189,4 +199,132 @@ public class ProjectService : IProjectService
             .ThenBy(p => p.Name);
     }
 
+    public async Task<object> CalculateProjectWagesAsync(int projectId, CancellationToken ct)
+    {
+        var project = await _projectRepository.GetAll()
+            .FirstOrDefaultAsync(p => p.Id == projectId, ct);
+
+        if (project == null)
+        {
+            throw new KeyNotFoundException($"Проект с ID {projectId} не найден");
+        }
+
+        var projectProducts = await _projectProductRepository.GetAll()
+            .Where(pp => pp.Project.Id == projectId)
+            .Include(pp => pp.Product)
+            .ToListAsync(ct);
+
+        var expenses = await _expenseRepository.GetAll()
+            .Where(e => e.Project.Id == projectId)
+            .ToListAsync(ct);
+
+        var employeeShifts = await _employeeShiftRepository.GetAll()
+            .Include(es => es.Employee)
+            .Where(es => es.Project.Id == projectId)
+            .ToListAsync(ct);
+
+        // Расчет общей суммы наценки
+        double totalMarkup = projectProducts.Sum(pp => pp.Markup * pp.Quantity);
+
+        // Вычет доли шефа
+        double managerShare = totalMarkup * project.ManagerShare / 100;
+        double remainingAmount = totalMarkup - managerShare;
+
+        // Вычет неоплаченных расходов без сотрудника
+        double unpaidExpensesWithoutEmployee = expenses
+            .Where(e => !e.IsPaidByCompany && e.Employee == null)
+            .Sum(e => e.Amount ?? 0);
+        remainingAmount -= unpaidExpensesWithoutEmployee;
+
+        // Расчет базовой ставки и общего количества часов
+        const double baseHourlyRate = 300;
+        double totalHours = employeeShifts.Sum(es => CalculateHoursWorked(es));
+        double totalBaseWages = totalHours * baseHourlyRate;
+
+        // Проверка достаточности средств для базовых зарплат
+        double adjustedHourlyRate = baseHourlyRate;
+        if (remainingAmount < totalBaseWages)
+        {
+            adjustedHourlyRate = remainingAmount / totalHours;
+            remainingAmount = 0;
+        }
+        else
+        {
+            remainingAmount -= totalBaseWages;
+        }
+
+        // Расчет среднего ИСН и бонусов
+        var employeeData = employeeShifts
+            .GroupBy(es => es.Employee)
+            .Select(g => new
+            {
+                Employee = g.Key,
+                TotalHours = g.Sum(es => CalculateHoursWorked(es)),
+                AverageISN = g.Average(es => es.ISN ?? 0)
+            })
+            .ToList();
+
+        double totalAverageISN = employeeData.Sum(ed => ed.AverageISN);
+
+        var results = employeeData.Select(ed =>
+        {
+            double baseWage = ed.TotalHours * adjustedHourlyRate;
+            double bonus = totalAverageISN > 0 ? (remainingAmount * ed.AverageISN / totalAverageISN) : 0;
+
+            // Расчет компенсации для сотрудника
+            double compensation = expenses
+                .Where(e => e.IsPaidByCompany && e.Employee?.Id == ed.Employee.Id)
+                .Sum(e => e.Amount ?? 0);
+
+            return new
+            {
+                EmployeeName = ed.Employee.Name,
+                TotalHours = ed.TotalHours,
+                AverageISN = ed.AverageISN,
+                BaseWage = baseWage,
+                Bonus = bonus,
+                Compensation = compensation,
+                TotalWage = baseWage + bonus + compensation
+            };
+        }).ToList();
+
+        var groupedShifts = employeeShifts
+            .GroupBy(es => es.Date.Date)
+            .OrderBy(g => g.Key)
+            .Select(g => new
+            {
+                Date = g.Key,
+                Shifts = g.Select(es => new
+                {
+                    EmployeeName = es.Employee.Name,
+                    Hours = CalculateHoursWorked(es),
+                    ISN = es.ISN ?? 0
+                }).ToList()
+            })
+            .ToList();
+
+        return new
+        {
+            ProjectId = project.Id,
+            EmployeeWages = results,
+            DailyShifts = groupedShifts
+        };
+    }
+
+    private static double CalculateHoursWorked(EmployeeShift shift)
+    {
+        if (shift.Arrival.HasValue && shift.Departure.HasValue)
+        {
+            TimeSpan workedTime = shift.Departure.Value - shift.Arrival.Value;
+            double hoursWorked = workedTime.TotalHours;
+
+            if (shift.ConsiderTravel && shift.TravelTime.HasValue)
+            {
+                hoursWorked += shift.TravelTime.Value;
+            }
+
+            return hoursWorked;
+        }
+        return 0;
+    }
 }

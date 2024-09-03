@@ -24,21 +24,22 @@ let ExpenseManagement = (function () {
                     <thead>
                         <tr class="project-header">
                             <th class="shortcol">${index + 1}</th>
-                            <th colspan="4">${project.name}</th>
+                            <th colspan="5">${project.name}</th>
                             <th class="shortcol">${formatDateForOutput(new Date(project.deadlineDate))}</th>
                             <th class="btncol">
                                 <button class="btn btn-add addExpenseBtn" data-project-id="${project.id}">+</button>
                             </th>
                         </tr>
                     </thead>
-                    <tbody  style="display: none;">
+                    <tbody style="display: none;">
                         <tr>
                             <th class="expense-header shortcol">№</th>
                             <th class="expense-header">Наименование</th>
                             <th class="expense-header midcol">Сумма</th>
                             <th class="expense-header shortcol">Тип</th>
+                            <th class="expense-header midcol">Оплатил</th>
                             <th class="expense-header">Комментарий</th>
-                            <th class="expense-header shortcol">Оплачено</th>
+                            <th class="expense-header shortcol">Компенсация</th>
                             <th class="btncol"></th>
                         </tr>
                     </tbody>
@@ -77,22 +78,33 @@ let ExpenseManagement = (function () {
         });
     }
 
-    function displayExpenses(expenses, tbody) {
+    async function displayExpenses(expenses, tbody) {
         tbody.find('tr:gt(0)').remove();
-        expenses.forEach((expense, index) => {
+        for (const [index, expense] of expenses.entries()) {
+            let employeeName = '';
+            if (expense.employee) {
+                try {
+                    const employee = await $.getJSON(`/api/employees/base/${expense.employee}`);
+                    employeeName = employee ? employee.name : '';
+                } catch (error) {
+                    console.error('Ошибка при получении сотрудника:', error);
+                }
+            }
+
             const expenseRow = $(`
-                <tr data-expense-id="${expense.id}">
-                    <td class="expense-data">${index + 1}</td>
-                    <td class="expense-data">${expense.name}</td>
-                    <td class="expense-data">${expense.amount}</td>
-                    <td class="expense-data">${translateExpenseType(expense.type)}</td>
-                    <td class="expense-data">${expense.description || ''}</td>
-                    <td class="expense-data">${expense.isPaidByCompany ? 'Да' : 'Нет'}</td>
-                    <td class="btncol expensebtns">
-                        <button class="btn delete-btn" data-expense-id="${expense.id}">⛌</button>
-                    </td>
-                </tr>
-            `);
+            <tr data-expense-id="${expense.id}">
+                <td class="expense-data shortcol">${index + 1}</td>
+                <td class="expense-data">${expense.name}</td>
+                <td class="expense-data midcol">${expense.amount}</td>
+                <td class="expense-data shortcol">${translateExpenseType(expense.type)}</td>
+                <td class="expense-data midcol">${employeeName}</td>
+                <td class="expense-data">${expense.description || ''}</td>
+                <td class="expense-data">${expense.isPaidByCompany ? 'Да' : 'Нет'}</td>
+                <td class="btncol expensebtns">
+                    <button class="btn delete-btn" data-expense-id="${expense.id}">⛌</button>
+                </td>
+            </tr>
+        `);
 
             tbody.append(expenseRow);
 
@@ -104,7 +116,7 @@ let ExpenseManagement = (function () {
                 e.stopPropagation();
                 module.deleteExpense(expense.id);
             });
-        });
+        }
     }
 
     module.openExpenseModal = function (projectId, expenseId = null) {
@@ -112,31 +124,47 @@ let ExpenseManagement = (function () {
         const form = $('#expenseForm')[0];
         form.reset();
 
-        $('#expenseProjectId').val(projectId);
+        $.ajax({
+            url: '/api/employees/base',
+            method: 'GET',
+            success: function (employees) {
+                const employeeOptions = `<option value="">Не указан</option>` +
+                    employees.map(employee =>
+                        `<option value="${employee.id}">${employee.name}</option>`
+                    ).join('');
 
-        if (expenseId) {
-            $('#expenseHeader').text('Редактировать расход');
-            $.ajax({
-                url: `/api/expenses/base/${expenseId}`,
-                method: 'GET',
-                success: function (expense) {
-                    $('#expenseId').val(expense.id);
-                    $('#expenseName').val(expense.name);
-                    $('#expenseAmount').val(expense.amount);
-                    $('#expenseIsPaidByCompany').prop('checked', expense.isPaidByCompany);
-                    $('#expenseType').val(expense.type);
-                    $('#expenseDescription').val(expense.description);
-                },
-                error: function () {
-                    alert('Ошибка при загрузке данных расхода');
+                $('#expenseEmployee').html(employeeOptions);
+                $('#expenseProjectId').val(projectId);
+
+                if (expenseId) {
+                    $('#expenseHeader').text('Редактировать расход');
+                    $.ajax({
+                        url: `/api/expenses/base/${expenseId}`,
+                        method: 'GET',
+                        success: function (expense) {
+                            $('#expenseId').val(expense.id);
+                            $('#expenseName').val(expense.name);
+                            $('#expenseAmount').val(expense.amount);
+                            $('#expenseIsPaidByCompany').prop('checked', expense.isPaidByCompany);
+                            $('#expenseType').val(expense.type);
+                            $('#expenseEmployee').val(expense.employee || null);
+                            $('#expenseDescription').val(expense.description);
+                        },
+                        error: function () {
+                            alert('Ошибка при загрузке данных расхода');
+                        }
+                    });
+                } else {
+                    $('#expenseHeader').text('Добавить новый расход');
+                    $('#expenseId').val('');
                 }
-            });
-        } else {
-            $('#expenseHeader').text('Добавить новый расход');
-            $('#expenseId').val('');
-        }
 
-        modal.fadeIn();
+                modal.fadeIn();
+            },
+            error: function () {
+                alert('Ошибка загрузки сотрудников');
+            }
+        });
     };
 
     module.deleteExpense = function (expenseId) {
@@ -145,7 +173,6 @@ let ExpenseManagement = (function () {
                 url: `/api/expenses/base/${expenseId}`,
                 method: 'DELETE',
                 success: function () {
-                    alert('Расход успешно удален');
                     module.loadProjects();
                 },
                 error: function () {
@@ -156,6 +183,7 @@ let ExpenseManagement = (function () {
     };
 
     module.submitExpenseForm = function () {
+        const employeeValue = $('#expenseEmployee').val();
         const expenseData = {
             id: $('#expenseId').val() || null,
             project: $('#expenseProjectId').val(),
@@ -163,6 +191,7 @@ let ExpenseManagement = (function () {
             amount: parseFloat($('#expenseAmount').val()),
             isPaidByCompany: $('#expenseIsPaidByCompany').is(':checked'),
             type: $('#expenseType').val(),
+            employee: employeeValue ? employeeValue : null,
             description: $('#expenseDescription').val()
         };
 
@@ -176,7 +205,6 @@ let ExpenseManagement = (function () {
             data: JSON.stringify(expenseData),
             success: function () {
                 $('#expenseModal').hide();
-                alert(expenseData.id ? 'Расход успешно обновлен' : 'Расход успешно добавлен');
                 module.loadProjects();
             },
             error: function () {

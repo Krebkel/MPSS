@@ -11,9 +11,14 @@ public enum ExpenseType
     Travel,
 
     /// <summary>
-    /// Расходы на расходные материалы
+    /// Расходные материалы
     /// </summary>
     Wares,
+    
+    /// <summary>
+    /// Расходы сотрудников
+    /// </summary>
+    Personal,
 
     /// <summary>
     /// Прочие расходы

@@ -40,7 +40,7 @@
                         <a class="nav-link" href="#expenses">Расходы</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#products">Изделия</a>
+                        <a class="nav-link" href="#products">Работы</a>
                     </li>
                 </ul>
             </div>
@@ -82,7 +82,7 @@
             </div>
             <div id="products" class="content-section" style="display: none;">
                 <div id="productTable">
-                    <h2 id="productsHeader">Изделия
+                    <h2 id="productsHeader">Работы
                         <button id="addProductBtn" class="btn btn-primary btn-add">+</button>
                     </h2>
                     <table id="productsTable" class="table table-striped">
@@ -134,8 +134,8 @@
                 <select id="projectResponsibleEmployee" name="projectResponsibleEmployee" required></select>
             </div>
             <div class="form-group-inline">
-                <label for="projectManagerShare">З/п шефа, %:</label>
-                <input type="number" id="projectManagerShare" name="projectManagerShare" required step="0.01" min="0" max="100">
+                <label for="projectManagerShare">% шефа:</label>
+                <input type="text" id="projectManagerShare" name="projectManagerShare" required step="0.01" min="0" max="100">
             </div>
             <div class="form-group-inline">
                 <label for="projectStatus">Статус:</label>
@@ -148,13 +148,13 @@
                 <label for="projectNote">Примечание:</label>
                 <input type="text" id="projectNote" name="projectNote">
             </div>
-            <h4>Изделия
+            <h4>Работы
                 <button type="button" id="addProjectProductBtn" class="btn btn-primary btn-add">+</button>
             </h4>
             <table id="projectProductsTable" class="table table-striped">
                 <thead>
                 <tr>
-                    <th class="longcol">Изделие</th>
+                    <th class="longcol">Работа</th>
                     <th class="shortcol">Кол-во</th>
                     <th class="midcol">Доход</th>
                     <th class="btncol"></th>
@@ -226,25 +226,29 @@
         <form id="expenseForm">
             <input type="hidden" id="expenseId" name="expenseId">
             <input type="hidden" id="expenseProjectId" name="expenseProjectId">
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="expenseName">Статья:</label>
                 <input type="text" id="expenseName" name="expenseName" required>
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="expenseAmount">Сумма:</label>
                 <input type="number" id="expenseAmount" name="expenseAmount" required step="0.01" min="0">
-            </div>
-            <div class="form-group">
-                <label for="expenseIsPaidByCompany">Оплачено компанией:</label>
+           
+                <label for="expenseIsPaidByCompany">Компенсация:</label>
                 <input type="checkbox" id="expenseIsPaidByCompany" name="expenseIsPaidByCompany">
             </div>
-            <div class="form-group">
+            <div class="form-group-inline">
                 <label for="expenseType">Тип:</label>
                 <select id="expenseType" name="expenseType" required>
                     <option value="Travel">Транспорт</option>
                     <option value="Wares">Товары</option>
                     <option value="Other">Прочее</option>
                 </select>
+                
+                <label for="expenseEmployee">Оплатил:</label>
+                <select id="expenseEmployee" name="expenseEmployee">
+                    <option value="">Выберите сотрудника</option>
+                </select>            
             </div>
             <div class="form-group">
                 <label for="expenseDescription">Комментарий:</label>
@@ -298,6 +302,7 @@
 </div>
 
 <script src="/libs/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="/libs/bootstrap.js"></script>
 <script src="/js/script.js"></script>
 <script src="/js/projects.js"></script>

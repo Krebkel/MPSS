@@ -14,6 +14,7 @@ public static class ExpenseExtensions
             Amount = request.Amount,
             Description = request.Description,
             Type = request.Type,
+            Employee = request.Employee,
             IsPaidByCompany = request.IsPaidByCompany
         };
     }
@@ -28,6 +29,7 @@ public static class ExpenseExtensions
             Amount = request.Amount,
             Description = request.Description,
             Type = request.Type,
+            Employee = request.Employee,
             IsPaidByCompany = request.IsPaidByCompany
         };
     }

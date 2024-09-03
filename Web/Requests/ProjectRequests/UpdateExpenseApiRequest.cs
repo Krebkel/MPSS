@@ -10,5 +10,6 @@ public class UpdateExpenseApiRequest
     public double? Amount { get; set; }
     public string? Description { get; set; }
     public ExpenseType Type { get; set; }
+    public int? Employee { get; set; }
     public bool IsPaidByCompany { get; set; }
 }

@@ -17,6 +17,9 @@ public interface IProjectService
     Task<bool> DeleteProjectAsync(int id, CancellationToken cancellationToken);
 
     Task<IEnumerable<object>> GetAllProjectsAsync(CancellationToken cancellationToken);
+
+    Task<object> CalculateProjectWagesAsync(int projectId, CancellationToken ct);
+
 }
 
 public class UpdateProjectRequest

@@ -1,7 +1,6 @@
 let ProjectManagement = (function () {
     const module = {};
-    const today = new Date();
-
+    
     module.createGanttChart = function (projects) {
         const chartContainer = $('#ganttChart');
         chartContainer.empty();
@@ -17,7 +16,7 @@ let ProjectManagement = (function () {
             return deadlineDate >= startDate && deadlineDate <= endDate;
         });
         
-        let monthRow = '<tr><th rowspan="2">Проект</th>';
+        let monthRow = '<tr><th rowspan="2" class="midcol">Проект</th>';
         let currentMonth = startDate.getMonth();
         let monthSpan = 0;
 
@@ -42,7 +41,7 @@ let ProjectManagement = (function () {
 
         let bodyRows = '';
         filteredProjects.forEach((project) => {
-            let projectRow = `<tr><td>${project.name}</td>`;
+            let projectRow = `<tr><td class="midcol">${project.name}</td>`;
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                 const currentDate = new Date(d);
                 currentDate.setHours(0, 0, 0, 0);
@@ -103,23 +102,26 @@ let ProjectManagement = (function () {
     module.loadAllShifts = function (projects, startDate, endDate) {
         if (projects) {
             const projectIds = projects.map(project => project.id);
-            $.ajax({
-                url: '/api/employeeShifts/base/byProjects',
-                method: 'GET',
-                data: {
-                    projectIds: projectIds.join(','),
-                    startDate: new Date(startDate.setHours(0, 0, 0, 0)).toISOString(),
-                    endDate: new Date(endDate.setHours(0, 0, 0, 0)).toISOString()
-                },
-                success: function (allShifts) {
-                    if (allShifts.length > 0) {
-                        module.updateAllShiftCounts(allShifts);
+            if (projectIds.length > 0) 
+            {
+                $.ajax({
+                    url: '/api/employeeShifts/base/byProjects',
+                    method: 'GET',
+                    data: {
+                        projectIds: projectIds.join(','),
+                        startDate: new Date(startDate.setHours(0, 0, 0, 0)).toISOString(),
+                        endDate: new Date(endDate.setHours(0, 0, 0, 0)).toISOString()
+                    },
+                    success: function (allShifts) {
+                        if (allShifts.length > 0) {
+                            module.updateAllShiftCounts(allShifts);
+                        }
+                    },
+                    error: function () {
+                        alert('Ошибка прогрузки смен');
                     }
-                },
-                error: function () {
-                    alert('Ошибка прогрузки смен');
-                }
-            });
+                });
+            }
         }
     };
 
@@ -180,64 +182,6 @@ let ProjectManagement = (function () {
             module.createGanttChart(projectsToShow);
         });
     };
-
-    function fillSelect(selector, items) {
-        const select = $(selector);
-        select.empty();
-        items.forEach(item => select.append(new Option(item.name, item.id)));
-    }
-
-    function displayProjects(projects, showActual) {
-        const projectsTableBody = $('#projectsTable tbody');
-        projectsTableBody.empty();
-
-        $('#hideProjectsBtn').toggle(!showActual);
-        $('#showAllProjectsBtn').toggle(showActual);
-        
-        projects.forEach((project, index) => {
-            let cellColor = '';
-            switch (project.projectStatus) {
-                case 'Active':
-                    cellColor = '#FDE9E5';
-                    break;
-                case 'Standby':
-                    cellColor = '#F3F1F0';
-                    break;
-                case 'Done':
-                    cellColor = '#ECF7F1';
-                    break;
-                case 'Paid':
-                    cellColor = '#E7F0FC';
-                    break;
-                default:
-                    cellColor = '';
-            }
-            projectsTableBody.append(`
-                <tr class="project-row" data-project-id="${project.id}">
-                    <td class="shortcol">${index + 1}</td>
-                    <td>${project.name}</td>
-                    <td class="longcol">${project.address}</td>
-                    <td class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</td>
-                    <td class="midcol" style="background-color: ${cellColor};">${translateStatus(project.projectStatus)}</td>
-                    <td class="btncol">
-                        <button name="deleteProjectBtn" class="btn delete-btn" data-project-id="${project.id}">⛌</button>
-                    </td>
-                </tr>
-            `);
-        });
-
-        $('#projectsTable').off('click', '.delete-btn');
-        $('#projectsTable').off('click', '.project-row');
-
-        $('#projectsTable').on('click', '.delete-btn', function(event) {
-            event.stopPropagation();
-            module.deleteProject($(this).data('project-id'));
-        });
-
-        $('#projectsTable').on('click', '.project-row', function() {
-            module.openProjectModal($(this).data('project-id'));
-        });
-    }
 
     module.deleteProject = function (projectId) {
         if (confirm('Вы уверены, что хотите удалить этот проект?')) {
@@ -301,12 +245,12 @@ let ProjectManagement = (function () {
                 $('#projectId').val('');
 
                 const startDate = new Date();
-                const deadlineDate = new Date(today.setDate(today.getDate() + 7));
+                const deadlineDate = new Date(startDate.setDate(startDate.getDate() + 7));
 
                 $('#projectStartDate').val(toUTC(new Date(startDate)).toISOString().split('T')[0]);
                 $('#projectDeadline').val(toUTC(new Date(deadlineDate)).toISOString().split('T')[0]);
             }
-
+            
             $('#addProjectProductBtn').off('click').on('click', function () {
                 module.addProjectProductRow({}, availableProducts);
             });
@@ -396,11 +340,9 @@ let ProjectManagement = (function () {
         $.ajax({
             url: `/api/projectProducts/base/${projectProductId}`,
             method: 'DELETE',
-            success: function () {
-                alert('Изделие успешно удалено из проекта');
-            },
+            success: function () {},
             error: function () {
-                alert('Ошибка при удалении изделия из проекта');
+                alert('Ошибка при удалении работы из проекта');
             }
         });
     };
@@ -479,7 +421,6 @@ let ProjectManagement = (function () {
                 module.saveProjectProducts(newProjectId)
                     .then(() => {
                         $('#projectModal').hide();
-                        alert(projectId ? 'Проект успешно обновлен' : 'Проект успешно добавлен');
                         module.loadProjects(true);
                     })
                     .catch(error => {
@@ -492,7 +433,6 @@ let ProjectManagement = (function () {
         });
     };
 
-    // Обновленная функция init
     module.init = function () {
         $(document).ready(function () {
             $('#projectForm').off('submit').on('submit', function (event) {
@@ -519,11 +459,76 @@ let ProjectManagement = (function () {
             $('#hideProjectsBtn').off('click').on('click', function () {
                 module.loadProjects(true);
             });
-
+                
             module.loadProjects(true);
         });
     };
 
+
+    function fillSelect(selector, items) {
+        const select = $(selector);
+        select.empty();
+        items.forEach(item => select.append(new Option(item.name, item.id)));
+    }
+
+    function displayProjects(projects, showActual) {
+        const projectsTableBody = $('#projectsTable tbody');
+        projectsTableBody.empty();
+
+        $('#hideProjectsBtn').toggle(!showActual);
+        $('#showAllProjectsBtn').toggle(showActual);
+
+        $('#projectManagerShare').mask('99', {
+            onComplete: function (value) {
+                $(this).val(value.replace(/\s/g, ''));
+            }
+        });
+
+        projects.forEach((project, index) => {
+            let cellColor;
+            switch (project.projectStatus) {
+                case 'Active':
+                    cellColor = '#FDE9E5';
+                    break;
+                case 'Standby':
+                    cellColor = '#F3F1F0';
+                    break;
+                case 'Done':
+                    cellColor = '#ECF7F1';
+                    break;
+                case 'Paid':
+                    cellColor = '#E7F0FC';
+                    break;
+                default:
+                    cellColor = '';
+            }
+            projectsTableBody.append(`
+                <tr class="project-row" data-project-id="${project.id}">
+                    <td class="shortcol">${index + 1}</td>
+                    <td>${project.name}</td>
+                    <td class="longcol">${project.address}</td>
+                    <td class="midcol">${formatDateForOutput(new Date(project.deadlineDate))}</td>
+                    <td class="midcol" style="background-color: ${cellColor};">${translateStatus(project.projectStatus)}</td>
+                    <td class="btncol">
+                        <button name="deleteProjectBtn" class="btn delete-btn" data-project-id="${project.id}">⛌</button>
+                    </td>
+                </tr>
+            `);
+        });
+
+        $('#projectsTable').off('click', '.delete-btn');
+        $('#projectsTable').off('click', '.project-row');
+
+        $('#projectsTable').on('click', '.delete-btn', function(event) {
+            event.stopPropagation();
+            module.deleteProject($(this).data('project-id'));
+        });
+
+        $('#projectsTable').on('click', '.project-row', function() {
+            module.openProjectModal($(this).data('project-id'));
+        });
+    }
+    
     return module;
 })();
 

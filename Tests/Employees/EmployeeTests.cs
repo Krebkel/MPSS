@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace Tests.Employees;
 
 /// <summary>
-/// Набор тестов для класса <see cref="EmployeeRepository"/>.
+/// Набор тестов для класса <see cref="EmployeeRepository"/>. НЕ АКТУАЛЕН
 /// </summary>
 [TestFixture]
 public class EmployeeTests

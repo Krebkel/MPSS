@@ -178,11 +178,18 @@ namespace Data.Migrations
                     Amount = table.Column<double>(type: "numeric(18,2)", nullable: true),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Type = table.Column<string>(type: "text", nullable: false),
+                    EmployeeId = table.Column<int>(type: "integer", nullable: true),
                     IsPaidByCompany = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Expenses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Expenses_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalSchema: "mpss",
+                        principalTable: "Employees",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Expenses_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -256,6 +263,12 @@ namespace Data.Migrations
                 schema: "mpss",
                 table: "EmployeeShifts",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expenses_EmployeeId",
+                schema: "mpss",
+                table: "Expenses",
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_ProjectId",
