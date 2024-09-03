@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    if (!checkAuth()) {
+        return;
+    }
 
     $('#counteragentINN').mask('9999999999', {
         clearIfNotMatch: true,

@@ -201,12 +201,23 @@ let EmployeeManagement = (function () {
         return `${day}.${month}.${year}`;
     }
 
+    module.manageAccess = function() {
+        showElementIfHasRole('addProjectBtn', 'Admin');
+        showElementIfHasRole('addProductBtn', 'Admin');
+        showElementIfHasRole('addShiftBtn', 'Admin');
+    }
+
     module.init = function () {
         $(document).ready(function () {
+            if (!checkAuth()) {
+                return;
+            }
             setupInputMasks();
             setupEventListeners();
             module.loadEmployees(false, 'employeesTable');
             module.loadEmployees(true, 'dataTable');
+            module.manageAccess();
+            
         });
     };
 

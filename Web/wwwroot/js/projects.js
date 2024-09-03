@@ -432,9 +432,18 @@ let ProjectManagement = (function () {
             }
         });
     };
+    
+    module.manageAccess = function() {
+        showElementIfHasRole('addProjectBtn', 'Admin');
+        showElementIfHasRole('addProductBtn', 'Admin');
+        showElementIfHasRole('addShiftBtn', 'Admin');
+    }
 
     module.init = function () {
         $(document).ready(function () {
+            if (!checkAuth()) {
+                return;
+            }
             $('#projectForm').off('submit').on('submit', function (event) {
                 event.preventDefault();
                 module.submitProjectForm();
@@ -459,11 +468,11 @@ let ProjectManagement = (function () {
             $('#hideProjectsBtn').off('click').on('click', function () {
                 module.loadProjects(true);
             });
-                
+            
             module.loadProjects(true);
+            module.manageAccess();
         });
     };
-
 
     function fillSelect(selector, items) {
         const select = $(selector);

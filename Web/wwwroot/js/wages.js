@@ -111,6 +111,9 @@ let ProjectWages = (function () {
 
     module.init = function () {
         $(document).ready(function () {
+            if (!checkAuth()) {
+                return;
+            }
             module.loadProjects();
         });
     };

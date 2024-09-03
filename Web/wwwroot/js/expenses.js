@@ -212,9 +212,18 @@ let ExpenseManagement = (function () {
             }
         });
     };
+    
+    module.manageAccess = function() {
+        showElementIfHasRole('addProjectBtn', 'Admin');
+        showElementIfHasRole('addProductBtn', 'Admin');
+        showElementIfHasRole('addShiftBtn', 'Admin');
+    }
 
     module.init = function () {
         $(document).ready(function () {
+            if (!checkAuth()) {
+                return;
+            }
             module.loadProjects();
 
             $('#expenseForm').on('submit', function (event) {
@@ -231,6 +240,8 @@ let ExpenseManagement = (function () {
                     $('.modal').hide();
                 }
             });
+
+            module.manageAccess();
         });
     };
 

@@ -46,7 +46,8 @@ internal class UserService : IUserService
             var user = new User
             {
                 Employee = createdEmployee,
-                Password = request.Password
+                Password = request.Password,
+                Role = UserRole.Regular
             };
 
             await _userRepository.AddAsync(user, cancellationToken);

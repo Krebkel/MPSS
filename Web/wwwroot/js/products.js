@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    if (!checkAuth()) {
+        return;
+    }
     function loadProducts() {
         $.getJSON('/api/products/base', function(products) {
             const productsTableBody = $('#productsTable tbody');
@@ -207,6 +210,6 @@ $(document).ready(function() {
     $('#addProductBtn').on('click', function() {
         openProductModal();
     });
-
+    
     loadProducts();
 });

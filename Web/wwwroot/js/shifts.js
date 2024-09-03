@@ -141,8 +141,17 @@ let ShiftManagement = (function () {
         });
     }
 
+    module.manageAccess = function() {
+        showElementIfHasRole('addProjectBtn', 'Admin');
+        showElementIfHasRole('addProductBtn', 'Admin');
+        showElementIfHasRole('addShiftBtn', 'Admin');
+    }
+
     module.init = function () {
         $(document).ready(function() {
+            if (!checkAuth()) {
+                return;
+            }
             $('#addShiftBtn').click(function () {
                 $('#addShiftForm').show();
                 $('#shiftForm')[0].reset();
@@ -225,6 +234,8 @@ let ShiftManagement = (function () {
                 });
             });
         });
+        
+        module.manageAccess();
     };
 
     return module;

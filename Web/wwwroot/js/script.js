@@ -71,7 +71,22 @@ function translateExpenseType(status) {
     return statuses[status] || 'Неизвестный статус';
 }
 
-$(document).ready(function() {
+function checkAuth() {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+        window.location.href = 'index.html';
+        return false;
+    }
+
+    const userRole = getUserRole();
+    if (userRole !== 'Admin' && userRole !== 'Manager') {
+        window.location.href = 'index.html';
+        return false;
+    }
+    return true;
+}
+
+$(document).ready(function() {    
     const contentSections = $('.content-section');
     const navLinks = $('.sidebar .nav-link');
 
