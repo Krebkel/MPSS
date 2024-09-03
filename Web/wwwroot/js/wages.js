@@ -117,7 +117,3 @@ let ProjectWages = (function () {
 
     return module;
 })();
-
-$(document).ready(function() {
-    ProjectWages.init();
-});

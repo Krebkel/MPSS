@@ -47,6 +47,12 @@ let EmployeeManagement = (function () {
         $('#addEmployeeBtn, #addEmployeeBtn2').on('click', function() {
             module.openEmployeeModal();
         });
+
+        $('.nav-link[href="#wages"]').on('click', function() {
+            if (typeof ProjectWages !== 'undefined' && typeof ProjectWages.init === 'function') {
+                ProjectWages.init();
+            }
+        });
     }
 
     module.loadEmployees = function(fullData = false, tableId = 'employeesTable') {
