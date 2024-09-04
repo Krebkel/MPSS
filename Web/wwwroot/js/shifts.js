@@ -149,7 +149,7 @@ let ShiftManagement = (function () {
 
     module.init = function () {
         $(document).ready(function() {
-            if (!checkAuth()) {
+            if (!AuthManagement.checkAuth()) {
                 return;
             }
             $('#addShiftBtn').click(function () {

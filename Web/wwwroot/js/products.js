@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    if (!checkAuth()) {
+    if (!AuthManagement.checkAuth()) {
         return;
     }
     function loadProducts() {

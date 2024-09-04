@@ -214,14 +214,14 @@ let ExpenseManagement = (function () {
     };
     
     module.manageAccess = function() {
-        showElementIfHasRole('addProjectBtn', 'Admin');
-        showElementIfHasRole('addProductBtn', 'Admin');
-        showElementIfHasRole('addShiftBtn', 'Admin');
+        AuthManagement.showElementIfHasRole('addProjectBtn', 'Admin');
+        AuthManagement.showElementIfHasRole('addProductBtn', 'Admin');
+        AuthManagement.showElementIfHasRole('addShiftBtn', 'Admin');
     }
 
     module.init = function () {
         $(document).ready(function () {
-            if (!checkAuth()) {
+            if (!AuthManagement.checkAuth()) {
                 return;
             }
             module.loadProjects();

@@ -111,7 +111,7 @@ let ProjectWages = (function () {
 
     module.init = function () {
         $(document).ready(function () {
-            if (!checkAuth()) {
+            if (!AuthManagement.checkAuth()) {
                 return;
             }
             module.loadProjects();
