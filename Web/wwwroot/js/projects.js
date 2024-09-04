@@ -432,12 +432,6 @@ let ProjectManagement = (function () {
             }
         });
     };
-    
-    module.manageAccess = function() {
-        AuthManagement.showElementIfHasRole('addProjectBtn', 'Admin');
-        AuthManagement.showElementIfHasRole('addProductBtn', 'Admin');
-        AuthManagement.showElementIfHasRole('addShiftBtn', 'Admin');
-    }
 
     module.init = function () {
         $(document).ready(function () {
@@ -470,7 +464,6 @@ let ProjectManagement = (function () {
             });
             
             module.loadProjects(true);
-            module.manageAccess();
         });
     };
 

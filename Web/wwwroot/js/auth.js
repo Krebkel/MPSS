@@ -26,15 +26,6 @@ let AuthManagement = (function () {
         $('#registerBtn').on('click', module.handleRegistration);
     };
 
-    module.initializeMasks = function () {
-        $('#loginPhone, #regPhone').mask('+7(999)999-99-99', {
-            clearIfNotMatch: true,
-            onComplete: function(value) {
-                $(this).val(value);
-            }
-        });
-    };
-
     module.checkAuth = function() {
         const token = localStorage.getItem('jwt_token');
         
@@ -115,21 +106,14 @@ let AuthManagement = (function () {
     };
 
     module.hasRole = function (requiredRole) {
-        const userRole = module.getUserRole();
-        return userRole === requiredRole;
+        const userRole = module.getUserRole().toLowerCase();
+        return userRole === requiredRole.toLowerCase();
     };
 
-    module.showElementIfHasRole = function (elementId, requiredRole) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.style.display = module.hasRole(requiredRole) ? 'block' : 'none';
-        }
-    };
 
     module.init = function () {
         $(document).ready(function () {
             module.setupEventListeners();
-            module.initializeMasks();
             module.checkAuth();
         });
     };

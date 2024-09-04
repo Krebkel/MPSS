@@ -240,8 +240,6 @@ let ExpenseManagement = (function () {
                     $('.modal').hide();
                 }
             });
-
-            module.manageAccess();
         });
     };
 

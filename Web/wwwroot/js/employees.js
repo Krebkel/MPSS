@@ -9,13 +9,6 @@ let EmployeeManagement = (function () {
             }
         });
 
-        $('#employeePhone').mask('+7(999)999-99-99', {
-            clearIfNotMatch: true,
-            onComplete: function(value) {
-                $(this).val(value);
-            }
-        });
-
         $('#employeeINN').mask('999999999999', {
             clearIfNotMatch: true,
             onComplete: function(value) {
@@ -201,12 +194,6 @@ let EmployeeManagement = (function () {
         return `${day}.${month}.${year}`;
     }
 
-    module.manageAccess = function() {
-        AuthManagement.showElementIfHasRole('addProjectBtn', 'Admin');
-        AuthManagement.showElementIfHasRole('addProductBtn', 'Admin');
-        AuthManagement.showElementIfHasRole('addShiftBtn', 'Admin');
-    }
-
     module.init = function () {
         $(document).ready(function () {
             if (!AuthManagement.checkAuth()) {
@@ -216,8 +203,6 @@ let EmployeeManagement = (function () {
             setupEventListeners();
             module.loadEmployees(false, 'employeesTable');
             module.loadEmployees(true, 'dataTable');
-            module.manageAccess();
-            
         });
     };
 

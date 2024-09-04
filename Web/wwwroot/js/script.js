@@ -95,4 +95,11 @@ $(document).ready(function() {
             $(event.target).fadeOut();
         }
     });
+
+    $('#loginPhone, #regPhone, #employeePhone').mask('+7(999)999-99-99', {
+        clearIfNotMatch: true,
+        onComplete: function(value) {
+            $(this).val(value);
+        }
+    });
 });
