@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-<nav class="navbar">
+<nav class="navbar" style="display: none;">
     <ul class="navbar-nav">
         <li class="nav-item">
             <a class="nav-link" href="projects.html">Проекты</a>
@@ -33,14 +33,52 @@
     </ul>
 </nav>
 
-<div class="container-fluid content">
-    <h1>тут ничего не было</h1>
-    <p>я гарантирую это</p>
+<div id="authModal" class="modal" style="display:inherit;">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="loginForm">
+            <h3>Авторизация</h3>
+            <div id="loginFormContent">
+                <div class="form-group-inline">
+                    <label for="loginPhone">Телефон:</label>
+                    <input type="text" id="loginPhone" name="loginPhone" class="auth-field" required>
+                </div>
+                <div class="form-group-inline">
+                    <label for="loginPassword">Пароль:</label>
+                    <input type="password" id="loginPassword" name="loginPassword" class="auth-field" required>
+                </div>
+                <div class="form-group-inline auth-buttons">
+                    <button id="loginBtn" type="submit" class="btn btn-primary">Войти</button>
+                    <p>Нет аккаунта? <a href="#" id="showRegisterForm">Зарегистрироваться</a></p>
+                </div>
+            </div>
+        </div>
+        <div id="registerForm" style="display: none;">
+            <h3>Регистрация</h3>
+            <div id="registerFormContent">
+                <div class="form-group-inline">
+                    <label for="regName">ФИО:</label>
+                    <input type="text" id="regName" class="auth-field" required>
+                </div>
+                <div class="form-group-inline">
+                    <label for="regPhone">Телефон:</label>
+                    <input type="text" id="regPhone" name="regPhone" class="auth-field" required>
+                </div>
+                <div class="form-group-inline">
+                    <label for="regPassword">Пароль:</label>
+                    <input type="password" id="regPassword" class="auth-field" required>
+                </div>
+                <div class="form-group-inline auth-buttons">
+                    <button id="registerBtn" type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                    <p>Уже есть аккаунт? <a href="#" id="showLoginForm">Войти</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="/libs/jquery.js"></script>
-<script src="/libs/bootstrap.js"></script>
+<script src="/libs/jquery-mask.js"></script>
 <script src="/js/script.js"></script>
-<script src="/js/projects.js"></script>
 </body>
 </html>
