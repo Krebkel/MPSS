@@ -64,11 +64,7 @@ builder.Services
     .Configure<DataOptions>(builder.Configuration.GetSection("Postgres"))
     .Configure<JwtTokenOptions>(builder.Configuration.GetSection("Jwt"));
 
-builder.Services.AddPostgresData()
-    .AddUsers()
-    .AddPostgresProducts()
-    .AddPostgresEmployees()
-    .AddPostgresProjects()
+builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -78,17 +74,29 @@ builder.Services.AddPostgresData()
         {
             ValidateIssuer = true,
             ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
             ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
 
+builder.Services
+    .AddPostgresData()
+    .AddUsers()
+    .AddPostgresProducts()
+    .AddPostgresEmployees()
+    .AddPostgresProjects();
+
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseAuthorizationErrorHandling();
 
 app.UseEndpoints(endpoints =>
 {
@@ -104,10 +112,7 @@ app.UseSwagger().UseSwaggerUI(c =>
 });
 
 app.UseHttpsRedirection();
-app.UseRouting();
 app.UseCors("CorsPolicy");
-app.UseAuthentication();
-app.UseAuthorization();
 app.UseHealthChecks("/healthcheck");
 app.MapControllers();
 app.UseDefaultFiles()
@@ -122,8 +127,5 @@ app.UseDefaultFiles()
                MaxAge = TimeSpan.FromMinutes(1)
            };
        }
-   }); 
-
-app.UseAuthorizationErrorHandling();
-
+   });
 app.Run();

@@ -9,9 +9,9 @@ using Web.Requests.ProjectRequests;
 
 namespace Web.Controllers.Base.Projects;
 
+[Authorize]
 [ApiController]
 [Route("api/projects/base")]
-[Authorize]
 public class ProjectBaseController : ControllerBase
 {
     private readonly ILogger<ProjectBaseController> _logger;
@@ -25,7 +25,6 @@ public class ProjectBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Project))]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddProject([FromBody] CreateProjectApiRequest request, CancellationToken ct)
     {
         try
@@ -47,7 +46,6 @@ public class ProjectBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Project))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateProject([FromBody] UpdateProjectApiRequest request, CancellationToken ct)
     {
         try
@@ -70,7 +68,6 @@ public class ProjectBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Project))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProject(int id, CancellationToken ct)
     {
         try
@@ -94,7 +91,6 @@ public class ProjectBaseController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteProject(int id, CancellationToken ct)
     {
         try
@@ -118,7 +114,6 @@ public class ProjectBaseController : ControllerBase
     
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Project>))]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetAllProjects(CancellationToken ct)
     {
         try

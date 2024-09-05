@@ -11,9 +11,9 @@ using Web.Requests.ProjectRequests;
 
 namespace Web.Controllers.Base.Projects;
 
+[Authorize]
 [ApiController]
 [Route("api/projectSuspension/base")]
-[Authorize]
 public class ProjectSuspensionBaseController : ControllerBase
 {
     private readonly ILogger<ProjectSuspensionBaseController> _logger;
@@ -28,7 +28,6 @@ public class ProjectSuspensionBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectSuspension))]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddProjectSuspension(
         [FromBody] CreateProjectSuspensionApiRequest request, CancellationToken ct)
     {
@@ -53,7 +52,6 @@ public class ProjectSuspensionBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectSuspension))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateProjectSuspension(
         [FromBody] UpdateProjectSuspensionApiRequest request, CancellationToken ct)
     {
@@ -78,7 +76,6 @@ public class ProjectSuspensionBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectSuspension))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProjectSuspension(int id, CancellationToken ct)
     {
         try
@@ -103,7 +100,6 @@ public class ProjectSuspensionBaseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteProjectSuspension(int id, CancellationToken ct)
     {
         try
@@ -133,7 +129,6 @@ public class ProjectSuspensionBaseController : ControllerBase
     [HttpGet("byProject/{projectId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectSuspension>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProjectSuspensionsByProjectId(int projectId, CancellationToken ct)
     {
         try

@@ -11,9 +11,9 @@ using Web.Requests.ProjectRequests;
 
 namespace Web.Controllers.Base.Projects;
 
+[Authorize]
 [ApiController]
 [Route("api/expenses/base")]
-[Authorize]
 public class ExpenseBaseController : ControllerBase
 {
     private readonly ILogger<ExpenseBaseController> _logger;
@@ -27,7 +27,6 @@ public class ExpenseBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Expense))]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddExpense([FromBody] CreateExpenseApiRequest request, CancellationToken ct)
     {
         try
@@ -50,7 +49,6 @@ public class ExpenseBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Expense))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateExpense([FromBody] UpdateExpenseApiRequest request, CancellationToken ct)
     {
         try
@@ -74,7 +72,6 @@ public class ExpenseBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Expense))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetExpense(int id, CancellationToken ct)
     {
         try
@@ -99,7 +96,6 @@ public class ExpenseBaseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteExpense(int id, CancellationToken ct)
     {
         try
@@ -129,7 +125,6 @@ public class ExpenseBaseController : ControllerBase
     [HttpGet("byProject/{projectId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetExpensesByProjectId(int projectId, CancellationToken ct)
     {
         try

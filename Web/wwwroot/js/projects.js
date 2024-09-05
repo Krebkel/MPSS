@@ -535,6 +535,8 @@ let ProjectManagement = (function () {
 })();
 
 $(document).ready(function() {
+    const userRole = AuthManagement.getUserRole();
+    console.log(userRole);
     ProjectManagement.init();
     ShiftManagement.init();
 });

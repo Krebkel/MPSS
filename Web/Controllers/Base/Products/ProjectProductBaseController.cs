@@ -11,9 +11,9 @@ using Web.Requests.ProductRequests;
 
 namespace Web.Controllers.Base.Products;
 
+[Authorize]
 [ApiController]
 [Route("api/projectProducts/base")]
-[Authorize]
 public class ProjectProductBaseController : ControllerBase
 {
     private readonly ILogger<ProjectProductBaseController> _logger;
@@ -28,7 +28,6 @@ public class ProjectProductBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddProjectProducts(
         [FromBody] CreateProjectProductApiRequest request, CancellationToken ct)
     {
@@ -53,7 +52,6 @@ public class ProjectProductBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateProjectProduct(
         [FromBody] UpdateProjectProductApiRequest request, CancellationToken ct)
     {
@@ -78,7 +76,6 @@ public class ProjectProductBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProjectProduct(int id, CancellationToken ct)
     {
         try
@@ -103,7 +100,6 @@ public class ProjectProductBaseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteProjectProduct(int id, CancellationToken ct)
     {
         try
@@ -133,7 +129,6 @@ public class ProjectProductBaseController : ControllerBase
     [HttpGet("byProject/{projectId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProjectProduct>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProjectProductsByProjectId(int projectId, CancellationToken ct)
     {
         try
@@ -159,7 +154,6 @@ public class ProjectProductBaseController : ControllerBase
     [HttpGet("recent/{productId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<object>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetRecentProjectProductsByProductId(
         int productId, 
         [FromQuery] int limit = 5, 

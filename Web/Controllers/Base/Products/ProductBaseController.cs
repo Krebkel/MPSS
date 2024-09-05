@@ -11,9 +11,9 @@ using Web.Requests.ProductRequests;
 
 namespace Web.Controllers.Base.Products;
 
+[Authorize]
 [ApiController]
 [Route("api/products/base")]
-[Authorize]
 public class ProductBaseController : ControllerBase
 {
     private readonly ILogger<ProductBaseController> _logger;
@@ -27,7 +27,6 @@ public class ProductBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> AddProduct([FromBody] CreateProductApiRequest request, CancellationToken ct)
     {
         try
@@ -49,7 +48,6 @@ public class ProductBaseController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductApiRequest request, CancellationToken ct)
     {
         try
@@ -72,7 +70,6 @@ public class ProductBaseController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetProduct(int id, CancellationToken ct)
     {
         try
@@ -97,7 +94,6 @@ public class ProductBaseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> DeleteProduct(int id, CancellationToken ct)
     {
         try
@@ -126,7 +122,6 @@ public class ProductBaseController : ControllerBase
     
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Product>))]
-    [Authorize(Roles = "Service,Administrator")]
     public async Task<IActionResult> GetAllProducts(CancellationToken ct)
     {
         try
