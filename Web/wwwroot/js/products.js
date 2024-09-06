@@ -1,21 +1,25 @@
 $(document).ready(function() {
     function loadProducts() {
-        $.getJSON('/api/products/base', function(products) {
+        $.ajax({
+            url: '/api/products/base',
+            method: 'GET',
+            dataType: 'json'
+        }).done(function(products) {
             const productsTableBody = $('#productsTable tbody');
             productsTableBody.empty();
 
             products.forEach((product, index) => {
                 const productRow = `
-                <tr class="product-row" data-product-id="${product.id}">
-                    <td class="shortcol">${index + 1}</td>
-                    <td>${product.name}</td>
-                    <td class="shortcol">${product.cost}</td>
-                    <td class="shortcol">${translateProductType(product.type)}</td>
-                    <td class="btncol">
-                        <button name="deleteProductBtn" class="btn delete-btn" data-product-id="${product.id}">⛌</button>
-                    </td>
-                </tr>
-            `;
+            <tr class="product-row" data-product-id="${product.id}">
+                <td class="shortcol">${index + 1}</td>
+                <td>${product.name}</td>
+                <td class="shortcol">${product.cost}</td>
+                <td class="shortcol">${translateProductType(product.type)}</td>
+                <td class="btncol">
+                    <button name="deleteProductBtn" class="btn delete-btn" data-product-id="${product.id}">⛌</button>
+                </td>
+            </tr>
+        `;
                 productsTableBody.append(productRow);
             });
 

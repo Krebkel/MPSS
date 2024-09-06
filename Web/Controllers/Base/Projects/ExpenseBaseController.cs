@@ -1,4 +1,5 @@
 using Contracts.ProjectEntities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Web.Requests.ProjectRequests;
 
 namespace Web.Controllers.Base.Projects;
 
+[Authorize]
 [ApiController]
 [Route("api/expenses/base")]
 public class ExpenseBaseController : ControllerBase

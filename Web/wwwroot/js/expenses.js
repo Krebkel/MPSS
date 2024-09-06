@@ -84,8 +84,13 @@ let ExpenseManagement = (function () {
             let employeeName = '';
             if (expense.employee) {
                 try {
-                    const employee = await $.getJSON(`/api/employees/base/${expense.employee}`);
+                    const employee = await $.ajax({
+                        url: `/api/employees/base/${expense.employee}`,
+                        method: 'GET',
+                        dataType: 'json'
+                    });
                     employeeName = employee ? employee.name : '';
+
                 } catch (error) {
                     console.error('Ошибка при получении сотрудника:', error);
                 }

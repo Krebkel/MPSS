@@ -35,29 +35,33 @@ $(document).ready(function() {
     });
 
     function loadCounteragents(fullData = false, tableId = 'counteragentsTable') {
-        $.getJSON('/api/counteragents/base', function(counteragents) {
+        $.ajax({
+            url: '/api/counteragents/base',
+            method: 'GET',
+            dataType: 'json'
+        }).done(function(counteragents) {
             const counteragentsTableBody = $(`#${tableId} tbody`);
             counteragentsTableBody.empty();
 
             counteragents.forEach((counteragent, index) => {
                 const counteragentRow = `
-                <tr class="counteragent-row" data-counteragent-id="${counteragent.id}">
-                  <td class="shortcol">${index + 1}</td>
-                  <td>${counteragent.name}</td>
-                  ${fullData ? `
+            <tr class="counteragent-row" data-counteragent-id="${counteragent.id}">
+                <td class="shortcol">${index + 1}</td>
+                <td>${counteragent.name}</td>
+                ${fullData ? `
                     <td class="midcol">${counteragent.inn}</td>
                     <td class="midcol">${counteragent.ogrn}</td>
                     <td class="midcol">${counteragent.accountNumber}</td>
                     <td class="midcol">${counteragent.bik}</td>
-                  ` : `
-                    <td className="midcol">${counteragent.contact}</td>
-                    <td className="midcol">${counteragent.phone}</td>
-                    `}
-                  <td class="btncol">
+                ` : `
+                    <td class="midcol">${counteragent.contact}</td>
+                    <td class="midcol">${counteragent.phone}</td>
+                `}
+                <td class="btncol">
                     <button class="btn delete-btn" data-counteragent-id="${counteragent.id}">⛌</button>
-                  </td>
-                </tr>
-              `;
+                </td>
+            </tr>
+        `;
                 counteragentsTableBody.append(counteragentRow);
             });
 

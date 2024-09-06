@@ -38,9 +38,12 @@ let ShiftManagement = (function () {
                     shiftDate.setHours(0, 0, 0, 0);
 
                     if (shiftDate.toDateString() === date.toDateString()) {
-                        return $.getJSON(`/api/employees/base/${shift.employee}`)
-                            .then(employee => {
-                                const shiftRow = `
+                        return $.ajax({
+                            url: `/api/employees/base/${shift.employee}`,
+                            method: 'GET',
+                            dataType: 'json'
+                        }).done(function(employee) {
+                            const shiftRow = `
                             <tr class="shift-row" data-shift-id="${shift.id}">
                                 <td class="shortcol">${currentIndex++}</td>
                                 <td>${employee.name}</td>
@@ -48,8 +51,8 @@ let ShiftManagement = (function () {
                                     <button name="deleteShiftBtn" class="btn delete-btn" data-shift-id="${shift.id}">⛌</button>
                                 </td>
                             </tr>`;
-                                shiftRows.push(shiftRow);
-                            });
+                            shiftRows.push(shiftRow);
+                        });
                     }
                 });
 

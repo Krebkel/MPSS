@@ -56,7 +56,11 @@ let EmployeeManagement = (function () {
     }
 
     module.loadEmployees = function(fullData = false, tableId = 'employeesTable') {
-        $.getJSON('/api/employees/base', function(employees) {
+        $.ajax({
+            url: '/api/employees/base',
+            method: 'GET',
+            dataType: 'json'
+        }).done(function(employees) {
             const employeesTableBody = $(`#${tableId} tbody`);
             employeesTableBody.empty();
 
@@ -67,6 +71,7 @@ let EmployeeManagement = (function () {
 
             setupRowEventListeners();
         });
+
     };
 
     function createEmployeeRow(employee, index, fullData) {
