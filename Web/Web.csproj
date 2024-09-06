@@ -52,12 +52,6 @@
       <None Update="wwwroot\libs\awesome_6.0.0_css_all.css">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\libs\bootstrap.css">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\libs\bootstrap.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="wwwroot\libs\jquery.js">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
