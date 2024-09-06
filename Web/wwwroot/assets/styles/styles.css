@@ -100,6 +100,10 @@ main {
     color: #1e1e2c;
 }
 
+.navicon {
+    margin-bottom: -0.08rem;
+}
+
 /* Base ...d on me havin zero bi...  */
 .content {
     background-color: #f4f5f7;
