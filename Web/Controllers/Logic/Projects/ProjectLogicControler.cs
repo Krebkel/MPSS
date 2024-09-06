@@ -1,4 +1,5 @@
 using Employees.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using Projects.Services;
 
 namespace Web.Controllers.Logic.Projects;
 
+[Authorize]
 [ApiController]
 [Route("api/projects/logic")]
 public class ProjectLogicController : ControllerBase
@@ -44,6 +46,29 @@ public class ProjectLogicController : ControllerBase
         {
             _logger.LogError(ex, "Ошибка при расчете зарплат для проекта");
             return BadRequest($"Ошибка при расчете зарплат: {ex.Message}");
+        }
+    }
+    
+    [HttpGet("cost/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetProjectCost(int id, CancellationToken ct)
+    {
+        try
+        {
+            var result = await _projectService.CalculateProjectCostAsync(id, ct);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Проект не найден");
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при расчете стоимости проекта");
+            return BadRequest($"Ошибка при расчете стоимости: {ex.Message}");
         }
     }
 }

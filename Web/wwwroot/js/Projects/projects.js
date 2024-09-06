@@ -550,4 +550,5 @@ $(document).ready(function() {
     ShiftManagement.init();
     ExpenseManagement.init();
     ProductManagement.init();
+    TotalsManagement.init();
 });

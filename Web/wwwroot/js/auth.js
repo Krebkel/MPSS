@@ -164,7 +164,6 @@ let AuthManagement = (function () {
             }
             module.setupEventListeners();
             module.setupAjaxInterceptor();
-            console.log("Auth interceptor is being set up");
         });
     };
 

@@ -327,4 +327,38 @@ public class ProjectService : IProjectService
         }
         return 0;
     }
+    
+    public async Task<object> CalculateProjectCostAsync(int projectId, CancellationToken ct)
+    {
+        var project = await _projectRepository.GetAll()
+            .FirstOrDefaultAsync(p => p.Id == projectId, ct);
+
+        if (project == null)
+        {
+            throw new KeyNotFoundException($"Проект с ID {projectId} не найден");
+        }
+
+        var projectProducts = await _projectProductRepository.GetAll()
+            .Where(pp => pp.Project.Id == projectId)
+            .Include(pp => pp.Product)
+            .ToListAsync(ct);
+
+        var expenses = await _expenseRepository.GetAll()
+            .Where(e => e.Project.Id == projectId)
+            .ToListAsync(ct);
+
+        double totalProductCost = projectProducts.Sum(pp => pp.Product.Cost * pp.Quantity);
+        double totalMarkup = projectProducts.Sum(pp => pp.Markup * pp.Quantity);
+        double totalCompensatedExpenses = expenses.Where(e => e.IsPaidByCompany).Sum(e => e.Amount ?? 0);
+
+        return new
+        {
+            ProjectId = project.Id,
+            ProjectName = project.Name,
+            TotalProductCost = totalProductCost,
+            TotalMarkup = totalMarkup,
+            TotalCompensatedExpenses = totalCompensatedExpenses,
+            TotalCost = totalProductCost + totalMarkup + totalCompensatedExpenses
+        };
+    }
 }

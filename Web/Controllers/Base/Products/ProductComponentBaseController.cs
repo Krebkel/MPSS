@@ -25,31 +25,25 @@ public class ProductComponentBaseController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductComponent>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductComponent))]
     public async Task<IActionResult> AddProductComponents(
-        [FromBody] IEnumerable<CreateProductComponentApiRequest> requests, CancellationToken ct)
+        [FromBody] CreateProductComponentApiRequest request, CancellationToken ct)
     {
         try
         {
-            var createdProductComponents = new List<ProductComponent>();
+            var addProductComponentRequest = request.ToCreateProductComponentApiRequest();
+            var createdProductComponent = await _productComponentService
+            .CreateProductComponentAsync(addProductComponentRequest, ct);
+    
+            _logger.LogInformation("Компонент работы {@ProductName} успешно добавлен: {@Name}",
+            createdProductComponent.Product, createdProductComponent.Name);
 
-            foreach (var request in requests)
-            {
-                var addProductComponentRequest = request.ToCreateProductComponentApiRequest();
-                var createdProductComponent = await _productComponentService
-                    .CreateProductComponentAsync(addProductComponentRequest, ct);
-                createdProductComponents.Add(createdProductComponent);
-            
-                _logger.LogInformation("Компонент изделия {@ProductName} успешно добавлен: {@Name}",
-                    createdProductComponent.Product, createdProductComponent.Name);
-            }
-
-            return Ok(createdProductComponents);
+            return Ok(createdProductComponent);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при добавлении компонентов изделия");
-            return BadRequest($"Ошибка при добавлении компонентов изделия: {ex.Message}");
+            _logger.LogError(ex, "Ошибка при добавлении компонента работы");
+            return BadRequest($"Ошибка при добавлении компонентов работы: {ex.Message}");
         }
     }
 
