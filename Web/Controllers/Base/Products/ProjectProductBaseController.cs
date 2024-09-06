@@ -1,4 +1,5 @@
 using Contracts.ProductEntities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Web.Requests.ProductRequests;
 
 namespace Web.Controllers.Base.Products;
 
+[Authorize]
 [ApiController]
 [Route("api/projectProducts/base")]
 public class ProjectProductBaseController : ControllerBase

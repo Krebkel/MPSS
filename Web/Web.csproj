@@ -13,10 +13,12 @@
       <ProjectReference Include="..\Employees\Employees.csproj" />
       <ProjectReference Include="..\Products\Products.csproj" />
       <ProjectReference Include="..\Projects\Projects.csproj" />
+      <ProjectReference Include="..\Users\Users.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
       <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
@@ -36,9 +38,11 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.1" />
       <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.2" />
       <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.6.2" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.6.2" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -46,12 +50,6 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="wwwroot\libs\awesome_6.0.0_css_all.css">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\libs\bootstrap.css">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\libs\bootstrap.js">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="wwwroot\libs\jquery.js">
@@ -102,10 +100,17 @@
       <None Update="wwwroot\js\wages.js">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="wwwroot\libs\jquery-mask.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\auth.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Controllers\Base\" />
+      <Folder Include="Controllers\Tokens\" />
     </ItemGroup>
 
 </Project>

@@ -27,4 +27,10 @@
       <ProjectReference Include="..\DataContracts\DataContracts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="User.cs">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Compile>
+    </ItemGroup>
+
 </Project>

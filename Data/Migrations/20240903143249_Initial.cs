@@ -46,7 +46,7 @@ namespace Data.Migrations
                     Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     IsDriver = table.Column<bool>(type: "boolean", nullable: false),
                     Passport = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
-                    DateOfBirth = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    DateOfBirth = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     INN = table.Column<string>(type: "character varying(12)", maxLength: 12, nullable: true),
                     AccountNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     BIK = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: true)
@@ -101,6 +101,29 @@ namespace Data.Migrations
                     table.ForeignKey(
                         name: "FK_Projects_Employees_ResponsibleEmployeeId",
                         column: x => x.ResponsibleEmployeeId,
+                        principalSchema: "mpss",
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                schema: "mpss",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EmployeeId = table.Column<int>(type: "integer", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalSchema: "mpss",
                         principalTable: "Employees",
                         principalColumn: "Id",
@@ -311,6 +334,12 @@ namespace Data.Migrations
                 schema: "mpss",
                 table: "ProjectSuspensions",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_EmployeeId",
+                schema: "mpss",
+                table: "Users",
+                column: "EmployeeId");
         }
 
         /// <inheritdoc />
@@ -334,6 +363,10 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProjectSuspensions",
+                schema: "mpss");
+
+            migrationBuilder.DropTable(
+                name: "Users",
                 schema: "mpss");
 
             migrationBuilder.DropTable(

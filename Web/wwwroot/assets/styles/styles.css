@@ -243,13 +243,17 @@ button[type="submit"] {
     width: 12rem;
 }
 
-input[type="text"], input[type="date"], input[type="checkbox"],
-input[type="number"], input[type="time"], select {
+input, select {
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 0.3rem;
     width: 100%;
     box-sizing: border-box;
+}
+
+input[type='password'] {
+    font-family: Verdana;
+    letter-spacing: 0.125em;
 }
 
 .time-input {

@@ -39,7 +39,7 @@ namespace Data.Migrations
                         .HasMaxLength(9)
                         .HasColumnType("character varying(9)");
 
-                    b.Property<DateTimeOffset>("DateOfBirth")
+                    b.Property<DateTimeOffset?>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("INN")
@@ -345,6 +345,32 @@ namespace Data.Migrations
                     b.ToTable("ProjectSuspensions", "mpss");
                 });
 
+            modelBuilder.Entity("Contracts.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Users", "mpss");
+                });
+
             modelBuilder.Entity("Contracts.EmployeeEntities.EmployeeShift", b =>
                 {
                     b.HasOne("Contracts.EmployeeEntities.Employee", "Employee")
@@ -437,6 +463,17 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Contracts.User", b =>
+                {
+                    b.HasOne("Contracts.EmployeeEntities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 #pragma warning restore 612, 618
         }

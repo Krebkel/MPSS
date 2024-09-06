@@ -164,9 +164,21 @@ let ProjectManagement = (function () {
         endDate.setDate(today.getDate() + 30);
 
         Promise.all([
-            $.getJSON('/api/counteragents/base'),
-            $.getJSON('/api/employees/base'),
-            $.getJSON('/api/projects/base')
+            $.ajax({
+                url: '/api/counteragents/base',
+                method: 'GET',
+                dataType: 'json'
+            }),
+            $.ajax({
+                url: '/api/employees/base',
+                method: 'GET',
+                dataType: 'json'
+            }),
+            $.ajax({
+                url: '/api/projects/base',
+                method: 'GET',
+                dataType: 'json'
+            })
         ]).then(([counteragents, employees, allProjects]) => {
             fillSelect('#projectCounteragent', counteragents);
             fillSelect('#projectResponsibleEmployee', employees);
@@ -533,6 +545,9 @@ let ProjectManagement = (function () {
 })();
 
 $(document).ready(function() {
+    AuthManagement.init();
     ProjectManagement.init();
     ShiftManagement.init();
+    ExpenseManagement.init();
+    ProductManagement.init();
 });

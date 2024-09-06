@@ -1,4 +1,5 @@
 using Contracts.ProjectEntities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using Web.Requests.ProjectRequests;
 
 namespace Web.Controllers.Base.Projects;
 
+[Authorize]
 [ApiController]
 [Route("api/projects/base")]
 public class ProjectBaseController : ControllerBase
