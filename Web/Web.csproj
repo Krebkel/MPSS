@@ -79,31 +79,34 @@
       <None Update="wwwroot\js\script.js">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\js\projects.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\js\employees.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\js\products.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\js\counteragents.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\js\shifts.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\js\expenses.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="wwwroot\js\wages.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="wwwroot\libs\jquery-mask.js">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="wwwroot\js\auth.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Projects\projects.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Projects\products.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Projects\expenses.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Projects\shifts.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Employees\wages.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Employees\employees.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Counteragents\counteragents.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\js\Projects\totals.js">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

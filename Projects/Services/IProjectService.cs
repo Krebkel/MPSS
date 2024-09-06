@@ -19,7 +19,8 @@ public interface IProjectService
     Task<IEnumerable<object>> GetAllProjectsAsync(CancellationToken cancellationToken);
 
     Task<object> CalculateProjectWagesAsync(int projectId, CancellationToken ct);
-
+    
+    Task<object> CalculateProjectCostAsync(int projectId, CancellationToken ct);
 }
 
 public class UpdateProjectRequest

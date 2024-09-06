@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Products.Services;
 
 namespace Web.Controllers.Logic.Products;
 
+[Authorize]
 [ApiController]
 [Route("api/productComponents/logic")]
 public class ProductComponentLogicController : ControllerBase

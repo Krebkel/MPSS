@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Projects.Services;
 
 namespace Web.Controllers.Logic.Projects;
 
+[Authorize]
 [ApiController]
 [Route("api/counteragents/logic")]
 public class CounteragentLogicController : ControllerBase
