@@ -1,51 +1,109 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text;
+using System.Text.Json.Serialization;
 using Data;
 using Employees;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
 using Products;
 using Projects;
+using Users;
+using Web.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавление контроллеров
-builder.Services.AddControllers()
+var allowedOrigings = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddHealthChecks();
+
+builder.Services
+    .AddCors(options => options
+        .AddPolicy("CorsPolicy", policyBuilder => policyBuilder
+            .WithOrigins(allowedOrigings)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()))
+    .AddControllers()
     .AddJsonOptions(opts =>
     {
         opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-// Добавление Swagger для документации API
-builder.Services.AddEndpointsApiExplorer()
-                .AddSwaggerGen();
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen(setup =>
+    {
+        setup.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
 
-// Конфигурация параметров базы данных
-builder.Services.Configure<DataOptions>(builder.Configuration.GetSection("Postgres"));
+        setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference 
+                    { 
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer" 
+                    }
+                },
+                new string[] {}
+            }
+        });
+    });
 
-// Добавление сервисов для работы с базой данных
+builder.Services
+    .Configure<DataOptions>(builder.Configuration.GetSection("Postgres"))
+    .Configure<JwtTokenOptions>(builder.Configuration.GetSection("Jwt"));
+
 builder.Services.AddPostgresData()
     .AddPostgresProducts()
     .AddPostgresEmployees()
-    .AddPostgresProjects();
-
-// Добавление проверки здоровья приложения
-builder.Services.AddHealthChecks();
+    .AddPostgresProjects()
+    .AddUsers();
 
 var app = builder.Build();
 
-// Настройка маршрутизации
 app.UseRouting();
 
-// Настройка конечных точек маршрутизации
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHealthChecks("/health");
 });
 
-// Подключение Swagger UI
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -53,7 +111,6 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger"; 
 });
 
-// Настройка статических файлов
 app.UseDefaultFiles()
    .UseStaticFiles(new StaticFileOptions
    {
