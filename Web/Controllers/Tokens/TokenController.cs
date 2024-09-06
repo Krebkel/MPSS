@@ -7,7 +7,6 @@ using Web.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Web.Controllers.Tokens;
 
@@ -31,25 +30,29 @@ public class TokenController : ControllerBase
         if (user == null) return BadRequest("Пользователь не найден");
         if (user.Password != request.Password) return BadRequest("Неправильный пароль");
         
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Employee.Phone),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
             new Claim("DisplayName", user.Employee.Name),
             new Claim("Phone", user.Employee.Phone),
             new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
-        var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(
-            _options.Issuer,
-            _options.Audience,
-            claims,
-            expires: DateTime.UtcNow.AddHours(1),
-            signingCredentials: signIn);
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+        var token = new JwtSecurityToken(
+            issuer: _options.Issuer,
+            audience: _options.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: creds);
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var encodedToken = tokenHandler.WriteToken(token);
+        
+        return Ok(new { token = encodedToken });
     }
 }
