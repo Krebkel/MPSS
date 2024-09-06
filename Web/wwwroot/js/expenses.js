@@ -241,7 +241,3 @@ let ExpenseManagement = (function () {
 
     return module;
 })();
-
-$(document).ready(function() {
-    ExpenseManagement.init();
-});

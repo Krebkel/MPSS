@@ -545,6 +545,9 @@ let ProjectManagement = (function () {
 })();
 
 $(document).ready(function() {
+    AuthManagement.init();
     ProjectManagement.init();
     ShiftManagement.init();
+    ExpenseManagement.init();
+    ProductManagement.init();
 });

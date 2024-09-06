@@ -89,7 +89,6 @@ let AuthManagement = (function () {
         }
     };
 
-
     module.handleLogin = function (e) {
         e.preventDefault();
         const phone = $('#loginPhone').val();
@@ -138,6 +137,7 @@ let AuthManagement = (function () {
         localStorage.setItem('user_phone', decodedToken.Phone);
         localStorage.setItem('user_role', decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
         $('#authModal').fadeOut();
+        window.location.href = 'projects.html';
     };
 
     module.handleAuthError = function (xhr, action) {
@@ -159,17 +159,14 @@ let AuthManagement = (function () {
 
     module.init = function () {
         $(document).ready(function () {
+            if (!AuthManagement.checkAuth()) {
+                return;
+            }
             module.setupEventListeners();
             module.setupAjaxInterceptor();
-            if (!module.checkAuth()) {
-                return;
-            }        
+            console.log("Auth interceptor is being set up");
         });
     };
 
     return module;
 })();
-
-$(document).ready(function() {
-    AuthManagement.init();
-});

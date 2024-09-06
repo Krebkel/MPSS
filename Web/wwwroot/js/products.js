@@ -1,4 +1,6 @@
-$(document).ready(function() {
+let ProductManagement = (function () {
+    const module = {};
+
     function loadProducts() {
         $.ajax({
             url: '/api/products/base',
@@ -31,7 +33,7 @@ $(document).ready(function() {
 
             $('.product-row').on('click', function() {
                 const productId = $(this).data('product-id');
-                openProductModal(productId);
+                module.openProductModal(productId);
             });
         });
     }
@@ -59,7 +61,7 @@ $(document).ready(function() {
         });
     }
 
-    function openProductModal(productId) {
+    module.openProductModal = function(productId) {
         const modal = $('#productModal');
         const form = $('#productForm')[0];
         form.reset();
@@ -99,7 +101,7 @@ $(document).ready(function() {
             $('#productId').val('');
             modal.fadeIn();
         }
-    }
+    };
 
     function addComponentRow(component = {}) {
         const componentRow = `
@@ -112,64 +114,6 @@ $(document).ready(function() {
         `;
         $('#componentsTable tbody').append(componentRow);
     }
-
-    $('#addComponentBtn').on('click', function() {
-        addComponentRow();
-    });
-
-    $(document).on('click', '.delete-component-btn', function() {
-        const row = $(this).closest('tr');
-        const componentId = row.data('component-id');
-
-        if (componentId) {
-            if (confirm('Вы уверены, что хотите удалить этот компонент?')) {
-                $.ajax({
-                    url: `/api/productComponents/base/${componentId}`,
-                    method: 'DELETE',
-                    success: function() {
-                        row.remove();
-                    },
-                    error: function(xhr) {
-                        alert('Ошибка при удалении компонента');
-                    }
-                });
-            }
-        } else {
-            row.remove();
-        }
-    });
-
-    $('#productForm').on('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(this);
-        const productId = formData.get('productId');
-        const productData = {
-            name: formData.get('productName'),
-            cost: parseFloat(formData.get('productCost')),
-            type: formData.get('productType')
-        };
-
-        const url = productId ? `/api/products/base/${productId}` : '/api/products/base';
-        const method = productId ? 'PUT' : 'POST';
-
-        if (productId) {
-            productData.id = parseInt(productId);
-        }
-
-        $.ajax({
-            url: url,
-            method: method,
-            contentType: 'application/json',
-            data: JSON.stringify(productData),
-            success: function(response) {
-                const newProductId = productId || response.id;
-                saveProductComponents(newProductId);
-            },
-            error: function(xhr) {
-                alert('Ошибка при сохранении работы');
-            }
-        });
-    });
 
     function saveProductComponents(productId) {
         const components = $('.component-row').map(function() {
@@ -208,9 +152,86 @@ $(document).ready(function() {
             });
     }
 
-    $('#addProductBtn').on('click', function() {
-        openProductModal();
-    });
+    function setupEventListeners() {
+        $('#productsTable').off('click', '.delete-btn').on('click', '.delete-btn', function(event) {
+            event.stopPropagation();
+            const productId = $(this).data('product-id');
+            deleteProduct(productId);
+        });
 
-    loadProducts();
-});
+        $('.product-row').off('click').on('click', function() {
+            const productId = $(this).data('product-id');
+            module.openProductModal(productId);
+        });
+
+        $('#addComponentBtn').off('click').on('click', function() {
+            addComponentRow();
+        });
+
+        $(document).off('click', '.delete-component-btn').on('click', '.delete-component-btn', function() {
+            const row = $(this).closest('tr');
+            const componentId = row.data('component-id');
+
+            if (componentId) {
+                if (confirm('Вы уверены, что хотите удалить этот компонент?')) {
+                    $.ajax({
+                        url: `/api/productComponents/base/${componentId}`,
+                        method: 'DELETE',
+                        success: function() {
+                            row.remove();
+                        },
+                        error: function(xhr) {
+                            alert('Ошибка при удалении компонента');
+                        }
+                    });
+                }
+            } else {
+                row.remove();
+            }
+        });
+
+        $('#productForm').off('submit').on('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const productId = formData.get('productId');
+            const productData = {
+                name: formData.get('productName'),
+                cost: parseFloat(formData.get('productCost')),
+                type: formData.get('productType')
+            };
+
+            const url = productId ? `/api/products/base/${productId}` : '/api/products/base';
+            const method = productId ? 'PUT' : 'POST';
+
+            if (productId) {
+                productData.id = parseInt(productId);
+            }
+
+            $.ajax({
+                url: url,
+                method: method,
+                contentType: 'application/json',
+                data: JSON.stringify(productData),
+                success: function(response) {
+                    const newProductId = productId || response.id;
+                    saveProductComponents(newProductId);
+                },
+                error: function(xhr) {
+                    alert('Ошибка при сохранении работы');
+                }
+            });
+        });
+
+        $('#addProductBtn').off('click').on('click', function() {
+            module.openProductModal();
+        });
+    }
+
+    module.init = function () {
+        AuthManagement.setupAjaxInterceptor();
+        setupEventListeners();
+        loadProducts();
+    };
+
+    return module;
+})();

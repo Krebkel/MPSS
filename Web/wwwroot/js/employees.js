@@ -219,5 +219,6 @@ let EmployeeManagement = (function () {
 })();
 
 $(document).ready(function() {
+    AuthManagement.init();
     EmployeeManagement.init();
 });
