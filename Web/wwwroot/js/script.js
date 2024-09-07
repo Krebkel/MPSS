@@ -82,7 +82,7 @@ $(document).ready(function() {
     });
 
     sidebar.on('mouseleave', function() {
-        content.css('left', '3.2rem');
+        content.css('left', '3.1rem');
     });
 
     navLinks.on('click', function (event) {
