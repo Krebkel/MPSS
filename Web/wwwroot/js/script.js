@@ -74,6 +74,16 @@ function translateExpenseType(status) {
 $(document).ready(function() {
     const contentSections = $('.content-section');
     const navLinks = $('.sidebar .nav-link');
+    const sidebar = $('.sidebar');
+    const content = $('.content');
+
+    sidebar.on('mouseenter', function() {
+        content.css('left', '12rem');
+    });
+
+    sidebar.on('mouseleave', function() {
+        content.css('left', '3.2rem');
+    });
 
     navLinks.on('click', function (event) {
         event.preventDefault();

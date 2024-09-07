@@ -1,6 +1,15 @@
 let AuthManagement = (function () {
     const module = {};
 
+    function setupInputMasks() {
+        $('#loginPhone, #regPhone').mask('+7(999)999-99-99', {
+            clearIfNotMatch: true,
+            onComplete: function(value) {
+                $(this).val(value);
+            }
+        });
+    }
+    
     function decodeJwt(token) {
         if (typeof token === 'object' && token.hasOwnProperty('token')) {
             token = token.token;
@@ -162,6 +171,7 @@ let AuthManagement = (function () {
             if (!AuthManagement.checkAuth()) {
                 return;
             }
+            setupInputMasks()
             module.setupEventListeners();
             module.setupAjaxInterceptor();
         });
