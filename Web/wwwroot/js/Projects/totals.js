@@ -1,5 +1,6 @@
 let TotalsManagement = (function () {
     const module = {};
+    let projectsData = [];
 
     module.loadProjectsForTotals = function () {
         $.ajax({
@@ -16,16 +17,14 @@ let TotalsManagement = (function () {
                             counteragentMap[counteragent.id] = counteragent.name;
                         });
 
-                        const doneProjects = projects
-                            .filter(project => project.projectStatus === 'Done')
-                            .map(function (project) {
-                                return {
-                                    ...project,
-                                    counteragent: counteragentMap[project.counteragent] || project.counteragent
-                                };
-                            });
+                        projectsData = projects.map(function (project) {
+                            return {
+                                ...project,
+                                counteragent: counteragentMap[project.counteragent] || project.counteragent
+                            };
+                        });
 
-                        displayProjects(doneProjects);
+                        loadProjectCosts();
                     }
                 });
             },
@@ -35,47 +34,64 @@ let TotalsManagement = (function () {
         });
     };
 
-    function displayProjects(projects) {
+    function loadProjectCosts() {
+        let loadedCount = 0;
+        projectsData.forEach((project, index) => {
+            $.ajax({
+                url: `/api/projects/logic/cost/${project.id}`,
+                method: 'GET',
+                success: function (costData) {
+                    projectsData[index].costData = costData;
+                    loadedCount++;
+                    if (loadedCount === projectsData.length) {
+                        displayProjects();
+                    }
+                },
+                error: function () {
+                    alert(`Ошибка при загрузке данных о стоимости проекта ${project.name}`);
+                }
+            });
+        });
+    }
+
+    function displayProjects() {
         const totalsContainer = $('#totalCostsContainer');
         totalsContainer.empty();
 
         const costTable = $('<table class="table table-striped cost-table"></table>');
-        costTable.append('<tr><th>№</th><th>Проект</th><th>Стоимость работ</th><th>Зарплатный фонд</th><th>Компенсация</th><th>Итоговая стоимость</th></tr>');
+        costTable.append('<thead><tr><th>№</th><th>Проект</th><th>Стоимость работ</th><th>Зарплатный фонд</th><th>Компенсация</th><th>Итоговая стоимость</th></tr></thead>');
+        const tableBody = $('<tbody></tbody>');
+        costTable.append(tableBody);
         totalsContainer.append(costTable);
 
-        projects.forEach((project, index) => {
-            loadProjectCost(project, index + 1);
+        projectsData.forEach((project, index) => {
+            displayProjectCost(tableBody, project, index + 1);
         });
     }
 
-    function loadProjectCost(project, projectIndex) {
-        $.ajax({
-            url: `/api/projects/logic/cost/${project.id}`,
-            method: 'GET',
-            success: function (costData) {
-                displayProjectCost(project, projectIndex, costData);
-            },
-            error: function () {
-                alert(`Ошибка при загрузке данных о стоимости проекта ${project.name}`);
-            }
-        });
-    }
-
-    function displayProjectCost(project, projectIndex, costData) {
-        const costTable = $('.cost-table');
+    function displayProjectCost(tableBody, project, projectIndex) {
         const costRow = $('<tr></tr>');
         costRow.append(`<td>${projectIndex}</td>`);
         costRow.append(`<td>${project.name}</td>`);
-        costRow.append(`<td>${formatCurrency(costData.totalProductCost)}</td>`);
-        costRow.append(`<td>${formatCurrency(costData.totalMarkup)}</td>`);
-        costRow.append(`<td>${formatCurrency(costData.totalCompensatedExpenses)}</td>`);
-        costRow.append(`<td>${formatCurrency(costData.totalCost)}</td>`);
-        costTable.append(costRow);
+        costRow.append(`<td>${formatCurrency(project.costData.totalProductCost)}</td>`);
+        costRow.append(`<td>${formatCurrency(project.costData.totalMarkup)}</td>`);
+        costRow.append(`<td>${formatCurrency(project.costData.totalCompensatedExpenses)}</td>`);
+        costRow.append(`<td>${formatCurrency(project.costData.totalCost)}</td>`);
+        tableBody.append(costRow);
     }
 
     function formatCurrency(amount) {
         return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(amount);
     }
+
+    module.sortProjects = function(field) {
+        projectsData.sort((a, b) => {
+            if (a[field] < b[field]) return -1;
+            if (a[field] > b[field]) return 1;
+            return 0;
+        });
+        displayProjects();
+    };
 
     module.init = function () {
         $(document).ready(function () {
