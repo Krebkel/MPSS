@@ -223,6 +223,29 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProjectFile",
+                schema: "mpss",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    ProjectId = table.Column<int>(type: "integer", nullable: true),
+                    UploadDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectFile", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectFile_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalSchema: "mpss",
+                        principalTable: "Projects",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProjectProducts",
                 schema: "mpss",
                 columns: table => new
@@ -306,6 +329,12 @@ namespace Data.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProjectFile_ProjectId",
+                schema: "mpss",
+                table: "ProjectFile",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProjectProducts_ProductId",
                 schema: "mpss",
                 table: "ProjectProducts",
@@ -355,6 +384,10 @@ namespace Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductComponents",
+                schema: "mpss");
+
+            migrationBuilder.DropTable(
+                name: "ProjectFile",
                 schema: "mpss");
 
             migrationBuilder.DropTable(

@@ -109,6 +109,35 @@ namespace Data.Migrations
                     b.ToTable("EmployeeShifts", "mpss");
                 });
 
+            modelBuilder.Entity("Contracts.FileEntities.ProjectFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UploadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectFile", "mpss");
+                });
+
             modelBuilder.Entity("Contracts.ProductEntities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -386,6 +415,15 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Contracts.FileEntities.ProjectFile", b =>
+                {
+                    b.HasOne("Contracts.ProjectEntities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId");
 
                     b.Navigation("Project");
                 });

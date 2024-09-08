@@ -11,6 +11,7 @@
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\Data\Data.csproj" />
       <ProjectReference Include="..\Employees\Employees.csproj" />
+      <ProjectReference Include="..\Files\Files.csproj" />
       <ProjectReference Include="..\Products\Products.csproj" />
       <ProjectReference Include="..\Projects\Projects.csproj" />
       <ProjectReference Include="..\Users\Users.csproj" />
@@ -169,7 +170,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\Base\" />
       <Folder Include="Controllers\Tokens\" />
     </ItemGroup>
 

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using Data;
 using Employees;
+using Files;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -92,6 +93,7 @@ builder.Services.AddPostgresData()
     .AddPostgresProducts()
     .AddPostgresEmployees()
     .AddPostgresProjects()
+    .AddPostgresFiles()
     .AddUsers();
 
 var app = builder.Build();
