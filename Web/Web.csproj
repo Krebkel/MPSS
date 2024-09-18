@@ -11,6 +11,7 @@
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\Data\Data.csproj" />
       <ProjectReference Include="..\Employees\Employees.csproj" />
+      <ProjectReference Include="..\Files\Files.csproj" />
       <ProjectReference Include="..\Products\Products.csproj" />
       <ProjectReference Include="..\Projects\Projects.csproj" />
       <ProjectReference Include="..\Users\Users.csproj" />
@@ -39,6 +40,12 @@
       <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.1" />
       <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
       <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.2" />
+      <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+      <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+      <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.6.2" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.6.2" />
@@ -166,10 +173,12 @@
       <None Update="wwwroot\assets\icons\act\search.svg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="wwwroot\js\Projects\files.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\Base\" />
       <Folder Include="Controllers\Tokens\" />
     </ItemGroup>
 

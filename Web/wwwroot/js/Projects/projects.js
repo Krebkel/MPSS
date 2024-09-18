@@ -252,9 +252,12 @@ let ProjectManagement = (function () {
                 $('#projectStatus').val(projectData.projectStatus);
 
                 projectProducts.forEach(projectProduct => module.addProjectProductRow(projectProduct, availableProducts));
+                ProjectFileManagement.loadProjectFiles(projectId);
+
             } else {
                 $('#modalTitle').text('Добавить новый проект');
                 $('#projectId').val('');
+                $('#projectFilesTable tbody').empty();
 
                 const startDate = new Date();
                 const deadlineDate = new Date(startDate.setDate(startDate.getDate() + 7));
@@ -429,19 +432,42 @@ let ProjectManagement = (function () {
             contentType: 'application/json',
             data: JSON.stringify(projectData),
             success: function (response) {
-                const newProjectId = projectId || response.id;
-                module.saveProjectProducts(newProjectId)
-                    .then(() => {
-                        $('#projectModal').hide();
-                        module.loadProjects(true);
-                    })
-                    .catch(error => {
-                        alert('Ошибка при сохранении изделий проекта: ' + error);
-                    });
+                $('#projectModal').hide();
+                module.loadProjects(true);
             },
             error: function () {
-                alert('Пасхалка, проект не сохранен просто потому что.');
+                alert('Ошибка сохранения проекта.');
             }
+        });
+    };
+
+    module.saveProjectFiles = function (projectId) {
+        return new Promise((resolve, reject) => {
+            const fileUploads = $('.project-file-row').map(function () {
+                const $this = $(this);
+                const fileInput = $this.find('input[type="file"]')[0];
+                if (fileInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('file', fileInput.files[0]);
+                    formData.append('projectId', projectId);
+                    return $.ajax({
+                        url: '/api/projectFiles',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    });
+                }
+                return null;
+            }).get().filter(upload => upload !== null);
+
+            Promise.all(fileUploads)
+                .then(() => {
+                    resolve();
+                })
+                .catch(error => {
+                    reject(error);
+                });
         });
     };
 
@@ -546,9 +572,10 @@ let ProjectManagement = (function () {
 
 $(document).ready(function() {
     AuthManagement.init();
+    ProductManagement.init();
     ProjectManagement.init();
+    ProjectFileManagement.init();
     ShiftManagement.init();
     ExpenseManagement.init();
-    ProductManagement.init();
     TotalsManagement.init();
 });

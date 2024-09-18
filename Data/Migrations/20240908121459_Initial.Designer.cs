@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240903143249_Initial")]
+    [Migration("20240908121459_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -110,6 +110,35 @@ namespace Data.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("EmployeeShifts", "mpss");
+                });
+
+            modelBuilder.Entity("Contracts.FileEntities.ProjectFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UploadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectFile", "mpss");
                 });
 
             modelBuilder.Entity("Contracts.ProductEntities.Product", b =>
@@ -389,6 +418,15 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Contracts.FileEntities.ProjectFile", b =>
+                {
+                    b.HasOne("Contracts.ProjectEntities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId");
 
                     b.Navigation("Project");
                 });
