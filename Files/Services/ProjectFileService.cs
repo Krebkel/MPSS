@@ -2,10 +2,9 @@ using System.IO.Compression;
 using Contracts.FileEntities;
 using Contracts.ProjectEntities;
 using DataContracts;
-using Microsoft.AspNetCore.Http;
+using Files.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-
-namespace Files.Services;
 
 public class ProjectFileService : IProjectFileService
 {
@@ -33,17 +32,18 @@ public class ProjectFileService : IProjectFileService
         Directory.CreateDirectory(Path.Combine(_basePath, ProjectFilesFolder));
     }
 
-    public async Task<ProjectFile> SaveFileAsync(IFormFile file, int projectId, CancellationToken ct)
+    public async Task<ProjectFile> SaveFileAsync(SaveProjectFileRequest request, CancellationToken ct)
     {
+        var file = request.File;
         if (file == null || file.Length == 0)
             throw new ArgumentException("Invalid file");
 
         var project = await _projectValidator.ValidateAndGetEntityAsync(
-            projectId,
+            request.ProjectId,
             _projectRepository, 
             "Проект", 
             ct);
-            
+
         var projectFile = new ProjectFile
         {
             Name = file.FileName,
@@ -51,8 +51,8 @@ public class ProjectFileService : IProjectFileService
             Project = project
         };
 
-        var fileName = $"{projectFile.UploadDate:yyyy.MM.dd}-{projectId}-{Path.GetFileName(file.FileName)}";
-        var relativePath = Path.Combine(ProjectFilesFolder, projectId.ToString(), projectFile.UploadDate.Year.ToString(), projectFile.UploadDate.Month.ToString());
+        var fileName = $"{projectFile.UploadDate:yyyy.MM.dd}-{request.ProjectId}-{Path.GetFileName(file.FileName)}";
+        var relativePath = Path.Combine(ProjectFilesFolder, request.ProjectId.ToString(), projectFile.UploadDate.Year.ToString(), projectFile.UploadDate.Month.ToString());
         var fullPath = Path.Combine(_basePath, relativePath);
         Directory.CreateDirectory(fullPath);
 
@@ -64,31 +64,21 @@ public class ProjectFileService : IProjectFileService
         }
 
         projectFile.FilePath = Path.Combine(relativePath, fileName);
-
         await _projectFileRepository.AddAsync(projectFile, ct);
 
         return projectFile;
     }
 
-    public async Task<Stream> GetFileAsync(int fileId, CancellationToken ct)
+    public async Task<ProjectFile> GetProjectFileByIdAsync(int id, CancellationToken ct)
     {
-        var projectFile = await _projectFileRepository.GetByIdAsync(fileId, ct);
-        if (projectFile == null)
-            throw new FileNotFoundException("File not found");
-
-        var fullPath = Path.Combine(_basePath, projectFile.FilePath);
-        if (!File.Exists(fullPath))
-            throw new FileNotFoundException("File not found", fullPath);
-
-        var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
-        return new GZipStream(fileStream, CompressionMode.Decompress);
+        return await _projectFileRepository.GetByIdAsync(id, ct);
     }
 
-    public async Task DeleteFileAsync(int fileId, CancellationToken ct)
+    public async Task<bool> DeleteFileAsync(int id, CancellationToken ct)
     {
-        var projectFile = await _projectFileRepository.GetByIdAsync(fileId, ct);
+        var projectFile = await _projectFileRepository.GetByIdAsync(id, ct);
         if (projectFile == null)
-            return;
+            return false;
 
         var fullPath = Path.Combine(_basePath, projectFile.FilePath);
         if (File.Exists(fullPath))
@@ -97,9 +87,47 @@ public class ProjectFileService : IProjectFileService
         }
 
         await _projectFileRepository.DeleteAsync(projectFile, ct);
+        return true;
     }
 
-    public string GetContentType(string fileName)
+    public async Task<IEnumerable<object>> GetProjectFilesByProjectIdAsync(int projectId, CancellationToken ct)
+    {
+        return await _projectFileRepository
+            .GetAll()
+            .Where(pf => pf.Project.Id == projectId)
+            .Select(pf => new
+            {
+                Id = pf.Id,
+                FileName = pf.Name,
+                FilePath = pf.FilePath,
+                ProjectId = pf.Project.Id
+            })
+            .ToListAsync(ct);
+    }
+
+    public async Task<(Stream fileStream, string fileName, string contentType)> GetFileForDownloadAsync(int id, CancellationToken ct)
+    {
+        var projectFile = await _projectFileRepository.GetByIdAsync(id, ct);
+        if (projectFile == null)
+            throw new FileNotFoundException("File not found");
+
+        var fullPath = Path.Combine(_basePath, projectFile.FilePath);
+        if (!File.Exists(fullPath))
+            throw new FileNotFoundException("File not found", fullPath);
+
+        var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+        var decompressedStream = new GZipStream(fileStream, CompressionMode.Decompress);
+        
+        return (decompressedStream, projectFile.Name, GetContentType(projectFile.Name));
+    }
+
+    public async Task<(Stream fileStream, string contentType)> GetFileForViewAsync(int id, CancellationToken ct)
+    {
+        var (fileStream, _, contentType) = await GetFileForDownloadAsync(id, ct);
+        return (fileStream, contentType);
+    }
+
+    private string GetContentType(string fileName)
     {
         var ext = Path.GetExtension(fileName).ToLowerInvariant();
         return ext switch

@@ -14,10 +14,17 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Products;
 using Projects;
+using Serilog;
 using Users;
 using Web.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((builder, configuration) => configuration
+    .ReadFrom
+    .Configuration(builder.Configuration)
+    .Destructure
+    .ToMaximumDepth(20));
 
 var allowedOrigings = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
 
@@ -51,10 +58,7 @@ builder.Services
             .AllowAnyHeader()
             .AllowCredentials()))
     .AddControllers()
-    .AddJsonOptions(opts =>
-    {
-        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    .AddJsonOptions(opts => { opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
 builder.Services
     .AddEndpointsApiExplorer()
@@ -62,7 +66,8 @@ builder.Services
     {
         setup.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+            Description =
+                "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
             Name = "Authorization",
             In = ParameterLocation.Header,
             Type = SecuritySchemeType.ApiKey,
@@ -74,13 +79,13 @@ builder.Services
             {
                 new OpenApiSecurityScheme
                 {
-                    Reference = new OpenApiReference 
-                    { 
+                    Reference = new OpenApiReference
+                    {
                         Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer" 
+                        Id = "Bearer"
                     }
                 },
-                new string[] {}
+                new string[] { }
             }
         });
     });
@@ -98,6 +103,8 @@ builder.Services.AddPostgresData()
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging();
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -113,21 +120,21 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-    c.RoutePrefix = "swagger"; 
+    c.RoutePrefix = "swagger";
 });
 
 app.UseDefaultFiles()
-   .UseStaticFiles(new StaticFileOptions
-   {
-       OnPrepareResponse = context =>
-       {
-           var headers = context.Context.Response.GetTypedHeaders();
-           headers.CacheControl = new CacheControlHeaderValue
-           {
-               Public = true,
-               MaxAge = TimeSpan.FromMinutes(1)
-           };
-       }
-   }); 
+    .UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = context =>
+        {
+            var headers = context.Context.Response.GetTypedHeaders();
+            headers.CacheControl = new CacheControlHeaderValue
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromMinutes(1)
+            };
+        }
+    });
 
 app.Run();

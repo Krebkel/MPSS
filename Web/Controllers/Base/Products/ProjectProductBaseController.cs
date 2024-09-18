@@ -28,7 +28,7 @@ public class ProjectProductBaseController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectProduct))]
-    public async Task<IActionResult> AddProjectProducts(
+    public async Task<IActionResult> AddProjectProduct(
         [FromBody] CreateProjectProductApiRequest request, CancellationToken ct)
     {
         try
