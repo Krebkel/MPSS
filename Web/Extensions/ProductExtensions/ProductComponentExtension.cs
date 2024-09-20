@@ -11,9 +11,8 @@ public static class ProductComponentExtension
         return new CreateProductComponentRequest
         {
             Product = request.Product,
-            Name = request.Name,
+            Component = request.Component,
             Quantity = request.Quantity,
-            Weight = request.Weight
         };
     }
     
@@ -24,9 +23,8 @@ public static class ProductComponentExtension
         {
             Id = request.Id,
             Product = request.Product,
-            Name = request.Name,
+            Component = request.Component,
             Quantity = request.Quantity,
-            Weight = request.Weight
         };
     }
 }

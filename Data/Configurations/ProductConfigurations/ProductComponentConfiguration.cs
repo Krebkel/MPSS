@@ -12,8 +12,9 @@ internal class ProductComponentConfiguration : IEntityTypeConfiguration<ProductC
         builder.HasOne(pc => pc.Product)
             .WithMany()
             .IsRequired();
-        builder.Property(pc => pc.Name).IsRequired().HasMaxLength(100);
+        builder.HasOne(pc => pc.Component)
+            .WithMany()
+            .IsRequired();
         builder.Property(pc => pc.Quantity).IsRequired(false);
-        builder.Property(pc => pc.Weight).IsRequired(false);
     }
 }

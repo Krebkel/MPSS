@@ -13,17 +13,12 @@ public class ProductComponent : DatabaseEntity
     public Product Product { get; set; }
 
     /// <summary>
-    /// Наименование производимой работы
+    /// Компонент производимой работы
     /// </summary>
-    public string Name { get; set; }
-
+    public Component Component { get; set; }
+    
     /// <summary>
-    /// Количество компонентов для выполнения работы
+    /// Количество единиц компонентов работы
     /// </summary>
-    public int? Quantity { get; set; }
-
-    /// <summary>
-    /// Вес одного компонента для выполнения работы
-    /// </summary>
-    public double? Weight { get; set; }
+    public double Quantity { get; set; }
 }

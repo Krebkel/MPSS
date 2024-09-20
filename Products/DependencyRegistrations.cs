@@ -10,6 +10,7 @@ public static class DependencyRegistrations
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IProductComponentService, ProductComponentService>();
         services.AddScoped<IProjectProductService, ProjectProductService>();
+        services.AddScoped<IComponentService, ComponentService>();
 
         return services;
     }

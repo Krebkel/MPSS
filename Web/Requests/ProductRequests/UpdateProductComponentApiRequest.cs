@@ -4,7 +4,6 @@ public class UpdateProductComponentApiRequest
 {
     public required int Id { get; set; }
     public required int Product { get; set; }
-    public required string Name { get; set; }
-    public int? Quantity { get; set; }
-    public double? Weight { get; set; }
+    public required int Component { get; set; }
+    public double Quantity { get; set; }
 }
