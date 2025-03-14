@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Employee> Employees { get; set; } = null!;
     public DbSet<EmployeeShift> EmployeeShifts { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Component> Components { get; set; } = null!;
     public DbSet<ProductComponent> ProductComponents { get; set; } = null!;
     public DbSet<Counteragent> Counteragents { get; set; } = null!;
     public DbSet<Expense> Expenses { get; set; } = null!;

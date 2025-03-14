@@ -9,22 +9,28 @@ public class ProductComponentService : IProductComponentService
 {
     private readonly IRepository<ProductComponent> _productComponentRepository;
     private readonly IRepository<Product> _productRepository;
+    private readonly IRepository<Component> _componentRepository;
     private readonly ILogger<ProductComponentService> _logger;
     private readonly IValidator<Product> _productValidator;
+    private readonly IValidator<Component> _componentValidator;
     private readonly IValidator<ProductComponent> _productComponentValidator;
 
 
     public ProductComponentService(
         IRepository<ProductComponent> productComponentRepository,
         IRepository<Product> productRepository,
+        IRepository<Component> componentRepository,
         ILogger<ProductComponentService> logger,
         IValidator<Product> productValidator,
+        IValidator<Component> componentValidator,
         IValidator<ProductComponent> productComponentValidator)
     {
         _productComponentRepository = productComponentRepository;
         _productRepository = productRepository;
+        _componentRepository = componentRepository;
         _logger = logger;
         _productValidator = productValidator;
+        _componentValidator = componentValidator;
         _productComponentValidator = productComponentValidator;
     }
 
@@ -34,18 +40,19 @@ public class ProductComponentService : IProductComponentService
             throw new ArgumentNullException(nameof(request));
 
         var product = await _productValidator.ValidateAndGetEntityAsync(request.Product,
-            _productRepository, "Изделие", cancellationToken);
+            _productRepository, "Работа", cancellationToken);
+        var component = await _componentValidator.ValidateAndGetEntityAsync(request.Component,
+            _componentRepository, "Компонент работы", cancellationToken);
 
         var createdProductComponent = new ProductComponent
         {
             Product = product,
-            Name = request.Name,
-            Quantity = request.Quantity,
-            Weight = request.Weight
+            Component = component,
+            Quantity = request.Quantity
         };
 
         await _productComponentRepository.AddAsync(createdProductComponent, cancellationToken);
-        _logger.LogInformation("Компонент изделия успешно добавлен: {@ProductComponent}", createdProductComponent);
+        _logger.LogInformation("Компонент работы успешно добавлен: {@ProductComponent}", createdProductComponent);
 
         return createdProductComponent;
     }
@@ -56,15 +63,15 @@ public class ProductComponentService : IProductComponentService
             throw new ArgumentNullException(nameof(request));
 
         var productComponent = await _productComponentValidator.ValidateAndGetEntityAsync(request.Id,
-            _productComponentRepository, "Компонент изделия", cancellationToken);
-        
+            _productComponentRepository, "Компонент работы", cancellationToken);
         var product = await _productValidator.ValidateAndGetEntityAsync(request.Product,
             _productRepository, "Изделие", cancellationToken);
+        var component = await _componentValidator.ValidateAndGetEntityAsync(request.Id,
+            _componentRepository, "Компонент", cancellationToken);
 
-        productComponent.Name = request.Name;
         productComponent.Product = product;
         productComponent.Quantity = request.Quantity;
-        productComponent.Weight = request.Weight;
+        productComponent.Component = component;
 
         await _productComponentRepository.UpdateAsync(productComponent, cancellationToken);
         _logger.LogInformation("Компонент изделия успешно обновлен: {@ProductComponent}", productComponent);
@@ -80,9 +87,8 @@ public class ProductComponentService : IProductComponentService
             {
                 Id = pc.Id,
                 Product = pc.Product.Id,
-                Name = pc.Name,
                 Quantity = pc.Quantity,
-                Weight = pc.Weight
+                Component = pc.Component.Id
             })
             .FirstOrDefaultAsync(pc => pc.Id == id, cancellationToken);
     }
@@ -120,9 +126,9 @@ public class ProductComponentService : IProductComponentService
             {
                 Id = pc.Id,
                 Product = pc.Product.Id,
-                Name = pc.Name,
-                Quantity = pc.Quantity,
-                Weight = pc.Weight
+                Component = pc.Component.Id,
+                Quantity = pc.Quantity
+                
             })
             .ToListAsync(cancellationToken);
     }

@@ -36,7 +36,7 @@ public class ProductComponentBaseController : ControllerBase
             .CreateProductComponentAsync(addProductComponentRequest, ct);
     
             _logger.LogInformation("Компонент работы {@ProductName} успешно добавлен: {@Name}",
-            createdProductComponent.Product, createdProductComponent.Name);
+            createdProductComponent.Product, createdProductComponent.Component);
 
             return Ok(createdProductComponent);
         }
@@ -59,7 +59,7 @@ public class ProductComponentBaseController : ControllerBase
 
             await _productComponentService.UpdateProductComponentAsync(updatedProductComponent, ct);
 
-            _logger.LogInformation("Компонент {@ProductComponenttName} успешно обновлен", request.Name);
+            _logger.LogInformation("Компонент {@ProductComponenttName} успешно обновлен", request.Component);
             
             return Ok(updatedProductComponent);
         }
