@@ -24,7 +24,7 @@ public static class ProductComponentExtension
             Id = request.Id,
             Product = request.Product,
             Component = request.Component,
-            Quantity = request.Quantity,
+            Quantity = request.Quantity
         };
     }
 }
